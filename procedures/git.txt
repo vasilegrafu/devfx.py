@@ -1,0 +1,8 @@
+--------------------------------------------------------------------------------------------------------------------------------
+Find all the wmpty directories with .gitkeep file:
+--------------------------------------------------------------------------------------------------------------------------------
+# Find all the directories (-type d)
+# Filter the empty ones (-empty)
+# Ignore the .git folder
+# Add .gitkeep to all the matched folders
+find . -type d -empty -not -path "./.git/*" -exec touch {}/.gitkeep \; 
