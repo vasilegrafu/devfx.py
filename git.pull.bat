@@ -1,2 +1,2 @@
-git.exe pull --progress "origin"
+git.exe pull --progress origin
 pause
