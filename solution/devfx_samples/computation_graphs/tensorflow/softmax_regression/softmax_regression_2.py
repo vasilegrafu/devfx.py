@@ -77,14 +77,14 @@ class SoftmaxRegression1ModelTrainer(cg.models.DeclarativeModelTrainer):
 
 
         # evaluators
-        self.construct_input_evaluator(input=input)
-        self.construct_output_evaluator(output=y)
-        self.construct_hypothesis_evaluator(hypothesis=h, input=x)
-        self.construct_evaluatee_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x])
-        self.construct_cost_evaluator(cost=J, input=x, output=y)
+        self.register_input_evaluator(input=input)
+        self.register_output_evaluator(output=y)
+        self.register_hypothesis_evaluator(hypothesis=h, input=x)
+        self.register_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x])
+        self.register_cost_evaluator(cost=J, input=x, output=y)
 
         # cost minimizer
-        self.construct_cost_optimizer_applier_evaluator(input=x, output=y, cost=J, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
+        self.register_cost_optimizer_applier_evaluator(input=x, output=y, cost=J, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

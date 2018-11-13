@@ -9,7 +9,7 @@ class MnistDataImporter(object):
         pass
 
     def __load_data_from(self, source_path):
-        data = std.os.file.read_text(source_path, encoding='utf-8', readlines=True)
+        data = os.file.read_text(source_path, encoding='utf-8', readlines=True)
         images = []
         labels = []
         for entry in data:

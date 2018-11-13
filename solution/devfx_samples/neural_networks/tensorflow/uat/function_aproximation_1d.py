@@ -60,13 +60,13 @@ class FunctionAproximationModelTrainer(cg.models.DeclarativeModelTrainer):
         J = cg.sqrt(cg.reduce_mean(cg.square(h - y)))
 
         # evaluators
-        self.construct_input_evaluator(input=x)
-        self.construct_output_evaluator(output=y)
-        self.construct_hypothesis_evaluator(hypothesis=h, input=x)
-        self.construct_cost_evaluator(cost=J, input=x, output=y)
+        self.register_input_evaluator(input=x)
+        self.register_output_evaluator(output=y)
+        self.register_hypothesis_evaluator(hypothesis=h, input=x)
+        self.register_cost_evaluator(cost=J, input=x, output=y)
 
         # cost minimizer
-        self.construct_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-3))
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-3))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

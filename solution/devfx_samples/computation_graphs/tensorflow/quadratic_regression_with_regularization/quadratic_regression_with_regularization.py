@@ -36,14 +36,14 @@ class QuadraticRegressionWithRegularizationModelTrainer(cg.models.DeclarativeMod
         J = 0.5*cg.reduce_mean(cg.square(h-y)+1000.0*cg.square(w2)+1000.0*cg.square(w3))
 
         # evaluators
-        self.construct_input_evaluator(input=input)
-        self.construct_evaluatee_evaluator(name='weight', evaluatee=[w0, w1, w2, w3])
-        self.construct_output_evaluator(output=y)
-        self.construct_hypothesis_evaluator(hypothesis=h, input=x)
-        self.construct_cost_evaluator(cost=J, input=x, output=y)
+        self.register_input_evaluator(input=input)
+        self.register_evaluator(name='weight', evaluatee=[w0, w1, w2, w3])
+        self.register_output_evaluator(output=y)
+        self.register_hypothesis_evaluator(hypothesis=h, input=x)
+        self.register_cost_evaluator(cost=J, input=x, output=y)
 
         # cost minimizer
-        self.construct_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

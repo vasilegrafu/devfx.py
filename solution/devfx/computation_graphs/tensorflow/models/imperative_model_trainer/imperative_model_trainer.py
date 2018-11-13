@@ -83,13 +83,13 @@ class ImperativeModelTrainer(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def construct_and_register_apply_cost_optimizer_function(self, optimizer=None):
+    def register_apply_cost_optimizer_function(self, optimizer=None):
         if(optimizer is None):
             raise exceptions.ArgumentError()
-        def apply_cost_optimizer(*args, **kwargs):
+        def __apply_cost_optimizer(*args, **kwargs):
             grads_and_vars = tf.contrib.eager.implicit_gradients(self.get_cost_function())(*args, **kwargs)
             optimizer.apply_gradients(grads_and_vars)
-        self.register_function('__apply_cost_optimizer', fn=apply_cost_optimizer)
+        self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
 
     def get_apply_cost_optimizer_function(self):
         return self.get_function('__apply_cost_optimizer')

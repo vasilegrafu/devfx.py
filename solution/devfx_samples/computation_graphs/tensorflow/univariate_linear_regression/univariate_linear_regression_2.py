@@ -33,11 +33,11 @@ class UnivariateLinearRegressionModelTrainer(cg.models.DeclarativeModelTrainer):
             J = 0.5*cg.reduce_mean(cg.square(h-y))
 
             # evaluators
-            self.construct_evaluatee_evaluator(name=name+'_input', evaluatee=x, hparams=())
-            self.construct_evaluatee_evaluator(name=name+'_weight', evaluatee=[w0, w1], hparams=())
-            self.construct_evaluatee_evaluator(name=name+'_output', evaluatee=y, hparams=())
-            self.construct_evaluatee_evaluator(name=name+'_hypothesis', evaluatee=h, feeds=[x], hparams=())
-            self.construct_evaluatee_evaluator(name=name+'_cost', evaluatee=J, feeds=[x, y], hparams=())
+            self.register_evaluator(name=name+'_input', evaluatee=x, hparams=())
+            self.register_evaluator(name=name+'_weight', evaluatee=[w0, w1], hparams=())
+            self.register_evaluator(name=name+'_output', evaluatee=y, hparams=())
+            self.register_evaluator(name=name+'_hypothesis', evaluatee=h, feeds=[x], hparams=())
+            self.register_evaluator(name=name+'_cost', evaluatee=J, feeds=[x, y], hparams=())
 
         return J
 
@@ -47,13 +47,13 @@ class UnivariateLinearRegressionModelTrainer(cg.models.DeclarativeModelTrainer):
         y = cg.placeholder(shape=[None], name='y')
 
         # --------------------------------
-        device = '/cpu:0'
-        with cg.device(device):
-            J = self.__build_model(name='cpu', x=x, y=y, device=device)
-        Js = [J]
+        # device = '/cpu:0'
+        # with cg.device(device):
+        #     J = self.__build_model(name='cpu', x=x, y=y, device=device)
+        # Js = [J]
 
         # --------------------------------
-        devices = ['/cpu:0', '/cpu:0']
+        devices = ['/cpu:0']
         x2 = cg.split(x, len(devices))
         y2 = cg.split(y, len(devices))
         Js = []
@@ -63,7 +63,7 @@ class UnivariateLinearRegressionModelTrainer(cg.models.DeclarativeModelTrainer):
                 Js.append(cost)
 
         # --------------------------------
-        self.construct_costs_optimizer_applier_evaluator(costs=Js, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
+        self.register_cost_optimizer_applier_evaluator(cost=Js, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

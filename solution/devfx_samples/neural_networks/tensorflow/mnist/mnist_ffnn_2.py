@@ -7,7 +7,7 @@ import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
-from devfx_howto.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
+from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
 
 cg.enable_imperative_execution_mode()
 

@@ -3,7 +3,7 @@ import devfx.databases.hdf5 as hdf5
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
-from devfx_howto.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
+from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
 
 """------------------------------------------------------------------------------------------------
 """
@@ -21,7 +21,7 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
         h = nn.activation.softmax(z, axis=1)
 
         y_pred = cg.cast_to_int32(cg.reshape(tensor=cg.argmax(h, axis=1), shape=[None, 1]))
-        self.construct_evaluatee_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x])
+        self.register_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x])
 
         # cost function
         y = cg.placeholder(shape=[None, 1], dtype=cg.int32, name='y')
@@ -30,16 +30,16 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
 
         # accuracy
         accuracy = cg.reduce_mean(cg.cast_to_float32(cg.equal(y_pred[:,0], y[:,0])))
-        self.construct_evaluatee_evaluator(name='accuracy', evaluatee=accuracy, feeds=[x, y])
+        self.register_evaluator(name='accuracy', evaluatee=accuracy, feeds=[x, y])
 
         # evaluators
-        self.construct_input_evaluator(input=input)
-        self.construct_output_evaluator(output=y)
-        self.construct_hypothesis_evaluator(hypothesis=h, input=x)
-        self.construct_cost_evaluator(cost=J, input=x, output=y)
+        self.register_input_evaluator(input=input)
+        self.register_output_evaluator(output=y)
+        self.register_hypothesis_evaluator(hypothesis=h, input=x)
+        self.register_cost_evaluator(cost=J, input=x, output=y)
 
         # cost minimizer
-        self.construct_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-5))
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-5))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

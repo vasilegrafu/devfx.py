@@ -6,7 +6,7 @@ import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
-from devfx_howto.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
+from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
 
 """------------------------------------------------------------------------------------------------
 """
@@ -46,7 +46,7 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
 
         h = fco
         y_pred = cg.cast_to_int32(cg.reshape(tensor=cg.argmax(h, axis=1), shape=[None, 1]))
-        self.construct_evaluatee_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x], hparams=[is_training])
+        self.register_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x], hparams=[is_training])
 
         # cost function
         y = cg.placeholder(shape=[None, 1], dtype=cg.int32, name='y')
@@ -55,27 +55,27 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
 
         # accuracy
         accuracy = cg.reduce_mean(cg.cast_to_float32(cg.equal(y_pred[:, 0], y[:, 0])))
-        self.construct_evaluatee_evaluator(name='accuracy', evaluatee=accuracy, feeds=[x, y], hparams=[is_training])
+        self.register_evaluator(name='accuracy', evaluatee=accuracy, feeds=[x, y], hparams=[is_training])
 
         # learning rate
         initial_learning_rate = cg.constant(value=1e-2)
         learning_rate = cg.create_variable('learning_rate', initializer=initial_learning_rate, trainable=False)
 
-        self.construct_evaluatee_evaluator(name='initial_learning_rate', evaluatee=initial_learning_rate)
-        self.construct_evaluatee_evaluator(name='learning_rate', evaluatee=learning_rate)
+        self.register_evaluator(name='initial_learning_rate', evaluatee=initial_learning_rate)
+        self.register_evaluator(name='learning_rate', evaluatee=learning_rate)
 
         update_learning_rate_input = cg.placeholder(shape=[], name='update_learning_rate_input')
         update_learning_rate = learning_rate.assign(update_learning_rate_input)
-        self.construct_evaluatee_evaluator(name='update_learning_rate', evaluatee=update_learning_rate, feeds=[update_learning_rate_input])
+        self.register_evaluator(name='update_learning_rate', evaluatee=update_learning_rate, feeds=[update_learning_rate_input])
 
         # evaluators
-        self.construct_input_evaluator(input=input, hparams=[is_training])
-        self.construct_output_evaluator(output=y, hparams=[is_training])
-        self.construct_hypothesis_evaluator(hypothesis=h, input=x, hparams=[is_training])
-        self.construct_cost_evaluator(cost=J, input=x, output=y, hparams=[is_training])
+        self.register_input_evaluator(input=input, hparams=[is_training])
+        self.register_output_evaluator(output=y, hparams=[is_training])
+        self.register_hypothesis_evaluator(hypothesis=h, input=x, hparams=[is_training])
+        self.register_cost_evaluator(cost=J, input=x, output=y, hparams=[is_training])
 
         # cost minimizer
-        self.construct_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, hparams=[is_training], optimizer=cg.train.AdamOptimizer(learning_rate=learning_rate))
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, hparams=[is_training], optimizer=cg.train.AdamOptimizer(learning_rate=learning_rate))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):

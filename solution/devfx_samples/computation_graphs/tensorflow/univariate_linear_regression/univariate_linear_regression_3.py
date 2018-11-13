@@ -37,7 +37,7 @@ class UnivariateLinearRegressionModelTrainer(cg.models.ImperativeModelTrainer):
 
         self.register_hypothesis_function(fn=h)
         self.register_cost_function(fn=J)
-        self.construct_and_register_apply_cost_optimizer_function(optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
+        self.register_apply_cost_optimizer_function(optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
