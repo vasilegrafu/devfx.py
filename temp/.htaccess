@@ -1,8 +1,0 @@
-Options +ExecCGI 
-AddHandler cgi-script .cgi .py
-DirectoryIndex index.cgi
-
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f 
-RewriteRule ^(.*)$ /demo1/index.cgi/$1 [L]
-
