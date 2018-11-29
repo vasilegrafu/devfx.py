@@ -1,3 +1,4 @@
+import devfx.os as os
 import numpy as np
 import devfx.data_containers as dc
 import devfx.statistics as stats
@@ -74,6 +75,7 @@ class UnivariateLinearRegressionModelTrainer(cg.models.DeclarativeModelTrainer):
 
 """------------------------------------------------------------------------------------------------
 """
+
 # generating data
 generated_data = UnivariateLinearRegressionDataGenerator().generate()
 dataset = dc.Dataset(data=generated_data)
@@ -91,10 +93,10 @@ figure.show()
 with UnivariateLinearRegressionModelTrainer() as model_trainer:
     model_trainer.train(training_data=training_dataset, batch_size=256,
                         test_data=test_dataset)
-    model_trainer.export_to('./exports/_1')
+    model_trainer.export_to(os.file_info.parent_directorypath(__file__) + '/exports/_1')
 
 # validation
-with cg.models.ModelExecuter('./exports/_1') as model_executer:
+with cg.models.ModelExecuter(os.file_info.parent_directorypath(__file__) + '/exports/_1') as model_executer:
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
     chart.scatter(test_dataset[0], test_dataset[1], color='blue')

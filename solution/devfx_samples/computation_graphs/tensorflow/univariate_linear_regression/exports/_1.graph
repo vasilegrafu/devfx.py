@@ -19,8 +19,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_UINT8
@@ -278,8 +278,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_UINT8
@@ -328,8 +328,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_INT32
@@ -418,8 +418,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_UINT8
@@ -450,8 +450,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_INT32
@@ -564,8 +564,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_UINT8
@@ -655,8 +655,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_INT32
@@ -686,8 +686,8 @@ meta_info_def {
         type: "type"
         allowed_values {
           list {
-            type: DT_HALF
             type: DT_BFLOAT16
+            type: DT_HALF
             type: DT_FLOAT
             type: DT_DOUBLE
             type: DT_UINT8
@@ -826,7 +826,7 @@ meta_info_def {
       is_stateful: true
     }
   }
-  tensorflow_version: "1.7.0"
+  tensorflow_version: "1.9.0"
   tensorflow_git_version: "b\'unknown\'"
 }
 graph_def {
@@ -863,7 +863,7 @@ graph_def {
     }
   }
   node {
-    name: "w0/Initializer/zeros/shape_as_tensor"
+    name: "w0/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -881,47 +881,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -938,47 +897,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Initializer/zeros"
-    op: "Fill"
-    input: "w0/Initializer/zeros/shape_as_tensor"
-    input: "w0/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -1110,7 +1034,7 @@ graph_def {
     }
   }
   node {
-    name: "w1/Initializer/zeros/shape_as_tensor"
+    name: "w1/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -1128,47 +1052,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -1185,47 +1068,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Initializer/zeros"
-    op: "Fill"
-    input: "w1/Initializer/zeros/shape_as_tensor"
-    input: "w1/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -3593,7 +3441,7 @@ graph_def {
     }
   }
   node {
-    name: "w0/Adam/Initializer/zeros/shape_as_tensor"
+    name: "w0/Adam/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -3611,47 +3459,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Adam/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -3668,47 +3475,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Adam/Initializer/zeros"
-    op: "Fill"
-    input: "w0/Adam/Initializer/zeros/shape_as_tensor"
-    input: "w0/Adam/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -3840,7 +3612,7 @@ graph_def {
     }
   }
   node {
-    name: "w0/Adam_1/Initializer/zeros/shape_as_tensor"
+    name: "w0/Adam_1/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -3858,47 +3630,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Adam_1/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -3915,47 +3646,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w0/Adam_1/Initializer/zeros"
-    op: "Fill"
-    input: "w0/Adam_1/Initializer/zeros/shape_as_tensor"
-    input: "w0/Adam_1/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w0"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -4087,7 +3783,7 @@ graph_def {
     }
   }
   node {
-    name: "w1/Adam/Initializer/zeros/shape_as_tensor"
+    name: "w1/Adam/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -4105,47 +3801,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Adam/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -4162,47 +3817,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Adam/Initializer/zeros"
-    op: "Fill"
-    input: "w1/Adam/Initializer/zeros/shape_as_tensor"
-    input: "w1/Adam/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -4334,7 +3954,7 @@ graph_def {
     }
   }
   node {
-    name: "w1/Adam_1/Initializer/zeros/shape_as_tensor"
+    name: "w1/Adam_1/Initializer/zeros"
     op: "Const"
     attr {
       key: "_class"
@@ -4352,47 +3972,6 @@ graph_def {
             dim {
               size: 1
             }
-          }
-        }
-      }
-    }
-    attr {
-      key: "dtype"
-      value {
-        type: DT_INT32
-      }
-    }
-    attr {
-      key: "value"
-      value {
-        tensor {
-          dtype: DT_INT32
-          tensor_shape {
-            dim {
-              size: 1
-            }
-          }
-          int_val: 1
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Adam_1/Initializer/zeros/Const"
-    op: "Const"
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
           }
         }
       }
@@ -4409,47 +3988,12 @@ graph_def {
         tensor {
           dtype: DT_FLOAT
           tensor_shape {
-          }
-          float_val: 0.0
-        }
-      }
-    }
-  }
-  node {
-    name: "w1/Adam_1/Initializer/zeros"
-    op: "Fill"
-    input: "w1/Adam_1/Initializer/zeros/shape_as_tensor"
-    input: "w1/Adam_1/Initializer/zeros/Const"
-    attr {
-      key: "T"
-      value {
-        type: DT_FLOAT
-      }
-    }
-    attr {
-      key: "_class"
-      value {
-        list {
-          s: "loc:@w1"
-        }
-      }
-    }
-    attr {
-      key: "_output_shapes"
-      value {
-        list {
-          shape {
             dim {
               size: 1
             }
           }
+          float_val: 0.0
         }
-      }
-    }
-    attr {
-      key: "index_type"
-      value {
-        type: DT_INT32
       }
     }
   }
@@ -4951,22 +4495,22 @@ graph_def {
   node {
     name: "Adam"
     op: "NoOp"
-    input: "^Adam/update_w0/ApplyAdam"
-    input: "^Adam/update_w1/ApplyAdam"
     input: "^Adam/Assign"
     input: "^Adam/Assign_1"
+    input: "^Adam/update_w0/ApplyAdam"
+    input: "^Adam/update_w1/ApplyAdam"
   }
   node {
     name: "init"
     op: "NoOp"
-    input: "^w0/Assign"
-    input: "^w1/Assign"
     input: "^beta1_power/Assign"
     input: "^beta2_power/Assign"
     input: "^w0/Adam/Assign"
     input: "^w0/Adam_1/Assign"
+    input: "^w0/Assign"
     input: "^w1/Adam/Assign"
     input: "^w1/Adam_1/Assign"
+    input: "^w1/Assign"
   }
   versions {
     producer: 26
@@ -4984,8 +4528,8 @@ collection_def {
   key: "trainable_variables"
   value {
     bytes_list {
-      value: "\n\004w0:0\022\tw0/Assign\032\tw0/read:02\026w0/Initializer/zeros:0"
-      value: "\n\004w1:0\022\tw1/Assign\032\tw1/read:02\026w1/Initializer/zeros:0"
+      value: "\n\004w0:0\022\tw0/Assign\032\tw0/read:02\026w0/Initializer/zeros:08\001"
+      value: "\n\004w1:0\022\tw1/Assign\032\tw1/read:02\026w1/Initializer/zeros:08\001"
     }
   }
 }
@@ -4993,8 +4537,8 @@ collection_def {
   key: "variables"
   value {
     bytes_list {
-      value: "\n\004w0:0\022\tw0/Assign\032\tw0/read:02\026w0/Initializer/zeros:0"
-      value: "\n\004w1:0\022\tw1/Assign\032\tw1/read:02\026w1/Initializer/zeros:0"
+      value: "\n\004w0:0\022\tw0/Assign\032\tw0/read:02\026w0/Initializer/zeros:08\001"
+      value: "\n\004w1:0\022\tw1/Assign\032\tw1/read:02\026w1/Initializer/zeros:08\001"
       value: "\n\rbeta1_power:0\022\022beta1_power/Assign\032\022beta1_power/read:02\033beta1_power/initial_value:0"
       value: "\n\rbeta2_power:0\022\022beta2_power/Assign\032\022beta2_power/read:02\033beta2_power/initial_value:0"
       value: "\n\tw0/Adam:0\022\016w0/Adam/Assign\032\016w0/Adam/read:02\033w0/Adam/Initializer/zeros:0"

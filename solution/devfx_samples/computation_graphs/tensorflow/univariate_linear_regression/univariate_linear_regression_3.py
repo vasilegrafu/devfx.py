@@ -26,8 +26,8 @@ class UnivariateLinearRegressionModelTrainer(cg.models.ImperativeModelTrainer):
     # ----------------------------------------------------------------
     def _build_model(self):
         def h(x, hparams=None):
-            w0 = cg.create_or_get_variable(name='w0', dtype=cg.float32, shape=(), initializer=cg.zeros_initializer())
-            w1 = cg.create_or_get_variable(name='w1', dtype=cg.float32, shape=(), initializer=cg.zeros_initializer())
+            w0 = cg.create_variable(name='w0', dtype=cg.float32, shape=(), initializer=cg.zeros_initializer())
+            w1 = cg.create_variable(name='w1', dtype=cg.float32, shape=(), initializer=cg.zeros_initializer())
             o = w0 + w1*x
             return o
 

@@ -14,34 +14,17 @@ class directory(directory_info):
         if(not directory.exists(path)):
             directory.create(path)
 
-    @classmethod
-    def creates(cls, path):
-        os.makedirs(path, exist_ok=True)
-
-    @classmethod
-    def creates_if_not_exists(cls, path):
-        if(not directory.exists(path)):
-            directory.creates(path)
-
     """----------------------------------------------------------------
     """
     @classmethod
     def remove(cls, path):
         os.remove(path)
 
-    @classmethod
-    def removes(cls, path):
-        os.removedirs(path)
-
     """----------------------------------------------------------------
     """
     @classmethod
     def rename(cls, from_path, to_path):
         os.rename(from_path, to_path)
-
-    @classmethod
-    def renames(cls, from_path, to_path):
-        os.renames(from_path, to_path)
 
     """------------------------------------------------------------------------------------------------
     """

@@ -1,4 +1,6 @@
+# import os as os2
 import devfx.os as os
+import tensorflow as tf
 import devfx.databases.hdf5 as hdf5
 import devfx.data_containers as dc
 import devfx.statistics as stats
@@ -10,6 +12,18 @@ from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import Mn
 """------------------------------------------------------------------------------------------------
 """
 class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
+    # def __init__(self):
+    #     # os2.environ["OMP_NUM_THREADS"] = "16"
+    #     # os2.environ["KMP_BLOCKTIME"] = "30"
+    #     # os2.environ["KMP_SETTINGS"] = "1"
+    #     # os2.environ["KMP_AFFINITY"]= "granularity=fine,verbose,compact,1,0"
+
+    #     config = tf.ConfigProto(intra_op_parallelism_threads=16,
+    #                             inter_op_parallelism_threads=16,  
+    #                             allow_soft_placement=True, 
+    #                             device_count={"CPU": 8})
+    #     super().__init__(config=config)
+
     # ----------------------------------------------------------------
     def _build_model(self):
         # hparams
