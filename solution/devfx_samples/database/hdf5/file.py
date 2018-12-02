@@ -10,7 +10,7 @@ with db.File('C.hdf5') as file:
     file['2']['2'] = value
 
 with db.File('C.hdf5') as file:
-    print(file.paths())
+    print(file.paths(max_depth=2))
 
 with db.File('C.hdf5') as file:
     file['/1/1'].attributes.set('a', 11)

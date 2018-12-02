@@ -37,8 +37,10 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
                                  filters=64,
                                  kernel_size=(4, 4),
                                  activation_fn=lambda z: nn.activation.relu(z))
+        print(conv1.shape)
         pool1 = nn.layers.max_pooling2d(name='pool1',
                                         input=conv1)
+        print(pool1.shape)
 
         conv2 = nn.layers.conv2d(name='conv2',
                                  input=pool1,
@@ -47,7 +49,6 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
                                  activation_fn=lambda z: nn.activation.relu(z))
         pool2 = nn.layers.max_pooling2d(name='pool2',
                                         input=conv2)
-
         linear = nn.layers.linearize(pool2)
 
         fc1 = nn.layers.fully_connected(name='fc1',
