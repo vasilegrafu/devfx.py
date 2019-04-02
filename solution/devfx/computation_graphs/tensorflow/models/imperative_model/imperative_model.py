@@ -5,7 +5,7 @@ import devfx.diagnostics as dgn
 import devfx.data_containers as dc
 from ..training_log import TrainingLog
 
-class ImperativeModelTrainer(object):
+class ImperativeModel(object):
     def __init__(self):
         self.__functions = {}
 
@@ -148,13 +148,13 @@ class ImperativeModelTrainer(object):
         # ----------------------------------------------------------------
         stopwatch = dgn.stopwatch().start()
 
-        cancellation_token = ImperativeModelTrainer.CancellationToken()
+        cancellation_token = ImperativeModel.CancellationToken()
 
         append_to_training_log_condition = lambda context: True
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        context = ImperativeModelTrainer.TrainingContext()
+        context = ImperativeModel.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
         context.iterations = iterations
         context.epochs = epochs
@@ -182,7 +182,7 @@ class ImperativeModelTrainer(object):
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = ImperativeModelTrainer.TrainingContext()
+            context = ImperativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.iteration = iteration
             context.iterations = iterations
@@ -214,7 +214,7 @@ class ImperativeModelTrainer(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModelTrainer.TrainingContext()
+                context = ImperativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.iterations = iterations
@@ -243,7 +243,7 @@ class ImperativeModelTrainer(object):
                     else:
                         self.run_apply_cost_optimizer_function(iteration_training_data[0], iteration_training_data[1], hparams)
                 else:
-                    context = ImperativeModelTrainer.TrainingContext()
+                    context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.iteration = iteration
                     context.iterations = iterations
@@ -266,7 +266,7 @@ class ImperativeModelTrainer(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModelTrainer.TrainingContext()
+                context = ImperativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.epoch = epoch
@@ -275,7 +275,7 @@ class ImperativeModelTrainer(object):
                 if(append_to_training_log_condition_result):
                     self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.position/training_data_iterator.count())
                     # ----------------------------------------------------------------
-                    context = ImperativeModelTrainer.TrainingContext()
+                    context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.iteration = iteration
                     context.iterations = iterations
@@ -298,7 +298,7 @@ class ImperativeModelTrainer(object):
                     # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModelTrainer.TrainingContext()
+                context = ImperativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.iterations = iterations
@@ -321,7 +321,7 @@ class ImperativeModelTrainer(object):
                 # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = ImperativeModelTrainer.TrainingContext()
+            context = ImperativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.iteration = iteration
             context.iterations = iterations
@@ -347,7 +347,7 @@ class ImperativeModelTrainer(object):
             # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        context = ImperativeModelTrainer.TrainingContext()
+        context = ImperativeModel.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
         context.iteration = iteration
         context.iterations = iterations
@@ -363,7 +363,7 @@ class ImperativeModelTrainer(object):
 
         stopwatch.stop()
 
-        result = ImperativeModelTrainer.TrainingResult()
+        result = ImperativeModel.TrainingResult()
         result.time_elapsed = stopwatch.elapsed
         result.iteration = iteration
         result.iterations = iterations

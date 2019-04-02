@@ -13,7 +13,7 @@ cg.enable_imperative_execution_mode()
 
 """------------------------------------------------------------------------------------------------
 """
-class MnistModelTrainer(cg.models.ImperativeModelTrainer):
+class MnistModel(cg.models.ImperativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         def h(x):
@@ -59,14 +59,14 @@ class MnistModelTrainer(cg.models.ImperativeModelTrainer):
         self.run_function('apply_cost_optimizer', context.iteration_training_data[0], context.iteration_training_data[1])
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.cost_on_training_data = self.run_cost_function(context.training_data_sample[0], context.training_data_sample[1])
-        training_log.last_item.cost_on_test_data = self.run_cost_function(context.test_data_sample[0], context.test_data_sample[1])
+        training_log.last_item.training_data_cost = self.run_cost_function(context.training_data_sample[0], context.training_data_sample[1])
+        training_log.last_item.test_data_cost = self.run_cost_function(context.test_data_sample[0], context.test_data_sample[1])
         training_log.last_item.accuracy = self.run_function('accuracy', context.test_data_sample[0], context.test_data_sample[1])
 
         print(training_log.last_item)
 
         # figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        # chart.plot(training_log.cost_on_training_data_list, color='green')
+        # chart.plot(training_log.training_data_cost_list, color='green')
         # figure.refresh()
 
     def _on_training_iteration_end(self, iteration, context):
@@ -93,12 +93,12 @@ test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0])
 results = []
 i = 1
 while(i <= 20):
-    model_trainer = MnistModelTrainer()
-    result = model_trainer.train(training_data=training_dataset, batch_size=64,
-                                 test_data=test_dataset,
-                                 training_data_sample=training_dataset.random_select(256)[:],
-                                 test_data_sample=test_dataset.random_select(256)[:])
-    model_trainer.close()
+    model = MnistModel()
+    result = model.train(training_data=training_dataset, batch_size=64,
+                         test_data=test_dataset,
+                         training_data_sample=training_dataset.random_select(256)[:],
+                         test_data_sample=test_dataset.random_select(256)[:])
+    model.close()
 
     results.append(result)
     print([_.iteration for _ in results], stats.avg([_.iteration for _ in results]))

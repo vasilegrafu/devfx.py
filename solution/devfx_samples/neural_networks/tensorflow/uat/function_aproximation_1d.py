@@ -24,7 +24,7 @@ class FunctionAproximationDataGenerator(object):
 
 """------------------------------------------------------------------------------------------------
 """
-class FunctionAproximationModelTrainer(cg.models.DeclarativeModelTrainer):
+class FunctionAproximationModel(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         # hypothesis
@@ -81,16 +81,16 @@ class FunctionAproximationModelTrainer(cg.models.DeclarativeModelTrainer):
 
     def _on_append_to_training_log(self, training_log, context):
         training_log.last_item.batch_size = context.batch_size
-        training_log.last_item.cost_on_training_data = self.run_cost_evaluator(input_data=context.training_data_sample[0], output_data=context.training_data_sample[1])
+        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data_sample[0], output_data=context.training_data_sample[1])
         # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.trend_of_cost_on_training_data = stats.normalized_trend(x=training_log.nr_list, y=training_log.cost_on_training_data_list, n_max=32)[0]*360/(2.0*np.pi)
-        #     context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_cost_on_training_data) <= 1e-2))
-        training_log.last_item.cost_on_test_data = self.run_cost_evaluator(input_data=context.test_data_sample[0], output_data=context.test_data_sample[1])
+        #     training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+        #     context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data_sample[0], output_data=context.test_data_sample[1])
 
         print(training_log.last_item)
 
         figure, chart1, chart2 = dv.PersistentFigure(id='status', size=(12, 4), chart_fns=[lambda _: dv.Chart2d(figure=_, position=121), lambda _: dv.Chart2d(figure=_, position=122)])
-        chart1.plot(training_log.cost_on_training_data_list, color='green')
+        chart1.plot(training_log.training_data_cost_list, color='green')
         chart2.scatter(context.test_data_sample[0][:,0], context.test_data_sample[1][:,0], color='blue')
         chart2.plot(context.test_data_sample[0][:,0], self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])[:,0], color='red')
         figure.refresh()
@@ -120,12 +120,12 @@ figure.show()
 # print(training_dataset, test_dataset)
 
 # learning from data
-model_trainer = FunctionAproximationModelTrainer()
-model_trainer.train(training_data=training_dataset, batch_size=32,
-                    training_data_sample = training_dataset.random_select(512)[:],
+model = FunctionAproximationModel()
+model.train(training_data=training_dataset, batch_size=32,
+            training_data_sample = training_dataset.random_select(512)[:],
                     test_data_sample = test_dataset.random_select(512)[:])
 
-model_trainer.close()
+model.close()
 
 
 

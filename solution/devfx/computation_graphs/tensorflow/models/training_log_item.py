@@ -27,15 +27,15 @@ class TrainingLogItem(object):
             value = attr[1]
 
             if(name == 'time_elapsed'):
-                name_value_list.append("{name}={value}".format(name=name, value=value))
+                name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
             elif(name == 'time_delta'):
-                name_value_list.append("{name}={value}".format(name=name, value=value))
+                name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
             elif (name == 'iteration'):
                 name_value_list.append("{name}={value}".format(name=name, value=value))
             elif (name == 'epoch'):
                 name_value_list.append("{name}={value:.3f}".format(name=name, value=value))
             elif(value is None):
-                name_value_list.append("{name}={value}".format(name=name, value=value))
+                name_value_list.append("{name}={value}".format(name=name, value=None))
             elif(refl.is_typeof(value, str)):
                 name_value_list.append("{name}={value}".format(name=name, value=value))
             elif (refl.is_typeof(value, int)):

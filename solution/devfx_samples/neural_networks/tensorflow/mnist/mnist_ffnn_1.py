@@ -10,7 +10,7 @@ from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import Mn
 
 """------------------------------------------------------------------------------------------------
 """
-class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
+class MnistModel(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         # hparams
@@ -85,10 +85,10 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        # training_log.last_item.cost_on_training_data = self.run_cost_evaluator(*context.training_data.random_select(1024*4), hparams_values=[False])
+        # training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data.random_select(1024*4), hparams_values=[False])
         # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.trend_of_cost_on_training_data = stats.normalized_trend(x=training_log.nr_list, y=training_log.cost_on_training_data_list, n_max=64)[0]*360/(2.0*np.pi)
-        # training_log.last_item.cost_on_test_data = self.run_cost_evaluator(*context.test_data.random_select(1024*4), hparams_values=[False])
+        #     training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=64)[0]*360/(2.0*np.pi)
+        # training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data.random_select(1024*4), hparams_values=[False])
 
         training_log.last_item.accuracy = self.run_evaluator(name='accuracy', feeds_data=[*context.test_data.random_select(1024*4)], hparams_values=[False])
         training_log.last_item.initial_learning_rate = self.run_evaluator(name='initial_learning_rate')
@@ -103,8 +103,8 @@ class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
         print(training_log.last_item)
 
         # figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        # chart.plot(training_log.cost_on_training_data_list, color='red')
-        # chart.plot(training_log.cost_on_test_data_list, color='green')
+        # chart.plot(training_log.training_data_cost_list, color='red')
+        # chart.plot(training_log.test_data_cost_list, color='green')
         # figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
@@ -128,11 +128,11 @@ test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0])
 results = []
 i = 1
 while(i <= 20):
-    model_trainer = MnistModelTrainer()
-    result = model_trainer.train(hparams_values=[True],
-                                 training_data=dc.Dataset(training_dataset[:]), batch_size=64,
-                                 test_data=dc.Dataset(test_dataset[:]))
-    model_trainer.close()
+    model = MnistModel()
+    result = model.train(hparams_values=[True],
+                         training_data=dc.Dataset(training_dataset[:]), batch_size=64,
+                         test_data=dc.Dataset(test_dataset[:]))
+    model.close()
 
     results.append(result)
     print([_.iteration for _ in results], stats.avg([_.iteration for _ in results]))

@@ -20,7 +20,7 @@ class QuadraticRegressionWithRegularizationDataGenerator(object):
 
 """------------------------------------------------------------------------------------------------
 """
-class QuadraticRegressionWithRegularizationModelTrainer(cg.models.DeclarativeModelTrainer):
+class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         # hypothesis
@@ -53,16 +53,16 @@ class QuadraticRegressionWithRegularizationModelTrainer(cg.models.DeclarativeMod
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.cost_on_training_data = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
+        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
         if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_cost_on_training_data = stats.normalized_trend(x=training_log.nr_list, y=training_log.cost_on_training_data_list, n_max=32)[0]*360/(2.0*np.pi)
-            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_cost_on_training_data) <= 1e-2))
-        training_log.last_item.cost_on_test_data = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
+            training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
 
         print(training_log.last_item)
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        chart.plot(training_log.cost_on_training_data_list, color='green')
+        chart.plot(training_log.training_data_cost_list, color='green')
         figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
@@ -90,15 +90,15 @@ data[0] = stats.StandardScaler(data[0]).transform(data[0])
 # print(training_data, test_data)
 
 # learning from data
-model_trainer = QuadraticRegressionWithRegularizationModelTrainer()
-model_trainer.train(training_data=training_data, batch_size=256,
-                    test_data=test_data)
+model = QuadraticRegressionWithRegularizationModel()
+model.train(training_data=training_data, batch_size=256,
+            test_data=test_data)
 
 # model validation
 figure = dv.Figure(size=(8, 6))
 chart = dv.Chart2d(figure=figure)
 chart.scatter(test_data[0], test_data[1], color='blue')
-chart.scatter(test_data[0], model_trainer.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
+chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
 figure.show()
 
-model_trainer.close()
+model.close()

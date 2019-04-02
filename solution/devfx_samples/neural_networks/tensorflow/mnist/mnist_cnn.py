@@ -11,7 +11,7 @@ from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import Mn
 
 """------------------------------------------------------------------------------------------------
 """
-class MnistModelTrainer(cg.models.DeclarativeModelTrainer):
+class MnistModel(cg.models.DeclarativeModel):
     # def __init__(self):
     #     # os2.environ["OMP_NUM_THREADS"] = "16"
     #     # os2.environ["KMP_BLOCKTIME"] = "30"
@@ -142,11 +142,11 @@ test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0])
 results = []
 i = 1
 while(i <= 20):
-    model_trainer = MnistModelTrainer()
-    result = model_trainer.train(hparams_values=[True],
-                                 training_data=dc.Dataset(training_dataset[:]), batch_size=64,
-                                 test_data=dc.Dataset(test_dataset[:]))
-    model_trainer.close()
+    model = MnistModel()
+    result = model.train(hparams_values=[True],
+                         training_data=dc.Dataset(training_dataset[:]), batch_size=64,
+                         test_data=dc.Dataset(test_dataset[:]))
+    model.close()
 
     results.append(result)
     print([_.iteration for _ in results], stats.avg([_.iteration for _ in results]))

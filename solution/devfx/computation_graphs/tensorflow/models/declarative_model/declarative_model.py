@@ -7,7 +7,7 @@ from ... import variables
 from ... import train
 from ..training_log import TrainingLog
 
-class DeclarativeModelTrainer(object):
+class DeclarativeModel(object):
     def __init__(self, target='', config=None):
         self.__graph = tf.Graph()
 
@@ -234,13 +234,13 @@ class DeclarativeModelTrainer(object):
             # ----------------------------------------------------------------
             stopwatch = dgn.stopwatch().start()
 
-            cancellation_token = DeclarativeModelTrainer.CancellationToken()
+            cancellation_token = DeclarativeModel.CancellationToken()
 
             append_to_training_log_condition = lambda context: True
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = DeclarativeModelTrainer.TrainingContext()
+            context = DeclarativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.iterations = iterations
             context.epochs = epochs
@@ -268,7 +268,7 @@ class DeclarativeModelTrainer(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = DeclarativeModelTrainer.TrainingContext()
+                context = DeclarativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.iterations = iterations
@@ -300,7 +300,7 @@ class DeclarativeModelTrainer(object):
                     # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
-                    context = DeclarativeModelTrainer.TrainingContext()
+                    context = DeclarativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.iteration = iteration
                     context.iterations = iterations
@@ -326,7 +326,7 @@ class DeclarativeModelTrainer(object):
                     if(self.exists_cost_optimizer_applier_evaluator()):
                         self.run_cost_optimizer_applier_evaluator(input_data=iteration_training_data[0], output_data=iteration_training_data[1], hparams_values=hparams_values)
                     else:
-                        context = DeclarativeModelTrainer.TrainingContext()
+                        context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
                         context.iteration = iteration
                         context.iterations = iterations
@@ -349,7 +349,7 @@ class DeclarativeModelTrainer(object):
                     # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
-                    context = DeclarativeModelTrainer.TrainingContext()
+                    context = DeclarativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.iteration = iteration
                     context.epoch = epoch
@@ -358,7 +358,7 @@ class DeclarativeModelTrainer(object):
                     if(append_to_training_log_condition_result):
                         self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.position/training_data_iterator.count())
                         # ----------------------------------------------------------------
-                        context = DeclarativeModelTrainer.TrainingContext()
+                        context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
                         context.iteration = iteration
                         context.iterations = iterations
@@ -381,7 +381,7 @@ class DeclarativeModelTrainer(object):
                         # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
-                    context = DeclarativeModelTrainer.TrainingContext()
+                    context = DeclarativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.iteration = iteration
                     context.iterations = iterations
@@ -404,7 +404,7 @@ class DeclarativeModelTrainer(object):
                     # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = DeclarativeModelTrainer.TrainingContext()
+                context = DeclarativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.iterations = iterations
@@ -430,7 +430,7 @@ class DeclarativeModelTrainer(object):
                 # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = DeclarativeModelTrainer.TrainingContext()
+            context = DeclarativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.iteration = iteration
             context.iterations = iterations
@@ -446,7 +446,7 @@ class DeclarativeModelTrainer(object):
 
             stopwatch.stop()
 
-        result = DeclarativeModelTrainer.TrainingResult()
+        result = DeclarativeModel.TrainingResult()
         result.time_elapsed = stopwatch.elapsed
         result.iteration = iteration
         result.iterations = iterations
