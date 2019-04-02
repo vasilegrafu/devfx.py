@@ -123,7 +123,7 @@ figure.show()
 model = FunctionAproximationModel()
 model.train(training_data=training_dataset, batch_size=32,
             training_data_sample = training_dataset.random_select(512)[:],
-                    test_data_sample = test_dataset.random_select(512)[:])
+            test_data_sample = test_dataset.random_select(512)[:])
 
 model.close()
 
