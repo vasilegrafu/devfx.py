@@ -8,7 +8,7 @@ BaseDatabaseEntity = db.orm.create_base_database_entity_type()
 class Entity1(BaseDatabaseEntity):
     __tablename__ = "entity1"
 
-    id = db.orm.Column_as__id()
+    id = db.orm.Column_as__Integer_id()
     entity2s = db.orm.Relationship_one_to_many("Entity2")
 
     created_on = db.orm.Column_as__created_on()
@@ -22,7 +22,7 @@ class Entity1(BaseDatabaseEntity):
 
 class Entity2(BaseDatabaseEntity):
     __tablename__ = "entity2"
-    id = db.orm.Column_as__id()
+    id = db.orm.Column_as__Integer_id()
     entity1_id = db.orm.Column_as_ForeignKey("entity1.id")
     entity1 = db.orm.Relationship_many_to_one("Entity1")
 
@@ -33,9 +33,7 @@ class Entity2(BaseDatabaseEntity):
     FloatingPointNumber = db.orm.Column_as_FloatingPointNumber()
 
     String = db.orm.Column_as_String()
-    UnicodeString = db.orm.Column_as_UnicodeString()
     Text = db.orm.Column_as_Text()
-    UnicodeText = db.orm.Column_as_UnicodeText()
 
     Boolean = db.orm.Column_as_Boolean()
 
@@ -56,9 +54,7 @@ class Entity2(BaseDatabaseEntity):
                 "FixedPointNumber={self.FixedPointNumber}, "\
                 "FloatingPointNumber={self.FloatingPointNumber}, "\
                 "String='{self.String}', " \
-                "UnicodeString='{self.UnicodeString}', " \
                 "Text='{self.Text}', " \
-                "UnicodeText='{self.UnicodeText}', " \
                 "Boolean={self.Boolean}, "\
                 "DateTime={self.DateTime}, "\
                 "Date={self.Date}, "\
@@ -70,11 +66,11 @@ class Entity2(BaseDatabaseEntity):
 
 """ Connection string
 """
-database_connection_string = 'sqlite:///orm.db'
+database_connection_string = 'sqlite:///devfx_samples/database/sqlalchemy/orm/didactic1.db'
 
 """ Deploy
 """
-db.orm.deploy_database_schema(BaseDatabaseEntity, database_connection_string)
+db.orm.deploy_database_metadata(BaseDatabaseEntity, database_connection_string)
 
 
 """ Create

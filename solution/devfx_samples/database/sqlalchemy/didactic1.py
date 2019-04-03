@@ -5,13 +5,13 @@ import devfx.databases.sqlalchemy as db
 database_metadata = db.create_database_metadata()
 
 entity1 = db.Table('entity1', database_metadata,
-                    db.Column_as__id(),
+                    db.Column_as__id(db.types.Integer(), autoincrement=True),
 
                     db.Column_as__created_on(),
                     db.Column_as__updated_on())
 
 entity2 = db.Table('entity2', database_metadata,
-                    db.Column_as__id(),
+                    db.Column_as__id(db.types.Integer(), autoincrement=True),
                     db.Column_as_ForeignKey('id_entity1', 'entity1.id'),
 
                     db.Column_as_BigInteger('BigInteger'),
@@ -20,9 +20,7 @@ entity2 = db.Table('entity2', database_metadata,
                     db.Column_as_FixedPointNumber('FixedPointNumber'),
                     db.Column_as_FloatingPointNumber('FloatingPointNumber'),
                     db.Column_as_String('String'),
-                    db.Column_as_UnicodeString('UnicodeString'),
                     db.Column_as_Text('Text'),
-                    db.Column_as_UnicodeText('UnicodeText'),
                     db.Column_as_Boolean('Boolean'),
                     db.Column_as_Date('Date'),
                     db.Column_as_DateTime('DateTime'),
@@ -34,11 +32,11 @@ entity2 = db.Table('entity2', database_metadata,
 
 """ Connection string
 """
-connection_string = 'sqlite:///core.db'
+connection_string = 'sqlite:///devfx_samples/database/sqlalchemy/didactic1.db'
 
 """ Deploy
 """
-db.deploy_database_schema(database_metadata=database_metadata, connection_string=connection_string)
+db.deploy_database_metadata(database_metadata=database_metadata, connection_string=connection_string)
 
 """ Create
 """
