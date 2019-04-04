@@ -1,18 +1,18 @@
 import datetime as dt
-import devfx.databases.sqlalchemy as db
+import devfx.databases.sqlalchemy as sadb
 
-BaseDatabaseEntity = db.orm.create_base_database_entity_type()
+BaseDatabaseEntity = sadb.orm.create_base_database_entity_type()
 
 """ Schema
 """
 class Entity1(BaseDatabaseEntity):
     __tablename__ = "entity1"
 
-    id = db.orm.Column_as__Integer_id()
-    entity2s = db.orm.Relationship_one_to_many("Entity2")
+    id = sadb.orm.Column_as__Integer_id()
+    entity2s = sadb.orm.Relationship_one_to_many("Entity2")
 
-    created_on = db.orm.Column_as__created_on()
-    updated_on = db.orm.Column_as__updated_on()
+    created_on = sadb.orm.Column_as__created_on()
+    updated_on = sadb.orm.Column_as__updated_on()
 
     def __repr__(self):
         return "Entity1(id={self.id}, "\
@@ -22,28 +22,28 @@ class Entity1(BaseDatabaseEntity):
 
 class Entity2(BaseDatabaseEntity):
     __tablename__ = "entity2"
-    id = db.orm.Column_as__Integer_id()
-    entity1_id = db.orm.Column_as_ForeignKey("entity1.id")
-    entity1 = db.orm.Relationship_many_to_one("Entity1")
+    id = sadb.orm.Column_as__Integer_id()
+    entity1_id = sadb.orm.Column_as_ForeignKey("entity1.id")
+    entity1 = sadb.orm.Relationship_many_to_one("Entity1")
 
-    BigInteger = db.orm.Column_as_BigInteger()
-    Integer = db.orm.Column_as_Integer()
-    SmallInteger = db.orm.Column_as_SmallInteger()
-    FixedPointNumber = db.orm.Column_as_FixedPointNumber()
-    FloatingPointNumber = db.orm.Column_as_FloatingPointNumber()
+    BigInteger = sadb.orm.Column_as_BigInteger()
+    Integer = sadb.orm.Column_as_Integer()
+    SmallInteger = sadb.orm.Column_as_SmallInteger()
+    FixedPointNumber = sadb.orm.Column_as_FixedPointNumber()
+    FloatingPointNumber = sadb.orm.Column_as_FloatingPointNumber()
 
-    String = db.orm.Column_as_String()
-    Text = db.orm.Column_as_Text()
+    String = sadb.orm.Column_as_String()
+    Text = sadb.orm.Column_as_Text()
 
-    Boolean = db.orm.Column_as_Boolean()
+    Boolean = sadb.orm.Column_as_Boolean()
 
-    DateTime = db.orm.Column_as_DateTime()
-    Date = db.orm.Column_as_Date()
-    Time = db.orm.Column_as_Time()
-    Timedelta = db.orm.Column_as_Timedelta()
+    DateTime = sadb.orm.Column_as_DateTime()
+    Date = sadb.orm.Column_as_Date()
+    Time = sadb.orm.Column_as_Time()
+    Timedelta = sadb.orm.Column_as_Timedelta()
 
-    created_on = db.orm.Column_as__created_on()
-    updated_on = db.orm.Column_as__updated_on()
+    created_on = sadb.orm.Column_as__created_on()
+    updated_on = sadb.orm.Column_as__updated_on()
 
     def __repr__(self):
         return "Entity2(id={self.id}, "\
@@ -70,12 +70,12 @@ database_connection_string = 'sqlite:///devfx_samples/database/sqlalchemy/orm/di
 
 """ Deploy
 """
-db.orm.deploy_database_metadata(BaseDatabaseEntity, database_connection_string)
+sadb.orm.deploy_database_metadata(BaseDatabaseEntity, database_connection_string)
 
 
 """ Create
 """
-with db.orm.Session(database_connection_string) as session:
+with sadb.orm.Session(database_connection_string) as session:
     entity11 = Entity1()
     session.add(entity11)
     session.flush()
@@ -120,7 +120,7 @@ with db.orm.Session(database_connection_string) as session:
 
 """ Query
 """
-with db.orm.Session(database_connection_string) as session:
+with sadb.orm.Session(database_connection_string) as session:
     entity1_list = session.query(Entity1.id).all()
     for entity1 in entity1_list:
         print(entity1)
@@ -131,21 +131,21 @@ with db.orm.Session(database_connection_string) as session:
 
 """ Update
 """
-with db.orm.Session(database_connection_string) as session:
+with sadb.orm.Session(database_connection_string) as session:
     entity2_list = session.query(Entity2).all()
     for entity2 in entity2_list:
         entity2.Integer = entity2.Integer+1
 
 """ Delete
 """
-# with db.orm.Session(database_connection_string) as session:
+# with sadb.orm.Session(database_connection_string) as session:
 #     entity1 = session.query(Entity1).first()
 #     session.delete(entity1)
 
 
 """ Relationship
 """
-with db.orm.Session(database_connection_string) as session:
+with sadb.orm.Session(database_connection_string) as session:
     entity1 = session.query(Entity1).first()
     print(entity1.entity2s)
     entity2 = session.query(Entity2).first()
