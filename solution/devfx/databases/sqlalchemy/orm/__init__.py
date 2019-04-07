@@ -48,8 +48,14 @@ from .base_database_entity import create_base_database_entity_type
 """----------------------------------------------------------
 """
 from .relationship import Relationship_one_to_many
+from .relationship import Relationship_One_to_many
+
 from .relationship import Relationship_many_to_one
+from .relationship import Relationship_many_to_One
+
 from .relationship import Relationship_one_to_one
+from .relationship import Relationship_One_to_one
+from .relationship import Relationship_one_to_One
 
 """----------------------------------------------------------
 """
