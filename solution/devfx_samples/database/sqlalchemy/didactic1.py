@@ -40,14 +40,14 @@ sadb.deploy_database_metadata(database_metadata=database_metadata, connection_st
 
 """ Create
 """
-with sadb.Connection(connection_string) as connection:
-    entity1_insert_result = connection.execute(entity1.insert())
+with sadb.DatabaseConnection(connection_string) as dbconnection:
+    entity1_insert_result = dbconnection.execute(entity1.insert())
     print(entity1_insert_result)
 
 """ Query
 """
-with sadb.Connection(connection_string) as connection:
-    entity1_select_result = connection.execute(entity1.select()).fetchall()
+with sadb.DatabaseConnection(connection_string) as dbconnection:
+    entity1_select_result = dbconnection.execute(entity1.select()).fetchall()
     print(entity1_select_result)
 
 

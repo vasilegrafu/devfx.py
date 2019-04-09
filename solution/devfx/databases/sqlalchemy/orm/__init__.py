@@ -59,6 +59,6 @@ from .relationship import Relationship_one_to_One
 
 """----------------------------------------------------------
 """
-from .session import Session
+from .database_session import DatabaseSession
 
 

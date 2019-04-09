@@ -2,7 +2,7 @@ import sqlalchemy as sa
 
 """------------------------------------------------------------------------------------------------
 """
-class Connection(object):
+class DatabaseConnection(object):
     def __init__(self, connection_string, echo=False, isolation_level=None):
         """
 

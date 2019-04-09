@@ -3,7 +3,7 @@ import sqlalchemy.orm
 
 """------------------------------------------------------------------------------------------------
 """
-class Session(object):
+class DatabaseSession(object):
     def __init__(self, connection_string, echo=False, autoflush=True, autocommit=False, expire_on_commit=True, isolation_level=None):
         """
 
@@ -22,7 +22,7 @@ class Session(object):
         self.__expire_on_commit = expire_on_commit
         self.__isolation_level = isolation_level
 
-        self.__session = None
+        self.__sesssion = None
 
     """----------------------------------------------------------------
     """
@@ -70,38 +70,38 @@ class Session(object):
     """----------------------------------------------------------------
     """
     def open(self):
-        if(self.__session is None):
+        if(self.__sesssion is None):
             if(self.__isolation_level is None):
                 engine = sa.create_engine(self.__connection_string, echo=self.__echo)
             else:
                 engine = sa.create_engine(self.__connection_string, echo=self.__echo, isolation_level=self.__isolation_level)
             Session = sa.orm.sessionmaker(bind=engine, autoflush=self.__autoflush, autocommit=self.__autocommit, expire_on_commit=self.__expire_on_commit)
-            self.__session = Session()
+            self.__sesssion = Session()
 
     def begin(self):
-        return self.__session.begin()
+        return self.__sesssion.begin()
 
     def flush(self, instances=None):
-        self.__session.flush(objects=instances)
+        self.__sesssion.flush(objects=instances)
 
     def rollback(self):
-        self.__session.rollback()
+        self.__sesssion.rollback()
 
     def commit(self):
-        self.__session.commit()
+        self.__sesssion.commit()
 
     def close(self):
-        self.__session.close()
-        self.__session = None
+        self.__sesssion.close()
+        self.__sesssion = None
 
     """----------------------------------------------------------------
     """
     def execute(self, statement, params=None):
-        return self.__session.execute(statement, params=params)
+        return self.__sesssion.execute(statement, params=params)
 
     # ----------------------------------------------------------------
     def add(self, instance):
-        self.__session.add(instance)
+        self.__sesssion.add(instance)
 
     def add_all(self, instances):
         for instance in instances:
@@ -109,7 +109,7 @@ class Session(object):
 
     # ----------------------------------------------------------------
     def expire(self, instance, attribute_names=None):
-        self.__session.expire(instance, attribute_names=attribute_names)
+        self.__sesssion.expire(instance, attribute_names=attribute_names)
 
     def expire_all(self, instances, attribute_names=None):
         for instance in instances:
@@ -117,7 +117,7 @@ class Session(object):
 
 
     def refresh(self, instance, attribute_names=None):
-        self.__session.refresh(instance, attribute_names=attribute_names)
+        self.__sesssion.refresh(instance, attribute_names=attribute_names)
 
     def refresh_all(self, instances, attribute_names=None):
         for instance in instances:
@@ -125,7 +125,7 @@ class Session(object):
 
     # ----------------------------------------------------------------
     def expunge(self, instance):
-        self.__session.expunge(instance)
+        self.__sesssion.expunge(instance)
 
     def expunge_all(self, instances):
         for instance in instances:
@@ -133,7 +133,7 @@ class Session(object):
 
     # ----------------------------------------------------------------
     def delete(self, instance):
-        self.__session.delete(instance)
+        self.__sesssion.delete(instance)
 
     def delete_all(self, instances):
         for instance in instances:
@@ -142,9 +142,9 @@ class Session(object):
     """----------------------------------------------------------------
     """
     def is_modified(self, instance, include_collections=True):
-        return self.__session.is_modified(instance, include_collections=include_collections)
+        return self.__sesssion.is_modified(instance, include_collections=include_collections)
 
     """----------------------------------------------------------------
     """
     def query(self, *entities, **kwargs):
-        return self.__session.query(*entities, **kwargs)
+        return self.__sesssion.query(*entities, **kwargs)

@@ -55,7 +55,7 @@ from .index import Index
 
 """----------------------------------------------------------
 """
-from .connection import Connection
+from .database_connection import DatabaseConnection
 
 """----------------------------------------------------------
 """

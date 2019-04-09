@@ -66,16 +66,16 @@ class Entity2(BaseDatabaseEntity):
 
 """ Connection string
 """
-database_connection_string = 'sqlite:///devfx_samples/database/sqlalchemy/orm/didactic1.db'
+connection_string = 'sqlite:///devfx_samples/database/sqlalchemy/orm/didactic1.db'
 
 """ Deploy
 """
-sadb.orm.deploy_database_metadata(BaseDatabaseEntity, database_connection_string)
+sadb.orm.deploy_database_metadata(BaseDatabaseEntity, connection_string)
 
 
 """ Create
 """
-with sadb.orm.Session(database_connection_string) as session:
+with sadb.orm.DatabaseSession(connection_string) as session:
     entity11 = Entity1()
     session.add(entity11)
     session.flush()
@@ -120,33 +120,33 @@ with sadb.orm.Session(database_connection_string) as session:
 
 """ Query
 """
-with sadb.orm.Session(database_connection_string) as session:
-    entity1_list = session.query(Entity1.id).all()
+with sadb.orm.DatabaseSession(connection_string) as dbsession:
+    entity1_list = dbsession.query(Entity1.id).all()
     for entity1 in entity1_list:
         print(entity1)
 
-    entity2_list = session.query(Entity2).all()
+    entity2_list = dbsession.query(Entity2).all()
     for entity2 in entity2_list:
         print(entity2)
 
 """ Update
 """
-with sadb.orm.Session(database_connection_string) as session:
-    entity2_list = session.query(Entity2).all()
+with sadb.orm.DatabaseSession(connection_string) as dbsession:
+    entity2_list = dbsession.query(Entity2).all()
     for entity2 in entity2_list:
         entity2.Integer = entity2.Integer+1
 
 """ Delete
 """
-# with sadb.orm.Session(database_connection_string) as session:
-#     entity1 = session.query(Entity1).first()
-#     session.delete(entity1)
+# with sadb.orm.DatabaseSession(database_connection_string) as dbsession:
+#     entity1 = dbsession.query(Entity1).first()
+#     dbsession.delete(entity1)
 
 
 """ Relationship
 """
-with sadb.orm.Session(database_connection_string) as session:
-    entity1 = session.query(Entity1).first()
+with sadb.orm.DatabaseSession(connection_string) as dbsession:
+    entity1 = dbsession.query(Entity1).first()
     print(entity1.entity2s)
-    entity2 = session.query(Entity2).first()
+    entity2 = dbsession.query(Entity2).first()
     print(entity2.entity1)
