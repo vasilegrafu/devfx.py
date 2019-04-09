@@ -5,7 +5,6 @@ import sqlalchemy as sa
 class DatabaseConnection(object):
     def __init__(self, connection_string, echo=False, isolation_level=None):
         """
-
         :param connection_string:
         :param echo:
         :param isolation_level: Possible values: None, "SERIALIZABLE", "REPEATABLE_READ", "READ_COMMITTED", "READ_UNCOMMITTED" and "AUTOCOMMIT"
