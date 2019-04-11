@@ -104,8 +104,12 @@ class DatabaseSession(object):
         self.__sesssion.add(instance)
 
     def add_all(self, instances):
-        for instance in instances:
-            self.add(instance)
+        self.__sesssion.add_all(instances)
+
+
+    # ----------------------------------------------------------------
+    def bulk_save(self, instances):
+        self.__sesssion.bulk_save_objects(instances)
 
     # ----------------------------------------------------------------
     def expire(self, instance, attribute_names=None):

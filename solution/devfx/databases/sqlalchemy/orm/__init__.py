@@ -40,7 +40,6 @@ from .column import Column_as__updated_on
 
 from .column import Column_as
 
-
 """----------------------------------------------------------
 """
 from .base_database_entity import create_base_database_entity_type

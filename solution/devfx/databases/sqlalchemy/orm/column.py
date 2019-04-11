@@ -102,3 +102,4 @@ def Column_as__updated_on(nullable=False, unique=False, index=False):
 """
 def Column_as(primary_key=False, default=None, onupdate=None, nullable=False, unique=False, index=False, *args, **kwargs):
     return sa.Column(primary_key=primary_key, default=default, nullable=nullable, unique=unique, index=index, *args, **kwargs)
+
