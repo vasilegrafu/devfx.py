@@ -13,31 +13,25 @@ class TargetResult(object):
         self.p2 = p1
 
 class Targets(object):
-    def __init__(self, p1, p2):
-        self.p1 = p1
-        self.p2 = p2
-
-    def target1(self, args):
+    @classmethod
+    def target1(cls, args):
         time.sleep(2)
-        print(self.p1, self.p2)
         print(args.p1, args.p2)
         return TargetResult('target1', 'target1')
 
-    def target2(self, args):
+    @classmethod
+    def target2(cls, args):
         time.sleep(2)
-        print(self.p1, self.p2)
         print(args.p1, args.p2)
         return TargetResult('target2', 'target2')
 
 def main():
     sw = dgn.stopwatch().start()
 
-    targets = Targets(4, 4)
-
-    process1 = mproc.Process(targets.target1, args=TargetArgs(1, 1))
+    process1 = mproc.Process(Targets.target1, TargetArgs(1, 1))
     process1.start()
 
-    process2 = mproc.Process(targets.target2, args=TargetArgs(2, 2))
+    process2 = mproc.Process(Targets.target2, TargetArgs(2, 2))
     process2.start()
 
     process1.join()
@@ -57,4 +51,3 @@ def main():
 
 if(__name__ == '__main__'):
     main()
-
