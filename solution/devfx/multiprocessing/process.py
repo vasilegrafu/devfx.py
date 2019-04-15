@@ -1,31 +1,40 @@
 import multiprocessing as mproc
+import devfx.exceptions as exceptions
 import devfx.reflection as refl
+from .process_result import ProcessResult
 
 class Process(mproc.Process):
-    def __init__(self, target, *args, **kwargs):
-        super().__init__()
+    def __init__(self, name=None, target=None, args=(), kwargs={}):
+        super().__init__(name=name)
+
         self.__target = target
         self.__args = args
         self.__kwargs = kwargs
 
         self.__queue = mproc.Queue()
-        self.__target_result = None
+
+        self.__result = None
 
     def run(self):
         try:
-            target_result = self.__target(*self.__args, **self.__kwargs)
+            result = self.__target(*self.__args, **self.__kwargs)
         except Exception as exception:
-            target_result = exception
+            result = exception
         finally:
             pass
-        self.__target_result = target_result
-        self.__queue.put(self.__target_result)
+        self.__queue.put(result)
 
+    def has_result(self):
+        return self.__queue.empty()
+    
     @property
     def result(self):
-        if(not self.__queue.empty()):
-            self.__target_result = self.__queue.get() 
-        return self.__target_result
+        if(self.__result is None):
+            if(self.__queue.empty()):
+                raise exceptions.OperationError()
+            else:
+                self.__result = ProcessResult(self.__queue.get())
+                return self.__result
+        else:
+            return self.__result
 
-    def result_is_exception(self):
-        return refl.is_typeof(self.result, Exception)

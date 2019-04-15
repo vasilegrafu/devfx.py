@@ -87,7 +87,7 @@ class dhistogram(object):
             align = kwargs.pop('align', None)
             if (align is None):
                 align = 'center'
-            self.__chart.bar(left=self.__dhistogram.x, height=self.__dhistogram.freq, width=self.__dhistogram.dx, align=align, *args, **kwargs)
+            self.__chart.bar(x=self.__dhistogram.x, height=self.__dhistogram.freq, width=self.__dhistogram.dx, align=align, *args, **kwargs)
 
     def on_chart(self, chart):
         return dhistogram._dhistogram_on_chart(self, chart)

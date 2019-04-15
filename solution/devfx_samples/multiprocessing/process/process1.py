@@ -1,6 +1,7 @@
+import time
 import devfx.multiprocessing as mproc
 import devfx.diagnostics as dgn
-import time
+import devfx.reflection as refl
 
 class TargetArgs(object):
     def __init__(self, p1, p2):
@@ -34,26 +35,24 @@ def main():
 
     targets = Targets(4, 4)
 
-    process1 = mproc.Process(targets.target1, TargetArgs(1, 1))
+    process1 = mproc.Process(target=targets.target1, args=(TargetArgs(1, 1), ))
     process1.start()
 
-    process2 = mproc.Process(targets.target2, TargetArgs(2, 2))
+    process2 = mproc.Process(target=targets.target2, args=(TargetArgs(2, 2), ))
     process2.start()
 
     process1.join()
     process2.join()
 
-    
-
-    if(process1.result_is_exception()):
-        print(process1.result)
+    if(process1.result.is_exception()):
+        print(process1.result.value)
     else:
-        print(process1.result.p1, process1.result.p2)
+        print(process1.result.value.p1, process1.result.value.p2)
 
-    if(process2.result_is_exception()):
-        print(process2.result)
+    if(process2.result.is_exception()):
+        print(process2.result.value)
     else:
-        print(process2.result.p1, process2.result.p2)
+        print(process2.result.value.p1, process2.result.value.p2)
 
     print("time elapsed: ", sw.stop().elapsed)
 

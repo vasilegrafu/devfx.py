@@ -1,6 +1,7 @@
+import time
 import devfx.multiprocessing as mproc
 import devfx.diagnostics as dgn
-import time
+import devfx.reflection as refl
 
 class Targets(object):
     lock = mproc.Lock()
@@ -23,11 +24,11 @@ def main():
     process1.join()
     process2.join()
 
-    if (process1.result_is_exception()):
-        print(process1.result)
+    if(process1.result.is_exception()):
+        print(process1.result.value)
 
-    if (process2.result_is_exception()):
-        print(process2.result)
+    if(process2.result.is_exception()):
+        print(process2.result.value)
 
     print("time elapsed: ", sw.stop().elapsed)
 

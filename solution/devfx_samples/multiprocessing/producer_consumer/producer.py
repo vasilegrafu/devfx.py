@@ -9,5 +9,8 @@ class Producer(object):
         i = 0
         while True:
             i += 1
+            if(i == 64):
+                queue.put(None)
+                break
             queue.put(i)
             time.sleep(0.05)

@@ -1,4 +1,5 @@
 from .process import Process
+from .process_result import ProcessResult
 from .queue import Queue
 from .pipe import Pipe
 from .lock import Lock

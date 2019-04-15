@@ -8,4 +8,6 @@ class Consumer(object):
     def run(self, queue):
         while True:
             i = queue.get()
+            if(i is None):
+                break
             print(i)
