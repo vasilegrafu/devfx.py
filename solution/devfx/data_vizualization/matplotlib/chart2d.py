@@ -207,11 +207,11 @@ class Chart2d(Chart):
 
             for _ in self.__chart.axes.get_xticklabels():
                 _.set_rotation(0)
-                _.set_fontsize('x-small')
+                _.set_fontsize('medium')
                 _.set_horizontalalignment('right')
 
             for _ in self.__chart.axes.get_yticklabels():
-                _.set_fontsize('x-small')
+                _.set_fontsize('medium')
 
         """----------------------------------------------------------------
         """
@@ -262,7 +262,7 @@ class Chart2d(Chart):
             if(eliminate_gaps is False):
                 self.__chart.plot(datetimes, values, *args, **kwargs)
             else:
-                self.__chart.plot([i[0] for i, _ in np.ndenumerate(values)], values, *args, **kwargs)
+                self.__chart.plot([i for i, _ in enumerate(values)], values, *args, **kwargs)
             self.__set_axes_properties(datetimes, eliminate_gaps)
 
         """----------------------------------------------------------------
@@ -283,7 +283,7 @@ class Chart2d(Chart):
             if(eliminate_gaps is False):
                 self.__chart.bar(datetimes, values, width=(1.0/1.25)*(min(np.diff(datetimes))/np.timedelta64(1, 'D')), *args, **kwargs)
             else:
-                self.__chart.bar([i[0] for i, _ in np.ndenumerate(values)], values, width=1.0/1.25, *args, **kwargs)
+                self.__chart.bar([i for i, _ in enumerate(values)], values, width=1.0/1.25, *args, **kwargs)
             self.__set_axes_properties(datetimes, eliminate_gaps)
 
     @property
