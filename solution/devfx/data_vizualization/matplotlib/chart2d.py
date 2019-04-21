@@ -98,17 +98,24 @@ class Chart2d(Chart):
                
     """------------------------------------------------------------------------------------------------
     """
-    def __do_prior_draw(self):
+    def _do_prior_draw(self):
         pass
 
-    def __do_post_draw(self):
+    def _do_post_draw(self):
         if(self.xlim() is not None):
             self.axes.set_xlim(self.get_xlim())
         if(self.ylim() is not None):
             self.axes.set_ylim(self.get_ylim())
 
+        for _ in self.axes.get_xticklabels():
+            _.set_rotation(0)
+            _.set_fontsize('large')
+            _.set_horizontalalignment('right')
+        for _ in self.axes.get_yticklabels():
+            _.set_fontsize('large')
+
     def plot(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         if (refl.is_iterable(args[0]) and (len(args) >= 2 and refl.is_iterable(args[1]))):
             a = np.asarray([args[0], args[1]])
             a = a.T
@@ -119,72 +126,72 @@ class Chart2d(Chart):
             result = self.axes.plot(args[0], *args[1:], **kwargs)
         else:
             raise exceptions.NotSupportedError()
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def fill(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.fill(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def fill_between(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.fill_between(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def bar(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.bar(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
     
     def barh(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.barh(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
         
     def hist(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.hist(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
             
     def hist2d(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.hist2d(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def pie(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.pie(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def scatter(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         if(refl.is_iterable(args[0]) and (len(args) >= 2 and refl.is_iterable(args[1]))):
             result = self.axes.scatter(args[0], args[1], *args[2:], marker = kwargs.pop('marker', '.'), **kwargs)
         elif(refl.is_iterable(args[0])):
             result = self.axes.scatter(range(1, len(args[0]) + 1), args[0], *args[1:], marker = kwargs.pop('marker', '.'), **kwargs)
         else:
             raise exceptions.NotSupportedError()
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def contour(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.contour(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     def image(self, *args, **kwargs):
-        self.__do_prior_draw()
+        self._do_prior_draw()
         result = self.axes.imshow(*args, **kwargs)
-        self.__do_post_draw()
+        self._do_post_draw()
         return result
 
     """------------------------------------------------------------------------------------------------
@@ -205,21 +212,15 @@ class Chart2d(Chart):
                 self.__chart.axes.set_xticks([int(round(i)) for i in np.linspace(0, len(datetimes)-1, nxticks)])
                 self.__chart.axes.set_xticklabels([datetimes[xtick].astype(dt.datetime).strftime('%Y-%m-%d\n%H:%M:%S') for xtick in self.__chart.axes.get_xticks()])
 
-            for _ in self.__chart.axes.get_xticklabels():
-                _.set_rotation(0)
-                _.set_fontsize('medium')
-                _.set_horizontalalignment('right')
-
-            for _ in self.__chart.axes.get_yticklabels():
-                _.set_fontsize('medium')
-
         """----------------------------------------------------------------
         """
         def candlesticks(self, datetimes, opens, highs, lows, closes, eliminate_gaps=True, colorup='g', colordown='r', alpha=0.75):
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
-            if(len(datetimes) < 2):
+            if(len(datetimes) <= 1):
                 raise exceptions.ArgumentError()
+
+            self.__chart._do_prior_draw()
 
             if(datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
@@ -241,7 +242,10 @@ class Chart2d(Chart):
                                              quotes=[(i, *_) for i, _ in enumerate(quotes)],
                                              width=1.0/1.25,
                                              colorup=colorup, colordown=colordown, alpha=alpha)
+
             self.__set_axes_properties(datetimes, eliminate_gaps)
+
+            self.__chart._do_post_draw()
 
 
         """----------------------------------------------------------------
@@ -249,8 +253,10 @@ class Chart2d(Chart):
         def plot(self, datetimes, values, eliminate_gaps=True, *args, **kwargs):
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
-            if(len(datetimes) < 2):
+            if(len(datetimes) <= 1):
                 raise exceptions.ArgumentError()
+
+            self.__chart._do_prior_draw()
 
             if (datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
@@ -263,15 +269,20 @@ class Chart2d(Chart):
                 self.__chart.plot(datetimes, values, *args, **kwargs)
             else:
                 self.__chart.plot([i for i, _ in enumerate(values)], values, *args, **kwargs)
+
             self.__set_axes_properties(datetimes, eliminate_gaps)
+
+            self.__chart._do_post_draw()
 
         """----------------------------------------------------------------
         """
         def bar(self, datetimes, values, eliminate_gaps=True, *args, **kwargs):
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
-            if(len(datetimes) < 2):
+            if(len(datetimes) <= 1):
                 raise exceptions.ArgumentError()
+
+            self.__chart._do_prior_draw()
 
             if (datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
@@ -284,7 +295,10 @@ class Chart2d(Chart):
                 self.__chart.bar(datetimes, values, width=(1.0/1.25)*(min(np.diff(datetimes))/np.timedelta64(1, 'D')), *args, **kwargs)
             else:
                 self.__chart.bar([i for i, _ in enumerate(values)], values, width=1.0/1.25, *args, **kwargs)
+
             self.__set_axes_properties(datetimes, eliminate_gaps)
+
+            self.__chart._do_post_draw()
 
     @property
     def timeseries(self):

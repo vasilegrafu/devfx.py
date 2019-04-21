@@ -31,16 +31,7 @@ class Chart(object):
         
 
     """------------------------------------------------------------------------------------------------
-    """ 
-    @property
-    def figure(self):
-        return self.__figure
-    
-    @figure.setter   
-    def figure(self, figure):
-        self.__figure = figure
-      
-      
+    """     
     @property
     def axes(self):
         return self.__axes
