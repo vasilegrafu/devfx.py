@@ -4,6 +4,8 @@ from .database_metadata import deploy_database_metadata
 
 """----------------------------------------------------------
 """
+from .column import Column
+
 from .column import Column_as_BigInteger
 from .column import Column_as_Integer
 from .column import Column_as_SmallInteger
@@ -46,6 +48,8 @@ from .base_database_entity import create_base_database_entity_type
 
 """----------------------------------------------------------
 """
+from .relationship import relationship
+
 from .relationship import Relationship_one_to_many
 from .relationship import Relationship_One_to_many
 
@@ -55,6 +59,10 @@ from .relationship import Relationship_many_to_One
 from .relationship import Relationship_one_to_one
 from .relationship import Relationship_One_to_one
 from .relationship import Relationship_one_to_One
+
+"""----------------------------------------------------------
+"""
+from .query import Query
 
 """----------------------------------------------------------
 """

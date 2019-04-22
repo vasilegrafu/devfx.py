@@ -13,6 +13,8 @@ from .types import types
 
 """----------------------------------------------------------
 """
+from .column import Column
+
 from .column import Column_as_BigInteger
 from .column import Column_as_Integer
 from .column import Column_as_SmallInteger

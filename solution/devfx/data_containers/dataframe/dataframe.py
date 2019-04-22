@@ -1,4 +1,5 @@
 import pandas as pd
+import devfx.reflection as refl
 from ..series import series
 
 class Dataframe(pd.DataFrame):
@@ -32,4 +33,10 @@ class Dataframe(pd.DataFrame):
     @classmethod
     def from_rows(cls, data, columns=None, index=None):
         return pd.DataFrame.from_records(data=data, columns=columns, index=index)
+
+    """----------------------------------------------------------------
+    """
+    @classmethod
+    def from_sql(cls, query, connection=None, index_columns=None):
+        return pd.read_sql(sql=query, con=connection, index_col=index_columns)
 
