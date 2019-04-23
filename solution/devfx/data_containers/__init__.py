@@ -8,7 +8,7 @@ from .series import Series
 
 """----------------------------------------------------------
 """
-from .dataframe import Dataframe
+from .dataframe import DataFrame
 
 """----------------------------------------------------------
 """

@@ -6,7 +6,7 @@ import devfx.data_vizualization.matplotlib as dv
 """
 normal1 = stats.normal(mu=0.0, sigma=1.0)
 normal2 = stats.normal(mu=5.0, sigma=1.0)
-data = np.concatenate((normal1.ndr(size=128), normal2.ndr(size=512)))
+data = np.concatenate((normal1.ndr(size=256), normal2.ndr(size=512)))
 
 figure = dv.Figure(size=(8, 4))
 

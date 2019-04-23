@@ -109,10 +109,10 @@ class Chart2d(Chart):
 
         for _ in self.axes.get_xticklabels():
             _.set_rotation(0)
-            _.set_fontsize('large')
-            _.set_horizontalalignment('right')
+            _.set_fontsize('medium')
         for _ in self.axes.get_yticklabels():
-            _.set_fontsize('large')
+            _.set_rotation(0)
+            _.set_fontsize('medium')
 
     def plot(self, *args, **kwargs):
         self._do_prior_draw()

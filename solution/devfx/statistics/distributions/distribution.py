@@ -211,15 +211,13 @@ class distribution(distribution_algebra_operation_node):
     """------------------------------------------------------------------------------------------------
     """
     def outliersNx_limits(self, Nx):
-        p25 = 25
-        p_25 = p25/100
+        p_25 = 25/100
         if (p_25 < self.cdf_a):
             Q1 = self.a
         else:
             Q1 = self._icdf(p_25)
 
-        p75 = 75
-        p_75 = p75/100
+        p_75 = 75/100
         if (p_75 > self.cdf_b):
             Q3 = self.b
         else:

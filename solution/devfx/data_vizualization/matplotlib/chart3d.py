@@ -127,6 +127,16 @@ class Chart3d(Chart):
         if (self.zlim() is not None):
             self.axes.set_zlim(self.get_zlim())
 
+        for _ in self.axes.get_xticklabels():
+            _.set_rotation(0)
+            _.set_fontsize('medium')
+        for _ in self.axes.get_yticklabels():
+            _.set_rotation(0)
+            _.set_fontsize('medium')
+        for _ in self.axes.get_zyticklabels():
+            _.set_rotation(0)
+            _.set_fontsize('medium')
+
     def plot(self, *args, **kwargs):
         self.__do_prior_draw()
         result = self.axes.plot(*args, **kwargs)
