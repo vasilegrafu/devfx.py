@@ -35,3 +35,11 @@ def from_sql(cls, query, connection=None, index_columns=None):
     return pd.read_sql(sql=query, con=connection, index_col=index_columns)
 
 DataFrame.from_sql = from_sql
+
+"""------------------------------------------------------------------------------------------------
+"""
+@classmethod
+def from_csv(cls, *args, **kwargs):
+    return pd.read_csv(*args, **kwargs)
+
+DataFrame.from_csv = from_csv
