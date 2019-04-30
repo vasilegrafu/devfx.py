@@ -20,6 +20,9 @@ print(temps_df)
 print("Get the column with the name Missoula:")
 print(temps_df['Missoula'])
 
+print("Get the column with the index:")
+print(temps_df.iloc[:, 0])
+
 print("Return both columns in a different order:")
 print(temps_df[['Philadelphia', 'Missoula']])
 

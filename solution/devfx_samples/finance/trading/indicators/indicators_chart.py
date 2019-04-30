@@ -11,16 +11,15 @@ def main():
                                    parse_dates=['datetime'])
 
     candlesticks = quotes[['open', 'high', 'low', 'close']][0:256]
-    volumes = quotes[['volume']][0:256]
+    volumes = quotes['volume'][0:256]
 
     figure = dv.Figure(size=(8, 6), grid=(2, 1))
 
     chart = dv.Chart2d(figure=figure, position=figure[0,0])
-    chart.timeseries.candlesticks(candlesticks.index, candlesticks['open'], candlesticks['high'], candlesticks['low'], candlesticks['close'])
-    chart.timeseries.plot(candlesticks.index, candlesticks['close'])
+    chart.timeseries.candlesticks(candlesticks)
 
     chart = dv.Chart2d(figure=figure, position=figure[1,0])     
-    chart.timeseries.bar(volumes.index, volumes['volume'])
+    chart.timeseries.bar(volumes)
 
 
     # to do: passing tuple, series, dataframe argument

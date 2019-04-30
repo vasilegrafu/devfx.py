@@ -2,6 +2,7 @@ import matplotlib as mpl
 import mpl_finance
 import matplotlib.dates
 import numpy as np
+import pandas as pd
 import datetime as dt
 import devfx.reflection as refl
 import devfx.exceptions as exceptions
@@ -214,7 +215,16 @@ class Chart2d(Chart):
 
         """----------------------------------------------------------------
         """
-        def candlesticks(self, datetimes, opens, highs, lows, closes, eliminate_gaps=True, colorup='g', colordown='r', alpha=0.75):
+        def candlesticks(self, data, eliminate_gaps=True, colorup='g', colordown='r', alpha=0.75):
+            if(refl.is_typeof(data, tuple) and len(data) == 5):
+                (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
+            elif(refl.is_typeof(data, list) and len(data) == 5):
+                (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
+            elif(refl.is_typeof(data, pd.DataFrame)):
+                (datetimes, opens, highs, lows, closes) = (data.index.values, data.iloc[:, 0].values, data.iloc[:, 1].values, data.iloc[:, 2].values, data.iloc[:, 3].values)
+            else:
+                raise exceptions.ArgumentError()
+            
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
             if(len(datetimes) <= 1):
@@ -222,14 +232,13 @@ class Chart2d(Chart):
 
             self.__chart._do_prior_draw()
 
+            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             if(datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
                 opens = opens[::-1]
                 highs = highs[::-1]
                 lows = lows[::-1]
                 closes = closes[::-1]
-
-            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             quotes = np.asarray((opens, highs, lows, closes)).T
 
             if(eliminate_gaps is False):
@@ -250,7 +259,18 @@ class Chart2d(Chart):
 
         """----------------------------------------------------------------
         """
-        def plot(self, datetimes, values, eliminate_gaps=True, *args, **kwargs):
+        def plot(self, data, eliminate_gaps=True, *args, **kwargs):
+            if(refl.is_typeof(data, tuple) and len(data) == 2):
+                (datetimes, values) = (data[0], data[1])
+            elif(refl.is_typeof(data, list) and len(data) == 2):
+                (datetimes, values) = (data[0], data[1])
+            elif(refl.is_typeof(data, pd.DataFrame)):
+                (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
+            elif(refl.is_typeof(data, pd.Series)):
+                (datetimes, values) = (data.index.values, data.values)
+            else:
+                raise exceptions.ArgumentError()
+
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
             if(len(datetimes) <= 1):
@@ -258,11 +278,10 @@ class Chart2d(Chart):
 
             self.__chart._do_prior_draw()
 
+            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             if (datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
                 values = values[::-1]
-
-            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             values = np.asarray(values)
 
             if(eliminate_gaps is False):
@@ -276,7 +295,18 @@ class Chart2d(Chart):
 
         """----------------------------------------------------------------
         """
-        def bar(self, datetimes, values, eliminate_gaps=True, *args, **kwargs):
+        def bar(self, data, eliminate_gaps=True, *args, **kwargs):
+            if(refl.is_typeof(data, tuple) and len(data) == 2):
+                (datetimes, values) = (data[0], data[1])
+            elif(refl.is_typeof(data, list) and len(data) == 2):
+                (datetimes, values) = (data[0], data[1])
+            elif(refl.is_typeof(data, pd.DataFrame)):
+                (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
+            elif(refl.is_typeof(data, pd.Series)):
+                (datetimes, values) = (data.index.values, data.values)
+            else:
+                raise exceptions.ArgumentError()
+
             if(len(datetimes) is None):
                 raise exceptions.ArgumentError()
             if(len(datetimes) <= 1):
@@ -284,11 +314,10 @@ class Chart2d(Chart):
 
             self.__chart._do_prior_draw()
 
+            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             if (datetimes[0] > datetimes[1]):
                 datetimes = datetimes[::-1]
                 values = values[::-1]
-
-            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             values = np.asarray(values)
 
             if(eliminate_gaps is False):

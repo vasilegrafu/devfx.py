@@ -14,7 +14,7 @@ Query.to_list = to_list
 
 """----------------------------------------------------------------
 """
-def to_dataframe(self, index_columns=None):
-    return pd.read_sql(sql=self.statement, con=self.session.bind, index_col=index_columns)
+def to_dataframe(self, index_col=None):
+    return pd.read_sql(sql=self.statement, con=self.session.bind, index_col=index_col)
 
 Query.to_dataframe = to_dataframe
