@@ -1,10 +1,10 @@
 import tensorflow as tf
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 
 """------------------------------------------------------------------------------------------------
 """
 def enable_declarative_execution_mode():
-    raise exceptions.NotSupportedError()
+    raise exps.NotSupportedError()
 
 def enable_imperative_execution_mode():
     tf.enable_eager_execution()

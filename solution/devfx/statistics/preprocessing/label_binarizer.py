@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 from .one_hot import one_hot
 
 """------------------------------------------------------------------------------------------------
@@ -15,21 +15,21 @@ class LabelBinarizer(object):
 
     def fit(self, classes):
         if(classes is None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         classes = np.asarray(classes)
         if(len(np.shape(classes)) != 1):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
 
         self.__classes = np.unique(classes)
 
     def transform(self, data):
         if(data is None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         data = np.asarray(data)
         if(len(np.shape(data)) != 1):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         if(len({_ for _ in data}.difference({_ for _ in self.__classes})) > 0):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
 
         n = len(self.__classes)
         binarized_data = np.array([one_hot(n, np.argwhere(self.__classes == _)) for _ in data])
@@ -37,12 +37,12 @@ class LabelBinarizer(object):
 
     def inverse_transform(self, binarized_data):
         if(binarized_data is None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         binarized_data = np.asarray(binarized_data)
         if(len(np.shape(binarized_data)) != 2):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         if(np.shape(binarized_data)[1] != len(self.__classes)):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
 
         classes = np.array([self.__classes[np.argmax(_)] for _ in binarized_data])
         return classes

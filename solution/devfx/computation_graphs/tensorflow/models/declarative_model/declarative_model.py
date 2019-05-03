@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
 import devfx.data_containers as dc
@@ -61,7 +61,7 @@ class DeclarativeModel(object):
     """------------------------------------------------------------------------------------------------
     """
     def _build_model(self):
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -75,7 +75,7 @@ class DeclarativeModel(object):
         elif ((len(feeds) >= 1) and (len(hparams) >= 1)):
             self.__evaluators[name] = lambda feeds_data, hparams_values: self.__session.run(evaluatee, feed_dict={**{feed: feeds_data[i] for (i, feed) in enumerate(feeds)}, **{hparam: hparams_value for (hparam, hparams_value) in zip(hparams, hparams_values)}})
         else:
-            raise exceptions.NotSupportedError()
+            raise exps.NotSupportedError()
 
     def get_evaluator(self, name):
         return self.__evaluators[name]
@@ -97,7 +97,7 @@ class DeclarativeModel(object):
             elif((feeds_data is not None) and (len(hparams_values) >= 1)):
                 result = self.__evaluators[name](feeds_data=feeds_data, hparams_values=hparams_values)
             else:
-                raise exceptions.NotSupportedError()
+                raise exps.NotSupportedError()
             return result
 
     """------------------------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ class DeclarativeModel(object):
     """
     def register_cost_optimizer_applier_evaluator(self, cost, input, output, hparams=(), optimizer=None, grad_clipping_values=None):
         if(optimizer is None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         cost_optimizer_applier = train.construct_optimizer_applier(optimizer=optimizer, fn=cost, grad_clipping_values=grad_clipping_values)
         self.register_evaluator(name='__cost_optimizer_applier', evaluatee=cost_optimizer_applier, feeds=[input, output], hparams=hparams)
 
@@ -201,9 +201,9 @@ class DeclarativeModel(object):
                 if(condition_fn()):
                     self.__is_cancellation_requested = True
             elif (condition is not None and condition_fn is not None):
-                raise exceptions.ArgumentError()
+                raise exps.ArgumentError()
             else:
-                raise exceptions.NotSupportedError()
+                raise exps.NotSupportedError()
 
         def is_cancellation_requested(self):
             return (self.__is_cancellation_requested == True)

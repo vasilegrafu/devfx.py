@@ -1,5 +1,5 @@
 import h5py as hdf5
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 from .group_adapter import GroupAdapter
 
 class File(GroupAdapter):
@@ -11,7 +11,7 @@ class File(GroupAdapter):
         elif (mode == 'rw'):
             mode = 'a'
         else:
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         self.__file = hdf5.File(name=path, mode=mode)
         super().__init__(group=self.__file)
 

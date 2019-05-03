@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
 import devfx.data_containers as dc
@@ -33,7 +33,7 @@ class ImperativeModel(object):
     """------------------------------------------------------------------------------------------------
     """
     def _build_model(self):
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -85,7 +85,7 @@ class ImperativeModel(object):
     """
     def register_apply_cost_optimizer_function(self, optimizer=None):
         if(optimizer is None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         def __apply_cost_optimizer(*args, **kwargs):
             grads_and_vars = tf.contrib.eager.implicit_gradients(self.get_cost_function())(*args, **kwargs)
             optimizer.apply_gradients(grads_and_vars)
@@ -116,9 +116,9 @@ class ImperativeModel(object):
                 if(condition_fn()):
                     self.__is_cancellation_requested = True
             elif (condition is not None and condition_fn is not None):
-                raise exceptions.ArgumentError()
+                raise exps.ArgumentError()
             else:
-                raise exceptions.NotSupportedError()
+                raise exps.NotSupportedError()
 
         def is_cancellation_requested(self):
             return (self.__is_cancellation_requested == True)

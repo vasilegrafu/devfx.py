@@ -1,4 +1,4 @@
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 from builtins import bool
 from datetime import date, time, datetime, timedelta
 from calendar import calendar
@@ -22,7 +22,7 @@ def is_typeof(arg, classinfo):
         return is_instance(arg, classinfo)
     if(is_instance(arg, type)):
         return is_class_or_subclass(arg, classinfo)
-    raise exceptions.NotSupportedError()
+    raise exps.NotSupportedError()
 
 """------------------------------------------------------------------------------------------------
 """

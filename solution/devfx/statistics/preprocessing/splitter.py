@@ -1,18 +1,18 @@
 import numpy as np
 import pandas as pd
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 
 class Splitter(object):
     def __init__(self, ratios=(0.75,)):
         if(not refl.is_iterable(ratios)):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         ratios = np.asarray(ratios)
         for ratio in ratios:
             if(not (0 <= ratio <= 1)):
-                raise exceptions.ArgumentError()
+                raise exps.ArgumentError()
         if(not (np.diff(ratios) >= 0).all()):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         self.__ratios = ratios
 
     @property
@@ -99,7 +99,7 @@ class Splitter(object):
             data_splitted.append(data[bounds[-1]:])
             return data_splitted
 
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
 
 # data = {

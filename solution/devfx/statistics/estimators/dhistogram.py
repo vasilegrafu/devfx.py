@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.mathematics as math
 from ..distributions import distribution
 
@@ -23,9 +23,9 @@ class dhistogram(object):
 
     def __call__(self, x):
         if (x < self.a):
-            raise exceptions.ArgumentOutOfRangeError()
+            raise exps.ArgumentOutOfRangeError()
         elif (x > self.b):
-            raise exceptions.ArgumentOutOfRangeError()
+            raise exps.ArgumentOutOfRangeError()
         else:
             return self.freq[np.searchsorted(self.xbin_edges[:-1], x)]
 
@@ -48,7 +48,7 @@ class dhistogram(object):
         elif ((bin_count is not None) and (dx is None)):
             bins = int(bin_count)
         else:
-            raise exceptions.NotSupportedError()
+            raise exps.NotSupportedError()
 
         (freq, bin_edges) = np.histogram(data, range=(ll, ul), bins=bins, density=density)
 

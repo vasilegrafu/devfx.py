@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 
 class ModelExecuter(object):
@@ -62,7 +62,7 @@ class ModelExecuter(object):
         elif (refl.is_typeof_tuple(fetch_names)):
             fetches = [self.__graph.get_tensor_by_name(complete_name(fetch_name)) for fetch_name in fetch_names]
         else:
-            raise exceptions.NotSupportedError()
+            raise exps.NotSupportedError()
 
         if(feed_dict is not None):
             feed_dict = {self.__graph.get_tensor_by_name(complete_name(feed_name)): feed_data for feed_name, feed_data in feed_dict.items()}

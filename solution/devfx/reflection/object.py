@@ -1,5 +1,5 @@
 import builtins as builtins
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 
 def setattr(self, name, value):
     builtins.setattr(self, name, value)
@@ -19,7 +19,7 @@ def getorcreateattr(self, name, value=None, value_fn=None):
         elif(value is None and value_fn is not None):
             setattr(self, name, value_fn())
         elif(value is not None and value_fn is not None):
-            raise exceptions.ArgumentError()
+            raise exps.ArgumentError()
         else:
-            raise exceptions.NotSupportedError()
+            raise exps.NotSupportedError()
     return getattr(self, name)

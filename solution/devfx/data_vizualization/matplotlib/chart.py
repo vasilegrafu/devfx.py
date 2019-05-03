@@ -1,13 +1,13 @@
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 
 class Chart(object):
     def __init__(self, figure=None, axes=None, title=None, grid=None):                              
         if(figure is None):
-            raise exceptions.ArgumentNoneError()
+            raise exps.ArgumentNoneError()
         self.figure = figure
         
         if(axes is None):
-            raise exceptions.ArgumentNoneError()
+            raise exps.ArgumentNoneError()
         self.axes = axes
         
         if(title is not None):

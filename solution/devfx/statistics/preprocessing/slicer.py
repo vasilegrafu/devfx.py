@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 
 class Slicer(object):
@@ -55,7 +55,7 @@ class Slicer(object):
             random_data = data[self.start:self.stop:self.step]
             return random_data
 
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
 
 # data = {

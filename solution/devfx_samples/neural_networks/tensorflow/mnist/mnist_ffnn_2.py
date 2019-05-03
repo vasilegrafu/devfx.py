@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.os as os
 import devfx.databases.hdf5 as hdf5
 import devfx.data_containers as dc
@@ -101,7 +101,7 @@ while(i <= 20):
     model.close()
 
     results.append(result)
-    print([_.iteration for _ in results], stats.avg([_.iteration for _ in results]))
+    print([_.iteration for _ in results], stats.mean([_.iteration for _ in results]))
 
     i += 1
 

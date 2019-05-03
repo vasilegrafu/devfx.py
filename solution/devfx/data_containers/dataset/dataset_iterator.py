@@ -1,4 +1,4 @@
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 
 class DatasetIterator(object):
     def __init__(self, dataset, position, batch_size=None):
@@ -42,7 +42,7 @@ class DatasetIterator(object):
     """----------------------------------------------------------------
     """
     def next(self, batch_size=None):
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
     def __getitem__(self, key):
         return self.dataset[key]
@@ -53,5 +53,5 @@ class DatasetIterator(object):
         return "{n} | {batch_size} | {position}".format(n=len(self.__dataset), batch_size=self.__batch_size, position=self.__position)
 
     def __repr__(self):
-        raise exceptions.NotSupportedError()
+        raise exps.NotSupportedError()
 

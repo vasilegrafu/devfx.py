@@ -1,5 +1,5 @@
 import os
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 
 class path(object):
     """----------------------------------------------------------------
@@ -64,7 +64,7 @@ class path(object):
             size = os.path.getsize(path)
             return size
         else:
-            raise exceptions.NotSupportedError()
+            raise exps.NotSupportedError()
 
     """----------------------------------------------------------------
     """

@@ -149,7 +149,7 @@ while(i <= 20):
     model.close()
 
     results.append(result)
-    print([_.iteration for _ in results], stats.avg([_.iteration for _ in results]))
+    print([_.iteration for _ in results], stats.mean([_.iteration for _ in results]))
 
     i += 1
 

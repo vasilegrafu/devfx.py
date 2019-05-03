@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import devfx.exceptions as exceptions
+import devfx.exceptions as exps
 import devfx.reflection as refl
 
 class RandomSelector(object):
@@ -50,7 +50,7 @@ class RandomSelector(object):
             random_data = data[random_indexes]
             return random_data
 
-        raise exceptions.NotImplementedError()
+        raise exps.NotImplementedError()
 
 
 # data = {
