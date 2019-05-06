@@ -1,8 +1,14 @@
-
 import numpy as np
+import pandas as pd
+import devfx.reflection as refl
 
 """------------------------------------------------------------------------------------------------
 """
 def sum(data):
-    data = np.asarray(data)
-    return np.sum(data, axis=None)
+    if(refl.is_typeof(data, pd.DataFrame)):
+        return data.sum()
+    elif(refl.is_typeof(data, pd.Series)):
+        return data.sum()
+    else:
+        data = np.asarray(data)
+        return np.sum(data, axis=None)

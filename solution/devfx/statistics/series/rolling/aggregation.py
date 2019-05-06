@@ -1,6 +1,6 @@
 import pandas as pd
 import devfx.reflection as refl
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 
 """------------------------------------------------------------------------------------------------
 """
@@ -10,5 +10,5 @@ def rolling_sum(data, n):
     elif(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).sum()
     else:
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
 

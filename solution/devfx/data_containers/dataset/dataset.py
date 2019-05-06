@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 from .dataset_forward_iterator import DatasetForwardIterator
 from .dataset_backward_iterator import DatasetBackwardIterator
@@ -69,7 +69,7 @@ class Dataset(object):
         elif(self.iterator_kind == DatasetIteratorKind.BACKWARD):
             return DatasetBackwardIterator(dataset=self, batch_size=batch_size)
         else:
-            raise exps.NotSupportedError()
+            raise exceps.NotSupportedError()
 
     """----------------------------------------------------------------
     """

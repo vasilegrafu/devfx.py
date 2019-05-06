@@ -1,4 +1,4 @@
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from .dataset_iterator import DatasetIterator
 
 class DatasetForwardIterator(DatasetIterator):

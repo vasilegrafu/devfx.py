@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 
 """------------------------------------------------------------------------------------------------
 """
@@ -14,33 +14,33 @@ class LabelEncoder(object):
 
     def fit(self, classes):
         if(classes is None):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
         classes = np.asarray(classes)
         if (len(np.shape(classes)) != 1):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
 
         self.__classes = np.unique(classes)
 
     def transform(self, data):
         if(data is None):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
         data = np.asarray(data)
         if (len(np.shape(data)) != 1):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
         if(len({_ for _ in data}.difference({_ for _ in self.__classes})) > 0):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
 
         encoded_data = np.searchsorted(self.__classes, data)
         return encoded_data
 
     def inverse_transform(self, encoded_data):
         if(encoded_data is None):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
         encoded_data = np.asarray(encoded_data)
         if (len(np.shape(encoded_data)) != 1):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
         if(len({_ for _ in encoded_data}.difference({_ for _ in range(len(self.__classes))})) > 0):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
 
         data = self.__classes[encoded_data]
         return data

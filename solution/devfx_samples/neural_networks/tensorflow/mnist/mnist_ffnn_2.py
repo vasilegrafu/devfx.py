@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.os as os
 import devfx.databases.hdf5 as hdf5
 import devfx.data_containers as dc

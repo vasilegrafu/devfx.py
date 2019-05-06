@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from .constants import e
 
 """ constants  
@@ -201,7 +201,7 @@ def next_even(n):
     elif(is_odd(n)):
         return n+1
     else:
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
 
 def next_odd(n):
     if(is_odd(n)):
@@ -209,7 +209,7 @@ def next_odd(n):
     elif(is_even(n)):
         return n+1
     else:
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
         
 """ special  
 """

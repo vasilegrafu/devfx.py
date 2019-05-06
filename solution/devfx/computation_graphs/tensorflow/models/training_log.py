@@ -1,4 +1,4 @@
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from .training_log_item import TrainingLogItem
 
 """------------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ class TrainingLog(object):
         elif(len(self.items) >= 1):
             time_delta = time_elapsed - self.last_item.time_elapsed
         else:
-            raise exps.NotSupportedError()
+            raise exceps.NotSupportedError()
 
         training_log_item = TrainingLogItem(nr=(len(self.__items) + 1),
                                             time_elapsed=time_elapsed,
@@ -40,11 +40,11 @@ class TrainingLog(object):
     def __getattr__(self, name):
         if(name[-len('_list'):] == '_list'):
             if(len(self.__items) == 0):
-                raise exps.NotSupportedError()
+                raise exceps.NotSupportedError()
             else:
                 name2 = name[:-len('_list')]
                 if(not hasattr(self.last_item, name2)):
-                    raise exps.ArgumentError()
+                    raise exceps.ArgumentError()
                 if(name not in self.__attr_list_cache):
                     self.__attr_list_cache[name] = [getattr(_, name2) for _ in self.__items]
                 else:

@@ -1,22 +1,39 @@
 import numpy as np
+import pandas as pd
 import scipy as sp
 import scipy.stats
+import devfx.reflection as refl
 
 """------------------------------------------------------------------------------------------------
 """
 def mean(data):
-    data = np.asarray(data)
-    return np.average(data, axis=None)
+    if(refl.is_typeof(data, pd.DataFrame)):
+        return data.mean()
+    elif(refl.is_typeof(data, pd.Series)):
+        return data.mean()
+    else:
+        data = np.asarray(data)
+        return np.average(data, axis=None)
 
 """------------------------------------------------------------------------------------------------
 """
 def median(data):
-    data = np.asarray(data)
-    return np.percentile(data, 50, axis=None)
+    if(refl.is_typeof(data, pd.DataFrame)):
+        return data.median()
+    elif(refl.is_typeof(data, pd.Series)):
+        return data.median()
+    else:
+        data = np.asarray(data)
+        return np.percentile(data, 50, axis=None)
 
 """------------------------------------------------------------------------------------------------
 """
 def mode(data):
-    data = np.asarray(data)
-    mode = sp.stats.mode(data, axis=None)
-    return (mode[0][0], mode.count[1][0])
+    if(refl.is_typeof(data, pd.DataFrame)):
+        return data.mode()
+    elif(refl.is_typeof(data, pd.Series)):
+        return data.mode()
+    else:
+        data = np.asarray(data)
+        mode = sp.stats.mode(data, axis=None)
+        return (mode[0][0], mode.count[1][0])

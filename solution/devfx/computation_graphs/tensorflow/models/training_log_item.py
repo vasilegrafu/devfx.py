@@ -1,4 +1,4 @@
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 
 """------------------------------------------------------------------------------------------------
@@ -49,4 +49,4 @@ class TrainingLogItem(object):
         return ', '.join(name_value_list)
 
     def __repr__(self):
-        raise exps.NotSupportedError()
+        raise exceps.NotSupportedError()

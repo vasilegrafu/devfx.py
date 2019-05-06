@@ -1,15 +1,15 @@
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from ..series.dispersion import min
 from ..series.dispersion import max
 
 def normalized_trend(x, y, n_max=None):
     if(len(x) < 2):
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
     if(len(y) < 2):
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
     if (not (len(x) == len(y))):
-        raise exps.ArgumentError()
+        raise exceps.ArgumentError()
     if(n_max is None):
         n_max = len(x)
 

@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from . import execution
 from . import types
 from . import scopes
@@ -14,7 +14,7 @@ def Variable(name=None, dtype=types.float32, initial_value=None, validate_shape=
         variable = tf.contrib.eager.Variable(initial_value=initial_value, dtype=dtype, validate_shape=validate_shape, name=name, trainable=trainable)
         return variable
     else:
-        raise exps.NotSupportedError()
+        raise exceps.NotSupportedError()
 
 """------------------------------------------------------------------------------------------------
 """
@@ -31,7 +31,7 @@ def create_variable(name, shape=None, dtype=types.float32, initializer=None, tra
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
-        raise exps.NotSupportedError()
+        raise exceps.NotSupportedError()
 
 def get_variable(name, shape=None, dtype=types.float32, initializer=None, trainable=True, validate_shape=True):
     if(execution.is_declarative_execution_mode_enabled()):
@@ -44,7 +44,7 @@ def get_variable(name, shape=None, dtype=types.float32, initializer=None, traina
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
-        raise exps.NotSupportedError()
+        raise exceps.NotSupportedError()
 
 def create_or_get_variable(name, shape=None, dtype=types.float32, initializer=None, trainable=True, validate_shape=True):
     if(execution.is_declarative_execution_mode_enabled()):
@@ -57,7 +57,7 @@ def create_or_get_variable(name, shape=None, dtype=types.float32, initializer=No
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
-        raise exps.NotSupportedError()
+        raise exceps.NotSupportedError()
 
 """------------------------------------------------------------------------------------------------
 """

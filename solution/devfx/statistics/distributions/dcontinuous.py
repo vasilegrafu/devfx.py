@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.mathematics as math
 from .distribution import distribution
@@ -23,42 +23,42 @@ class dcontinuous(distribution):
         return self._cpdf(x)
         
     def _cpdf(self, x):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
         
     def icpdf(self, p):
         return self._icpdf(p)
         
     def _icpdf(self, p):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
     def pdf(self, x):
         if(refl.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
-                raise exps.ArgumentOutOfRangeError()
+                raise exceps.ArgumentOutOfRangeError()
             return self._pdf(x)
         else:
             if ((x < self.a) or (x > self.b)):
-                raise exps.ArgumentOutOfRangeError()
+                raise exceps.ArgumentOutOfRangeError()
             return self._pdf(x)
 
     def _pdf(self, x):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """    
     def _mean(self):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
        
     def _var(self):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
        
     def _skew(self):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
         
     def _kurtosis(self):
-        raise exps.NotImplementedError()
+        raise exceps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

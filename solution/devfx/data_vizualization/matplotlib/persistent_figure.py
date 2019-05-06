@@ -1,4 +1,4 @@
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 from .figure import Figure
 
 class PersistentFigure(object):
@@ -45,7 +45,7 @@ class PersistentFigure(object):
                 figure.empty()
 
         if(len(charts) == 0):
-            raise exps.NotSupportedError()
+            raise exceps.NotSupportedError()
         elif(len(charts) == 1):
             return (figure, charts[0])
         else:

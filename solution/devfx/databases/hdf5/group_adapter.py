@@ -1,5 +1,5 @@
 import h5py as hdf5
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 from .dataset_adapter import DatasetAdapter
 from .attributes_manager import AttributesManager
@@ -23,7 +23,7 @@ class GroupAdapter(object):
         elif(refl.is_typeof(item, hdf5.Dataset)):
             return DatasetAdapter(item)
         else:
-            raise exps.NotSupportedError()
+            raise exceps.NotSupportedError()
 
     def __getitem__(self, path):
         return self.get(path)
@@ -40,7 +40,7 @@ class GroupAdapter(object):
 
     def check_is_group(self, path):
         if (not self.is_group(path)):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
 
     def is_dataset(self, path):
         item = self.__group[path]
@@ -48,7 +48,7 @@ class GroupAdapter(object):
 
     def check_is_dataset(self, path):
         if (not self.is_dataset(path)):
-            raise exps.ArgumentError()
+            raise exceps.ArgumentError()
 
     """----------------------------------------------------------------
     """
@@ -118,5 +118,5 @@ class GroupAdapter(object):
                 elif(isinstance(item, hdf5.Dataset)):
                     yield path
                 else:
-                    raise exps.NotSupportedError()
+                    raise exceps.NotSupportedError()
         return [_ for _ in paths_iterator(depth=1, group=self.__group, root=root)]

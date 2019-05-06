@@ -1,5 +1,5 @@
 import multiprocessing as mproc
-import devfx.exceptions as exps
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 from .process_result import ProcessResult
 
@@ -31,7 +31,7 @@ class Process(mproc.Process):
     def result(self):
         if(self.__result is None):
             if(self.__queue.empty()):
-                raise exps.OperationError()
+                raise exceps.OperationError()
             else:
                 self.__result = ProcessResult(self.__queue.get())
                 return self.__result
