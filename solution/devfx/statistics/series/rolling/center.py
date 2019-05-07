@@ -12,15 +12,13 @@ def rolling_mean(data, n):
     else:
         raise exceps.ArgumentError()
 
-# def rolling_expmean(data, n, alpha=0.05):
-#     if(refl.is_typeof(data, pd.DataFrame)):
-#         return data.ewm(alpha=alpha).mean()
-#     elif(refl.is_typeof(data, pd.Series)):
-#         return data.ewm(alpha=alpha).mean()
-#     else:
-#         raise exceps.ArgumentError()
-
 def rolling_expmean(data, n, alpha=0.05):
+    if(refl.is_typeof(data, pd.Series)):
+        return data.ewm(alpha=alpha).mean()
+    else:
+        raise exceps.ArgumentError()
+
+def rolling_expmean2(data, n, alpha=0.05):
     def func(data, alpha):
         return np.average(data, weights=np.power((1.0-alpha), np.arange(1, len(data)+1)))
 
