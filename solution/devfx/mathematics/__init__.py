@@ -33,7 +33,7 @@ from .functions import pow10
 from .functions import pow10
 from .functions import powe
 
-from .functions import sqrrt
+from .functions import sqrt
 from .functions import cbrt
 
 from .functions import log

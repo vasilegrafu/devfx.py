@@ -5,9 +5,7 @@ import devfx.exceptions as exceps
 """------------------------------------------------------------------------------------------------
 """
 def rolling_skew(data, n):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.rolling(window=n).skew()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).skew()
     else:
         raise exceps.ArgumentError()
@@ -15,9 +13,7 @@ def rolling_skew(data, n):
 """------------------------------------------------------------------------------------------------
 """
 def rolling_kurtosis(data, n):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.rolling(window=n).kurt()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).kurt()
     else:
         raise exceps.ArgumentError()

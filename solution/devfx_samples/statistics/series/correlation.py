@@ -4,10 +4,12 @@ import devfx.data_vizualization.matplotlib as dv
 """------------------------------------------------------------------------------------------------
 """ 
 X = stats.normal(0.0, 1.0)
-E = stats.normal(0.0, 1.0)
+E = stats.normal(0.0, 10.0)
 
 x = X(1024*4)
 y = lambda x: 2*x + E(x.size)
+
+print(stats.corr(x, y(x)))
 
 figure = dv.Figure(size=(8, 8), grid=(2,1))
 

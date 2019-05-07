@@ -1,40 +1,48 @@
 import numpy as np
-import devfx.mathematics as math
-from ..series import center
+import pandas as pd
+import devfx.reflection as refl
+from .center import mean
 
 """------------------------------------------------------------------------------------------------
 """
 def mad(data):
-    data = np.asarray(data)
-    mean = center.mean(data)
-    distance = math.abs(data-mean)
-    return center.mean(distance)
+    if(refl.is_typeof(data, pd.Series)):
+        return data.mad()
+    else:
+        data = np.asarray(data)
+        return mean(np.abs(data-mean(data)))
 
 """------------------------------------------------------------------------------------------------
 """
-def S2(data):
-    data = np.asarray(data)
-    return np.var(data, ddof=1, axis=None)
-
-def S(data):
-    return math.sqrrt(S2(data))
-
 def var(data):
-    data = np.asarray(data)
-    return np.var(data, ddof=0, axis=None)
+    if(refl.is_typeof(data, pd.Series)):
+        return data.var(ddof=1, axis=None)
+    else:
+        data = np.asarray(data)
+        return np.var(data, ddof=1, axis=None)
 
 def stddev(data):
-    return math.sqrrt(var(data))
+    if(refl.is_typeof(data, pd.Series)):
+        return data.std(ddof=1, axis=None)
+    else:
+        data = np.asarray(data)
+        return np.std(data, ddof=1, axis=None)
 
 """------------------------------------------------------------------------------------------------
 """
 def min(data):
-    data = np.asarray(data)
-    return np.amin(data, axis=None)
+    if(refl.is_typeof(data, pd.Series)):
+        return data.min()
+    else:
+        data = np.asarray(data)
+        return np.amin(data, axis=None)
 
 def max(data):
-    data = np.asarray(data)
-    return np.amax(data, axis=None)
+    if(refl.is_typeof(data, pd.Series)):
+        return data.max()
+    else:
+        data = np.asarray(data)
+        return np.amax(data, axis=None)
 
 def range(data):
     return max(data)-min(data)
@@ -42,8 +50,11 @@ def range(data):
 """------------------------------------------------------------------------------------------------
 """
 def percentile(data, p100):
-    data = np.asarray(data)
-    return np.percentile(data, p100)
+    if(refl.is_typeof(data, pd.Series)):
+        return data.quantile(p100/100.0)
+    else:
+        data = np.asarray(data)
+        return np.percentile(data, p100)
 
 def Q1(data):
     return percentile(data, 25)
@@ -61,11 +72,11 @@ def IQR(data):
 """------------------------------------------------------------------------------------------------
 """
 def outliersNx_limits(data, Nx):
-    Q1 = Q1(data)
-    Q3 = Q3(data)
-    IQR = Q3-Q1
-    lol = Q1-Nx*1.5*IQR
-    uol = Q3+Nx*1.5*IQR
+    q1 = Q1(data)
+    q3 = Q3(data)
+    IQR = q3-q1
+    lol = q1-Nx*1.5*IQR
+    uol = q3+Nx*1.5*IQR
     return (lol, uol)
 
 def is_outlierNx(data, x, Nx):

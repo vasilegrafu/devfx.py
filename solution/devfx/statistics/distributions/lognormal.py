@@ -36,32 +36,32 @@ class lognormal(dcontinuous):
     """------------------------------------------------------------------------------------------------
     """       
     def _cpdf(self, x):
-        return sp.stats.lognorm.cdf(x, s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.cdf(x, s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
         
     def _icpdf(self, p):
-        return sp.stats.lognorm.ppf(p, s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.ppf(p, s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
     
     """------------------------------------------------------------------------------------------------
     """ 
     def _pdf(self, x):
-        return sp.stats.lognorm.pdf(x, s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.pdf(x, s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
         
     """------------------------------------------------------------------------------------------------
     """       
     def _rvs(self, size):
-        return sp.stats.lognorm.rvs(size, s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.rvs(size, s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
    
     """------------------------------------------------------------------------------------------------
     """       
     def _mean(self):
-        return sp.stats.lognorm.mean(s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.mean(s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
         
     def _var(self):
-        return sp.stats.lognorm.var(s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.var(s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
                        
     def _skew(self):
-        return sp.stats.lognorm.stats(moments='s', s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.stats(moments='s', s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
         
     def _kurtosis(self):
-        return sp.stats.lognorm.stats(moments='k', s=math.sqrrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
+        return sp.stats.lognorm.stats(moments='k', s=math.sqrt(self.sigma2), loc=0.0, scale=math.expe(self.mu))
        

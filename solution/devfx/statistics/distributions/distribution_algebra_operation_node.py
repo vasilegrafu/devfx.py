@@ -138,8 +138,8 @@ class distribution_algebra_operation_node(object):
     def powe(self):
         return distribution_algebra_operation_node(lambda size: math.powe(self.sample(size)))
 
-    def sqrrt(self):
-        return distribution_algebra_operation_node(lambda size: math.sqrrt(self.sample(size)))
+    def sqrt(self):
+        return distribution_algebra_operation_node(lambda size: math.sqrt(self.sample(size)))
 
     def cbrt(self):
         return distribution_algebra_operation_node(lambda size: math.cbrt(self.sample(size)))

@@ -76,7 +76,7 @@ def pow10(x):
 def powe(x):
     return np.power(x, e)
 
-def sqrrt(x):
+def sqrt(x):
     return np.sqrt(x)
     
 def cbrt(x):

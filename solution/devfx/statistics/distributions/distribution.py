@@ -172,7 +172,7 @@ class distribution(distribution_algebra_operation_node):
         raise exceps.NotImplementedError()
 
     def stddev(self):
-        return math.sqrrt(self.var())
+        return math.sqrt(self.var())
         
     def skew(self):
         return self._skew()

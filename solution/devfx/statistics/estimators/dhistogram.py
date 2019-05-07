@@ -42,7 +42,7 @@ class dhistogram(object):
             ul = math.max(data)
 
         if ((bin_count is None) and (dx is None)):
-            bins = int(math.min([math.ceil(math.sqrrt(data.size)), 64]))
+            bins = int(math.min([math.ceil(math.sqrt(data.size)), 64]))
         elif ((bin_count is None) and (dx is not None)):
             bins = int(math.ceil((ul-ll)/dx))
         elif ((bin_count is not None) and (dx is None)):

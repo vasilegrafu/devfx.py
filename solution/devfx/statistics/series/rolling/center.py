@@ -7,9 +7,7 @@ from .apply import rolling_apply
 """------------------------------------------------------------------------------------------------
 """
 def rolling_mean(data, n):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.rolling(window=n).mean()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).mean()
     else:
         raise exceps.ArgumentError()
@@ -31,9 +29,7 @@ def rolling_expmean(data, n, alpha=0.05):
 """------------------------------------------------------------------------------------------------
 """
 def rolling_median(data, n):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.rolling(window=n).median()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).median()
     else:
         raise exceps.ArgumentError()

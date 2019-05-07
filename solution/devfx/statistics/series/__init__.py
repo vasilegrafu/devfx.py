@@ -11,8 +11,6 @@ from .correlation import cov
 from .correlation import corr
 
 from .dispersion import mad
-from .dispersion import S2
-from .dispersion import S
 from .dispersion import var
 from .dispersion import stddev
 from .dispersion import min

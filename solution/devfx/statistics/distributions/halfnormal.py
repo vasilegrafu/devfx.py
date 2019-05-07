@@ -10,7 +10,7 @@ class halfnormal(dcontinuous):
     def __init__(self, mu=0.0, sigma2=1.0**2):
         self.mu = mu
         self.sigma2 = sigma2
-        self.__distribution = sp.stats.halfnorm(loc=self.mu, scale=math.sqrrt(self.sigma2))
+        self.__distribution = sp.stats.halfnorm(loc=self.mu, scale=math.sqrt(self.sigma2))
 
         a = -math.inf
         b = +math.inf

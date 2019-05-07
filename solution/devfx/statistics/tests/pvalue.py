@@ -26,36 +26,36 @@ class pvalue(object):
             def two_tailed(self, mu0, sigma0=None):
                 n = self.data.size
                 mean = center.mean(self.data)
-                S = dispersion.S(self.data)
+                S = dispersion.stddev(self.data)
                 if (sigma0 is not None):
-                    cv = math.abs((mean-mu0)/(sigma0/math.sqrrt(n)))
+                    cv = math.abs((mean-mu0)/(sigma0/math.sqrt(n)))
                     pvalue = normal().cdf(-cv)+(1.0-normal().cdf(cv))
                 else:
-                    cv = math.abs((mean-mu0)/(S/math.sqrrt(n)))
+                    cv = math.abs((mean-mu0)/(S/math.sqrt(n)))
                     pvalue = student(n-1).cdf(-cv) + (1.0-student(n-1).cdf(cv))
                 return (n, mean, S, cv, pvalue)
 
             def lower_tailed(self, mu0, sigma0=None):
                 n = self.data.size
                 mean = center.mean(self.data)
-                S = dispersion.S(self.data)
+                S = dispersion.stddev(self.data)
                 if (sigma0 is not None):
-                    cv = (mean-mu0)/(sigma0/math.sqrrt(n))
+                    cv = (mean-mu0)/(sigma0/math.sqrt(n))
                     pvalue = normal().cdf(cv)
                 else:
-                    cv = (mean-mu0)/(S/math.sqrrt(n))
+                    cv = (mean-mu0)/(S/math.sqrt(n))
                     pvalue = student(n-1).cdf(cv)
                 return (n, mean, S, cv, pvalue)
 
             def upper_tailed(self, mu0, sigma0=None):
                 n = self.data.size
                 mean = center.mean(self.data)
-                S = dispersion.S(self.data)
+                S = dispersion.stddev(self.data)
                 if (sigma0 is not None):
-                    cv = (mean-mu0)/(sigma0/math.sqrrt(n))
+                    cv = (mean-mu0)/(sigma0/math.sqrt(n))
                     pvalue = 1.0-normal().cdf(cv)
                 else:
-                    cv = (mean-mu0)/(S/math.sqrrt(n))
+                    cv = (mean-mu0)/(S/math.sqrt(n))
                     pvalue = 1.0-student(n-1).cdf(cv)
                 return (n, mean, S, cv, pvalue)
 

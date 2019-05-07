@@ -30,13 +30,13 @@ class pi(object):
                 alpha = 1.0-ccoef/100.0
                 if(sigma is not None):
                     d = normal().icdf(1.0-alpha/2.0)
-                    thetaL = mean-d*sigma*math.sqrrt(1.0+1.0/n)
-                    thetaU = mean+d*sigma*math.sqrrt(1.0+1.0/n)
+                    thetaL = mean-d*sigma*math.sqrt(1.0+1.0/n)
+                    thetaU = mean+d*sigma*math.sqrt(1.0+1.0/n)
                 else:
                     d = student(n-1).icdf(1.0-alpha/2.0)
-                    S = dispersion.S(self.data)
-                    thetaL = mean-d*S*math.sqrrt(1.0+1.0/n)
-                    thetaU = mean+d*S*math.sqrrt(1.0+1.0/n)
+                    S = dispersion.stddev(self.data)
+                    thetaL = mean-d*S*math.sqrt(1.0+1.0/n)
+                    thetaU = mean+d*S*math.sqrt(1.0+1.0/n)
                 return (thetaL, thetaU)
 
             def lower_one_sided(self, ccoef=95, sigma=None):
@@ -45,12 +45,12 @@ class pi(object):
                 alpha = 1.0 - ccoef/100.0
                 if(sigma is not None):
                     d = normal().icdf(1.0-alpha)
-                    thetaL = mean-d*sigma*math.sqrrt(1.0+1.0/n)
+                    thetaL = mean-d*sigma*math.sqrt(1.0+1.0/n)
                     thetaU = +math.inf
                 else:
                     d = student(n-1).icdf(1.0-alpha)
-                    S = dispersion.S(self.data)
-                    thetaL = mean-d*S*math.sqrrt(1.0+1.0/n)
+                    S = dispersion.stddev(self.data)
+                    thetaL = mean-d*S*math.sqrt(1.0+1.0/n)
                     thetaU = +math.inf
                 return (thetaL, thetaU)
 
@@ -61,12 +61,12 @@ class pi(object):
                 if(sigma is not None):
                     d = normal().icdf(1.0-alpha)
                     thetaL = -math.inf
-                    thetaU = mean+d*sigma*math.sqrrt(1.0+1.0/n)
+                    thetaU = mean+d*sigma*math.sqrt(1.0+1.0/n)
                 else:
                     d = student(n-1).icdf(1.0-alpha)
-                    S = dispersion.S(self.data)
+                    S = dispersion.stddev(self.data)
                     thetaL = -math.inf
-                    thetaU = mean+d*S*math.sqrrt(1.0+1.0/n)
+                    thetaU = mean+d*S*math.sqrt(1.0+1.0/n)
                 return (thetaL, thetaU)
 
         """--------------------------------------------------------------------------------------------

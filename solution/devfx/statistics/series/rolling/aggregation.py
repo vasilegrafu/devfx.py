@@ -5,9 +5,7 @@ import devfx.exceptions as exceps
 """------------------------------------------------------------------------------------------------
 """
 def rolling_sum(data, n):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.rolling(window=n).sum()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.rolling(window=n).sum()
     else:
         raise exceps.ArgumentError()

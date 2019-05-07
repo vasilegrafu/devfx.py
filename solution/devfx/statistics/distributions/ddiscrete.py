@@ -69,7 +69,7 @@ class ddiscrete(distribution):
         a = math.min(data)
         b = math.max(data)
         xrange = np.hstack((math.range(start=a, stop=b, step=1), b))
-        coef = math.sqrrt(center.mean((self.cdf(xrange)-empirical(data).cdf(xrange))**2))
+        coef = math.sqrt(center.mean((self.cdf(xrange)-empirical(data).cdf(xrange))**2))
         return coef
 
     """------------------------------------------------------------------------------------------------

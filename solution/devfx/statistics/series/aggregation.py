@@ -5,9 +5,7 @@ import devfx.reflection as refl
 """------------------------------------------------------------------------------------------------
 """
 def sum(data):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.sum()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.sum()
     else:
         data = np.asarray(data)

@@ -7,9 +7,7 @@ import devfx.reflection as refl
 """------------------------------------------------------------------------------------------------
 """
 def mean(data):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.mean()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.mean()
     else:
         data = np.asarray(data)
@@ -18,9 +16,7 @@ def mean(data):
 """------------------------------------------------------------------------------------------------
 """
 def median(data):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.median()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.median()
     else:
         data = np.asarray(data)
@@ -29,9 +25,7 @@ def median(data):
 """------------------------------------------------------------------------------------------------
 """
 def mode(data):
-    if(refl.is_typeof(data, pd.DataFrame)):
-        return data.mode()
-    elif(refl.is_typeof(data, pd.Series)):
+    if(refl.is_typeof(data, pd.Series)):
         return data.mode()
     else:
         data = np.asarray(data)

@@ -30,13 +30,13 @@ class ci(object):
                 alpha = 1.0-ccoef/100.0
                 if(sigma is not None): 
                     d = normal().icdf(1.0-alpha/2.0)
-                    thetaL = mean-d*sigma/math.sqrrt(n)
-                    thetaU = mean+d*sigma/math.sqrrt(n)
+                    thetaL = mean-d*sigma/math.sqrt(n)
+                    thetaU = mean+d*sigma/math.sqrt(n)
                 else:
                     d = student(n-1).icdf(1.0-alpha/2.0)
-                    S = dispersion.S(self.data)
-                    thetaL = mean-d*S/math.sqrrt(n)
-                    thetaU = mean+d*S/math.sqrrt(n)
+                    S = dispersion.stddev(self.data)
+                    thetaL = mean-d*S/math.sqrt(n)
+                    thetaU = mean+d*S/math.sqrt(n)
                 return (thetaL, thetaU)
                             
             def lower_one_sided(self, ccoef=95, sigma=None):
@@ -45,12 +45,12 @@ class ci(object):
                 alpha = 1.0-ccoef/100.0
                 if(sigma is not None): 
                     d = normal().icdf(1.0-alpha)
-                    thetaL = mean-d*sigma/math.sqrrt(n)
+                    thetaL = mean-d*sigma/math.sqrt(n)
                     thetaU = +math.inf
                 else:
                     d = student(n-1).icdf(1.0-alpha)
-                    S = dispersion.S(self.data)
-                    thetaL = mean-d*S/math.sqrrt(n)
+                    S = dispersion.stddev(self.data)
+                    thetaL = mean-d*S/math.sqrt(n)
                     thetaU = +math.inf
                 return (thetaL, thetaU)
                 
@@ -61,12 +61,12 @@ class ci(object):
                 if(sigma is not None): 
                     d = normal().icdf(1.0-alpha)
                     thetaL = -math.inf
-                    thetaU = mean+d*sigma/math.sqrrt(n)
+                    thetaU = mean+d*sigma/math.sqrt(n)
                 else:
                     d = student(n-1).icdf(1.0-alpha)
-                    S = dispersion.S(self.data)
+                    S = dispersion.stddev(self.data)
                     thetaL = -math.inf
-                    thetaU = mean+d*S/math.sqrrt(n)
+                    thetaU = mean+d*S/math.sqrt(n)
                 return (thetaL, thetaU)
         
         """--------------------------------------------------------------------------------------------
@@ -111,14 +111,14 @@ class ci(object):
                 if(sigmas is not None):
                     (sigma1, sigma2) = sigmas
                     d = normal().icdf(1.0-alpha/2.0)
-                    thetaL = (mean1-mean2)-d*math.sqrrt(sigma1**2/n1+sigma2**2/n2)
-                    thetaU = (mean1-mean2)+d*math.sqrrt(sigma1**2/n1+sigma2**2/n2)
+                    thetaL = (mean1-mean2)-d*math.sqrt(sigma1**2/n1+sigma2**2/n2)
+                    thetaU = (mean1-mean2)+d*math.sqrt(sigma1**2/n1+sigma2**2/n2)
                 else:
-                    (S1, S2) = (dispersion.S(self.data1), dispersion.S(self.data2))
+                    (S1, S2) = (dispersion.stddev(self.data1), dispersion.stddev(self.data2))
                     n = math.floor((S1**2/n1+S2**2/n2)**2/((1.0/(n1-1))*(S1**2/n1)**2+(1.0/(n2-1))*(S2**2/n2)**2))
                     d = student(n).icdf(1.0-alpha/2.0)
-                    thetaL = (mean1-mean2)-d*math.sqrrt(S1**2/n1+S2**2/n2)
-                    thetaU = (mean1-mean2)+d*math.sqrrt(S1**2/n1+S2**2/n2)
+                    thetaL = (mean1-mean2)-d*math.sqrt(S1**2/n1+S2**2/n2)
+                    thetaU = (mean1-mean2)+d*math.sqrt(S1**2/n1+S2**2/n2)
                 return (thetaL, thetaU)
                          
             def lower_one_sided(self, ccoef=95, sigmas=None):           
@@ -128,13 +128,13 @@ class ci(object):
                 if(sigmas is not None):
                     (sigma1, sigma2) = sigmas
                     d = normal().icdf(1.0-alpha)
-                    thetaL = (mean1-mean2)-d*math.sqrrt(sigma1**2/n1+sigma2**2/n2)
+                    thetaL = (mean1-mean2)-d*math.sqrt(sigma1**2/n1+sigma2**2/n2)
                     thetaU = +math.inf
                 else:
-                    (S1, S2) = (dispersion.S(self.data1), dispersion.S(self.data2))
+                    (S1, S2) = (dispersion.stddev(self.data1), dispersion.stddev(self.data2))
                     n = math.floor((S1**2/n1+S2**2/n2)**2/((1.0/(n1-1))*(S1**2/n1)**2+(1.0/(n2-1))*(S2**2/n2)**2))
                     d = student(n).icdf(1.0-alpha)
-                    thetaL = (mean1-mean2)-d*math.sqrrt(S1**2/n1+S2**2/n2)
+                    thetaL = (mean1-mean2)-d*math.sqrt(S1**2/n1+S2**2/n2)
                     thetaU = +math.inf
                 return (thetaL, thetaU)
                 
@@ -146,13 +146,13 @@ class ci(object):
                     (sigma1, sigma2) = sigmas
                     d = normal().icdf(1.0-alpha)
                     thetaL = -math.inf
-                    thetaU = (mean1-mean2)+d*math.sqrrt(sigma1**2/n1+sigma2**2/n2)
+                    thetaU = (mean1-mean2)+d*math.sqrt(sigma1**2/n1+sigma2**2/n2)
                 else:
-                    (S1, S2) = (dispersion.S(self.data1), dispersion.S(self.data2))
+                    (S1, S2) = (dispersion.stddev(self.data1), dispersion.stddev(self.data2))
                     n = math.floor((S1**2/n1+S2**2/n2)**2/((1.0/(n1-1))*(S1**2/n1)**2+(1.0/(n2-1))*(S2**2/n2)**2))
                     d = student(n).icdf(1.0-alpha)
                     thetaL = -math.inf
-                    thetaU = (mean1-mean2)+d*math.sqrrt(S1**2/n1+S2**2/n2)
+                    thetaU = (mean1-mean2)+d*math.sqrt(S1**2/n1+S2**2/n2)
                 return (thetaL, thetaU)
         
         """--------------------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ class ci(object):
             
             def two_sided(self, ccoef=95):
                 n = self.data.size
-                S2 = dispersion.S2(self.data)
+                S2 = dispersion.var(self.data)
                 alpha = 1.0-ccoef/100.0
                 dL = chisquare(n-1).icdf(alpha/2.0)
                 dU = chisquare(n-1).icdf(1.0-alpha/2.0)
@@ -193,7 +193,7 @@ class ci(object):
                                        
             def lower_one_sided(self, ccoef=95):
                 n = self.data.size
-                S2 = dispersion.S2(self.data)
+                S2 = dispersion.var(self.data)
                 alpha = 1.0-ccoef/100.0
                 dU = chisquare(n-1).icdf(1.0-alpha)
                 thetaL = (n-1)*S2/dU
@@ -202,7 +202,7 @@ class ci(object):
                 
             def upper_one_sided(self, ccoef=95):
                 n = self.data.size
-                S2 = dispersion.S2(self.data)
+                S2 = dispersion.var(self.data)
                 alpha = 1.0-ccoef/100.0
                 dL = chisquare(n-1).icdf(alpha)
                 thetaL = math.zero
