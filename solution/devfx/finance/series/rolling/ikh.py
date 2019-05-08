@@ -1,2 +1,0 @@
-
-Ichimoku Kinko Hyo (IKH)

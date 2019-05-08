@@ -1,1 +1,0 @@
-Money Flow Index (MFI)

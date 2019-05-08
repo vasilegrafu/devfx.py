@@ -24,13 +24,13 @@ class DataGenerator(object):
 def test():
     data = DataGenerator().generate(1024)
     data['y_rolling_mean'] = stats.rolling_mean(data['y'], 64)
-    data['y_rolling_expmean'] = stats.rolling_expmean(data['y'], 64)
+    data['y_rolling_ewmean'] = stats.rolling_ewmean(data['y'], 64)
 
     figure = dv.Figure(size=(8, 8), grid=(1,1))
     chart = dv.Chart2d(figure=figure, position=figure[0,0])
     chart.plot(data['x'], data['y'])
     chart.plot(data['x'], data['y_rolling_mean'], 'red')
-    chart.plot(data['x'], data['y_rolling_expmean'], 'green')
+    chart.plot(data['x'], data['y_rolling_ewmean'], 'green')
     figure.show()
 
 """------------------------------------------------------------------------------------------------

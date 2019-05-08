@@ -3,7 +3,7 @@ from .apply import rolling_apply
 from .aggregation import rolling_sum
 
 from .center import rolling_mean
-from .center import rolling_expmean
+from .center import rolling_ewmean
 from .center import rolling_median
 
 from .correlation import rolling_cov

@@ -1,1 +1,0 @@
-Relative Strength Index (RSI)

@@ -1,1 +1,0 @@
-Average Directional Index (ADX)
