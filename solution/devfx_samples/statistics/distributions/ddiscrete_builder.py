@@ -7,7 +7,7 @@ import devfx.data_vizualization.matplotlib as dv
 def test():
     # ----------------------------------------------------------------
     def poisson(rate):
-        return stats.ddiscrete_builder(
+        return stats.distributions.ddiscrete_builder(
             cdf=None,
             pmf=lambda x: math.expe(-rate)*rate**x/math.nF(x),
             a=0,

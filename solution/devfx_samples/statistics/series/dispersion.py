@@ -6,7 +6,7 @@ import devfx.statistics as stats
 def test():
     mu = 0.0
     sigma = 1.0
-    normal = stats.normal(mu, sigma)
+    normal = stats.distributions.normal(mu, sigma)
 
     data = []
     data.append(np.hstack((normal.rvs(1024), [50])))
@@ -14,15 +14,15 @@ def test():
     data = np.asarray(data)
     
     # outliers_limits
-    (lol, uol) = stats.outliers_limits(data[0])
+    (lol, uol) = stats.series.outliers_limits(data[0])
     print(lol, uol)
-    print(stats.outliers_limits(data[0]))
-    print(stats.is_outlier(data[0], [50]))
+    print(stats.series.outliers_limits(data[0]))
+    print(stats.series.is_outlier(data[0], [50]))
 
-    (lol, uol) = stats.outliers2x_limits(data[1])
+    (lol, uol) = stats.series.outliers2x_limits(data[1])
     print(lol, uol)
-    print(stats.outliers2x_limits(data[1]))
-    print(stats.is_outlier2x(data[0], [50]))
+    print(stats.series.outliers2x_limits(data[1]))
+    print(stats.series.is_outlier2x(data[0], [50]))
 
     
 """------------------------------------------------------------------------------------------------

@@ -3,8 +3,8 @@ import devfx.data_vizualization.seaborn as dv
 
 """------------------------------------------------------------------------------------------------
 """ 
-normalD1 = stats.normal(mu=0.0, sigma=1.0)
-normalDErr = stats.normal(mu=0.0, sigma=1.0)
+normalD1 = stats.distributions.normal(mu=0.0, sigma=1.0)
+normalDErr = stats.distributions.normal(mu=0.0, sigma=1.0)
 
 X = normalD1.ndr(size=4*1024)
 E = normalDErr.ndr(size=4*1024)

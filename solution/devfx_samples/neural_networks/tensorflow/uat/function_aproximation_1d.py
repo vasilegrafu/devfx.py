@@ -12,7 +12,7 @@ class FunctionAproximationDataGenerator(object):
         pass
 
     def generate(self, M):
-        x = stats.uniform(a=-4*3.14, b=+4.0*3.14).rvs(M)
+        x = stats.distributions.uniform(a=-4*3.14, b=+4.0*3.14).rvs(M)
         y = np.cos(x)*x + np.random.normal(0.0, 1.0, size=M)
 
         x = [[_] for _ in x]
@@ -83,7 +83,7 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
         training_log.last_item.batch_size = context.batch_size
         training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data_sample[0], output_data=context.training_data_sample[1])
         # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+        #     training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
         #     context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
         training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data_sample[0], output_data=context.test_data_sample[1])
 

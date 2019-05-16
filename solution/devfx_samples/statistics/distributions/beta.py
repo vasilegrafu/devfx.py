@@ -12,10 +12,10 @@ def test():
     figure = dv.Figure(size=(8, 8), grid=(2, 1))
 
     chart = dv.Chart2d(figure=figure, position=figure[0,0])
-    stats.beta(a=a, b=b, alpha=alpha, beta=beta).cdf_on_chart(chart).plot()
+    stats.distributions.beta(a=a, b=b, alpha=alpha, beta=beta).cdf_on_chart(chart).plot()
 
     chart = dv.Chart2d(figure=figure, position=figure[1,0])
-    stats.beta(a=a, b=b, alpha=alpha, beta=beta).pdf_on_chart(chart).plot()
+    stats.distributions.beta(a=a, b=b, alpha=alpha, beta=beta).pdf_on_chart(chart).plot()
 
     figure.show()
 

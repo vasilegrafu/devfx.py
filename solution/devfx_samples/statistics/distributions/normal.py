@@ -9,22 +9,22 @@ def test_cdf():
     mu = 0.0
     sigma = 0.5
     chart = dv.Chart2d(figure, position=figure[0,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).cdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).cdf_on_chart(chart).plot()
 
     mu = 0.5
     sigma = 0.5
     chart = dv.Chart2d(figure, position=figure[1,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).cdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).cdf_on_chart(chart).plot()
 
     mu = 1.0
     sigma = 1.0
     chart = dv.Chart2d(figure, position=figure[2,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).cdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).cdf_on_chart(chart).plot()
 
     mu = 2.0
     sigma = 2.0
     chart = dv.Chart2d(figure, position=figure[3,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).cdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).cdf_on_chart(chart).plot()
 
     figure.show()
 
@@ -36,22 +36,22 @@ def test_pdf():
     mu = 0.0
     sigma = 0.5
     chart = dv.Chart2d(figure, position=figure[0,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).pdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).pdf_on_chart(chart).plot()
 
     mu = 0.5
     sigma = 0.5
     chart = dv.Chart2d(figure, position=figure[1,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).pdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).pdf_on_chart(chart).plot()
 
     mu = 1.0
     sigma = 1.0
     chart = dv.Chart2d(figure, position=figure[2,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).pdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).pdf_on_chart(chart).plot()
 
     mu = 2.0
     sigma = 2.0
     chart = dv.Chart2d(figure, position=figure[3,0], ylim=(0.0, 1.0))
-    stats.normal(mu, sigma).pdf_on_chart(chart).plot()
+    stats.distributions.normal(mu, sigma).pdf_on_chart(chart).plot()
 
     figure.show()
 

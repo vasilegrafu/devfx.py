@@ -6,7 +6,7 @@ import devfx.data_vizualization.matplotlib as dv
 def test():
     mu = 1.0
     sigma2 = 0.5**2
-    lognormal = stats.lognormal(mu, sigma2)
+    lognormal = stats.distributions.lognormal(mu, sigma2)
 
     figure = dv.Figure(size=(8, 8), grid=(2,1))
 

@@ -13,22 +13,22 @@ def test_cdf():
     n = 1.0
     chart = dv.Chart2d(figure=figure, position=figure[0,0])
     for rate in rate_range:
-        stats.gamma(n, rate).cdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 1.5
     chart = dv.Chart2d(figure=figure, position=figure[1,0])
     for rate in rate_range:
-        stats.gamma(n, rate).cdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 2.0
     chart = dv.Chart2d(figure=figure, position=figure[2,0])
     for rate in rate_range:
-        stats.gamma(n, rate).cdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 4.0
     chart = dv.Chart2d(figure=figure, position=figure[3,0])
     for rate in rate_range:
-        stats.gamma(n, rate).cdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     figure.show()
 
@@ -44,22 +44,22 @@ def test_pdf():
     n = 1.0
     chart = dv.Chart2d(figure=figure, position=figure[0,0])
     for rate in rate_range:
-        stats.gamma(n, rate).pdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 1.5
     chart = dv.Chart2d(figure=figure, position=figure[1,0])
     for rate in rate_range:
-        stats.gamma(n, rate).pdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 2.0
     chart = dv.Chart2d(figure=figure, position=figure[2,0])
     for rate in rate_range:
-        stats.gamma(n, rate).pdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 4.0
     chart = dv.Chart2d(figure=figure, position=figure[3,0])
     for rate in rate_range:
-        stats.gamma(n, rate).pdf_on_chart(chart).plot()
+        stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     figure.show()
 

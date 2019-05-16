@@ -21,18 +21,18 @@ class LogisticRegression1DataGenerator(object):
         data = []
         block = M//2
         while (len(data) < M):
-            x = stats.uniform(a=a, b=b).rvs(block)
-            y = stats.bernoulli(0.5).rvs(block)
+            x = stats.distributions.uniform(a=a, b=b).rvs(block)
+            y = stats.distributions.bernoulli(0.5).rvs(block)
             p = math.logistic(w0 + w1*x)
 
-            to_accept = stats.bernoulli(p).rvs(block)
+            to_accept = stats.distributions.bernoulli(p).rvs(block)
             _p = p[(y == 1) & (to_accept == 1)]
             _x = x[(y == 1) & (to_accept == 1)]
             _y = y[(y == 1) & (to_accept == 1)]
             for _ in zip(_p, _x, _y):
                 data.append([_[0], _[1], _[2]])
 
-            to_accept = stats.bernoulli(1-p).rvs(block)
+            to_accept = stats.distributions.bernoulli(1-p).rvs(block)
             _p = p[(y == 0) & (to_accept == 1)]
             _x = x[(y == 0) & (to_accept == 1)]
             _y = y[(y == 0) & (to_accept == 1)]
@@ -79,7 +79,7 @@ class LogisticRegression1Model(cg.models.DeclarativeModel):
     def _on_append_to_training_log(self, training_log, context):
         training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
         if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
             context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
         training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
         training_log.last_item.w = [_[0] for _ in self.run_evaluator(name='weight')]

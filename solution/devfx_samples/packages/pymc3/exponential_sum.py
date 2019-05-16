@@ -17,9 +17,9 @@ with pymc3.Model() as pm:
 figure = dv.Figure(size=(8, 8))
 
 chart = dv.Chart2d(figure=figure, position=(2, 1, 1), xmin=0)
-stats.dhistogram.from_data(trace['x'], bin_count=24).on_chart(chart).bar()
+stats.estimators.dhistogram.from_data(trace['x'], bin_count=24).on_chart(chart).bar()
 
 # chart = dv.chart2d(figure=figure, position=(2, 1, 2))
-# stats.cdhistogram.from_data(exponential_1.random(size=1024*64)).on_chart(chart).bar()
+# stats.estimators.cdhistogram.from_data(exponential_1.random(size=1024*64)).on_chart(chart).bar()
 
 dv.Figures.show()

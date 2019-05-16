@@ -6,8 +6,8 @@ def test_mean():
     mu = 2.0
     sigma = 2.0
     def compute():
-        data = stats.normal(mu, sigma).rvs(64)
-        (thetaL, thetaU) = stats.ci.mean.normal(data).two_sided(ccoef=95)
+        data = stats.distributionss.normal(mu, sigma).rvs(64)
+        (thetaL, thetaU) = stats.estimators.ci.mean.normal(data).two_sided(ccoef=95)
         return (thetaL, thetaU)
         
     N = 1024*1024
@@ -29,9 +29,9 @@ def test_mean_difference():
     mu2 = 1.0
     sigma2 = 2.0
     def compute():
-        data1 = stats.normal(mu1, sigma1).rvs(64)
-        data2 = stats.normal(mu2, sigma2).rvs(64)
-        (thetaL, thetaU) = stats.ci.mean_difference.normal(data1, data2).two_sided()
+        data1 = stats.distributions.normal(mu1, sigma1).rvs(64)
+        data2 = stats.distributions.normal(mu2, sigma2).rvs(64)
+        (thetaL, thetaU) = stats.estimators.ci.mean_difference.normal(data1, data2).two_sided()
         return (thetaL, thetaU)
         
     N = 1024*1024
@@ -51,8 +51,8 @@ def test_variance():
     mu = 2.0
     sigma = 2.0
     def compute():
-        data = stats.normal(mu, sigma).rvs(64)
-        (thetaL, thetaU) = stats.ci.variance.normal(data).upper_one_sided(ccoef=75)
+        data = stats.distributions.normal(mu, sigma).rvs(64)
+        (thetaL, thetaU) = stats.estimators.ci.variance.normal(data).upper_one_sided(ccoef=75)
         return (thetaL, thetaU)
         
     N = 1024*1024

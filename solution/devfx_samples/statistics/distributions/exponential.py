@@ -11,7 +11,7 @@ def test_cdf():
     chart = dv.Chart2d()
 
     for rate in rate_range:
-        stats.exponential(rate).cdf_on_chart(chart).bar(n=16)
+        stats.distributions.exponential(rate).cdf_on_chart(chart).bar(n=16)
 
     chart.figure.show()
 
@@ -24,7 +24,7 @@ def test_pdf():
     chart = dv.Chart2d()
 
     for rate in rate_range:
-        stats.exponential(rate).pdf_on_chart(chart).bar(n=16)
+        stats.distributions.exponential(rate).pdf_on_chart(chart).bar(n=16)
 
     chart.figure.show()
    

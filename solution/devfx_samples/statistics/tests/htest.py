@@ -12,9 +12,9 @@ def test_htest():
     # For this example we generate some data, but this data is our new data which we want to test against theortical assumptions
     mu = 8.5
     sigma = sigma0
-    data = stats.normal(mu, sigma).rvs(256)
+    data = stats.distributions.normal(mu, sigma).rvs(256)
 
-    (n, mean, S, cv, pvalue, alpha, rejectH0) = stats.htest.mean.normal(data).upper_tailed(mu0, sigma0)
+    (n, mean, S, cv, pvalue, alpha, rejectH0) = stats.tests.htest.mean.normal(data).upper_tailed(mu0, sigma0)
     print((n, mean, S, cv, pvalue, alpha, rejectH0))
     
 """------------------------------------------------------------------------------------------------

@@ -12,11 +12,11 @@ def test():
 
     chart = dv.Chart2d(figure=figure, position=figure[0,0], ylim=(0.0, 0.5))
     for n in n_range:
-        stats.chisquare(n).pdf_on_chart(chart).plot()
+        stats.distributions.chisquare(n).pdf_on_chart(chart).plot()
 
     chart = dv.Chart2d(figure=figure, position=figure[1,0], ylim=(0.0, 1.0))
     for n in n_range:
-        stats.chisquare(n).cdf_on_chart(chart).plot()
+        stats.distributions.chisquare(n).cdf_on_chart(chart).plot()
 
     figure.show()
      

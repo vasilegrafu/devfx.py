@@ -23,7 +23,7 @@ X = math.linspace(0.0, 16.0, size)
 # Noise
 mu = 0.0
 sigma = 1.0
-epsilon = stats.normal(mu, sigma).rvs(size)
+epsilon = stats.distributions.normal(mu, sigma).rvs(size)
 
 Y_model = alpha + beta*X
 Y_real = Y_model + epsilon
@@ -58,19 +58,19 @@ with pymc3.Model() as pm:
 # Posterior analysis
 # pymc3.traceplot(trace)
 
-print(stats.center.mean(trace['alpha']))
-print(stats.center.mean(trace['beta']))
-print(stats.center.mean(trace['sigma']))
+print(stats.series.center.mean(trace['alpha']))
+print(stats.series.center.mean(trace['beta']))
+print(stats.series.center.mean(trace['sigma']))
 
 figure = dv.Figure(size=(8, 8))
 
 chart = dv.Chart2D(figure=figure, position=(3, 1, 1))
-stats.dhistogram.from_data(trace['alpha']).on_chart(chart).bar()
+stats.estimators.dhistogram.from_data(trace['alpha']).on_chart(chart).bar()
 
 chart = dv.Chart2D(figure=figure, position=(3, 1, 2))
-stats.dhistogram.from_data(trace['beta']).on_chart(chart).bar()
+stats.estimators.dhistogram.from_data(trace['beta']).on_chart(chart).bar()
 
 chart = dv.Chart2D(figure=figure, position=(3, 1, 3))
-stats.dhistogram.from_data(trace['sigma']).on_chart(chart).bar()
+stats.estimators.dhistogram.from_data(trace['sigma']).on_chart(chart).bar()
 
 dv.Figures.show()

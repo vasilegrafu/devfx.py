@@ -10,13 +10,13 @@ def test_cdf():
     n = 4
     p_range = [0.16, 0.32]
     for p in p_range:
-        stats.negbinomial(n, p).cdf_on_chart(chart).plot()
+        stats.distributions.negbinomial(n, p).cdf_on_chart(chart).plot()
 
     chart = dv.Chart2d(figure=figure, position=figure[1,0])
     n = 8
     p_range = [0.16, 0.32]
     for p in p_range:
-        stats.negbinomial(n, p).cdf_on_chart(chart).plot()
+        stats.distributions.negbinomial(n, p).cdf_on_chart(chart).plot()
 
     figure.show()
     
@@ -29,13 +29,13 @@ def test_pmf():
     n = 1
     p_range = [0.16, 0.32]
     for p in p_range:
-        stats.negbinomial(n, p).pmf_on_chart(chart).plot()
+        stats.distributions.negbinomial(n, p).pmf_on_chart(chart).plot()
 
     chart = dv.Chart2d(figure=figure, position=figure[1,0], ylim=(0, 0.10))
     n = 8
     p_range = [0.16, 0.32]
     for p in p_range:
-        stats.negbinomial(n, p).pmf_on_chart(chart).plot()
+        stats.distributions.negbinomial(n, p).pmf_on_chart(chart).plot()
 
     figure.show()
   

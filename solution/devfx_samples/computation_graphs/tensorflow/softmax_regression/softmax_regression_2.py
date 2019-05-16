@@ -11,10 +11,10 @@ class SoftmaxRegression1DataGenerator(object):
         pass
 
     def generate(self, M):
-        x11 = stats.normal(mu=2.0, sigma=1.0).rvs(M)
-        x12 = stats.normal(mu=6.0, sigma=1.0).rvs(M)
-        x21 = stats.normal(mu=2.0, sigma=1.0).rvs(M)
-        x22 = stats.normal(mu=6.0, sigma=1.0).rvs(M)
+        x11 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
+        x12 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
+        x21 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
+        x22 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
         # print(x11, x12, x21, x22)
 
         xs11 = np.array([x11, x21]).T
@@ -96,7 +96,7 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
     def _on_append_to_training_log(self, training_log, context):
         training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
         if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
             context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
         training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
         output_pred, output = (self.run_evaluator(name='output_pred', feeds_data=[context.test_data[0]]), context.test_data[1])
@@ -121,7 +121,7 @@ data_generator = SoftmaxRegression1DataGenerator()
 data = data_generator.generate(M=16)
 
 # splitting data
-(training_data, test_data) = stats.Splitter().split(data)
+(training_data, test_data) = stats.preprocessing.Splitter().split(data)
 print(training_data, test_data)
 
 # learning from data

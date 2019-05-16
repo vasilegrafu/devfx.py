@@ -1,8 +1,8 @@
-from .distributions import *
-from .series import *
-from .estimators import *
-from .tests import *
-from .regression import *
-from .preprocessing import *
+from . import distributions
+from . import series
+from . import estimators
+from . import tests
+from . import regression
+from . import preprocessing
 
 

@@ -6,7 +6,7 @@ import devfx.data_vizualization.matplotlib as dv
 """ 
 def test():   
     def exponential(rate):
-        return stats.dcontinuous_builder(
+        return stats.distributions.dcontinuous_builder(
             cdf=lambda x: 1.0-math.e**(-rate*x),
             pdf=lambda x: rate*math.e**(-rate*x),
             a=0,

@@ -6,8 +6,8 @@ def test():
     mu = 2.0
     sigma = 2.0
     def compute():
-        data = stats.normal(mu, sigma).rvs(64)
-        (thetaL, thetaU) = stats.pi.mean.normal(data).two_sided()
+        data = stats.distributions.normal(mu, sigma).rvs(64)
+        (thetaL, thetaU) = stats.estimators.pi.mean.normal(data).two_sided()
         return (thetaL, thetaU)
           
     N = 1024*1024
@@ -15,7 +15,7 @@ def test():
     i = 1
     while(i <= N):
         (thetaL, thetaU) = compute()
-        data = stats.normal(mu, sigma).rvs(1)
+        data = stats.distributions.normal(mu, sigma).rvs(1)
         if(thetaL <= data <= thetaU):
             n+=1
         print(i, n/i)
