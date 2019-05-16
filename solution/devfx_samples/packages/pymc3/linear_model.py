@@ -58,9 +58,9 @@ with pymc3.Model() as pm:
 # Posterior analysis
 # pymc3.traceplot(trace)
 
-print(stats.series.center.mean(trace['alpha']))
-print(stats.series.center.mean(trace['beta']))
-print(stats.series.center.mean(trace['sigma']))
+print(stats.series.mean(trace['alpha']))
+print(stats.series.mean(trace['beta']))
+print(stats.series.mean(trace['sigma']))
 
 figure = dv.Figure(size=(8, 8))
 
