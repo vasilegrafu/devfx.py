@@ -51,7 +51,7 @@ class Figure(object):
         elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position, projection='3d')
         elif(refl.is_typeof_int(position)):
-            return self.__figure.add_subplot(position)
+            return self.__figure.add_subplot(position, projection='3d')
         else:
             if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
                 return self.__figure.add_subplot(*position, projection='3d')

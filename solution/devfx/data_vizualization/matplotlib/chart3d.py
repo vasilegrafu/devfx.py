@@ -133,7 +133,7 @@ class Chart3d(Chart):
         for _ in self.axes.get_yticklabels():
             _.set_rotation(0)
             _.set_fontsize('medium')
-        for _ in self.axes.get_zyticklabels():
+        for _ in self.axes.get_zticklabels():
             _.set_rotation(0)
             _.set_fontsize('medium')
 
