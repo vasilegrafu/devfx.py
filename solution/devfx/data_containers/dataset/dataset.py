@@ -60,6 +60,12 @@ class Dataset(object):
 
     def _on_getitem_data_filter(self, data, hparams):
         return data
+    
+    # def __str__(self):
+    #     raise exceps.NotSupportedError()
+
+    # def __repr__(self):
+    #     raise exceps.NotSupportedError()
 
     """----------------------------------------------------------------
     """

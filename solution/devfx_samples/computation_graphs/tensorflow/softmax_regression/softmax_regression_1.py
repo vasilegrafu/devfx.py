@@ -130,17 +130,23 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-# generating data
-data_generator = SoftmaxRegression1DataGenerator()
-data = data_generator.generate(M=1024*256)
+def main():
+    # generating data
+    data_generator = SoftmaxRegression1DataGenerator()
+    data = data_generator.generate(M=1024*256)
 
-# splitting data
-(training_data, test_data) = stats.preprocessing.Splitter().split(data)
-# print(training_data, test_data)
+    # splitting data
+    (training_data, test_data) = stats.preprocessing.Splitter().split(data)
+    # print(training_data, test_data)
 
-# learning from data
-model = SoftmaxRegression1Model()
-model.train(training_data=training_data, batch_size=64,
-            test_data=test_data)
+    # learning from data
+    model = SoftmaxRegression1Model()
+    model.train(training_data=training_data, batch_size=64,
+                test_data=test_data)
 
-model.close()
+    model.close()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

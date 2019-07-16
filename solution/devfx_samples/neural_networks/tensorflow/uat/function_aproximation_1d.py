@@ -106,26 +106,30 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-# generating data
-data_generator = FunctionAproximationDataGenerator()
-dataset = dc.Dataset(data_generator.generate(M=1024*256))
+def main():
+    # generating data
+    data_generator = FunctionAproximationDataGenerator()
+    dataset = dc.Dataset(data_generator.generate(M=1024*256))
 
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(dataset[0], dataset[1])
-figure.show()
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(dataset[0], dataset[1])
+    figure.show()
 
-# splitting data
-(training_dataset, test_dataset) = dataset.split()
-# print(training_dataset, test_dataset)
+    # splitting data
+    (training_dataset, test_dataset) = dataset.split()
+    # print(training_dataset, test_dataset)
 
-# learning from data
-model = FunctionAproximationModel()
-model.train(training_data=training_dataset, batch_size=32,
-            training_data_sample = training_dataset.random_select(512)[:],
-            test_data_sample = test_dataset.random_select(512)[:])
+    # learning from data
+    model = FunctionAproximationModel()
+    model.train(training_data=training_dataset, batch_size=32,
+                training_data_sample = training_dataset.random_select(512)[:],
+                test_data_sample = test_dataset.random_select(512)[:])
 
-model.close()
+    model.close()
 
-
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()
 

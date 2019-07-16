@@ -67,21 +67,27 @@ class MnistModel(cg.models.DeclarativeModel):
     
 """------------------------------------------------------------------------------------------------
 """
-data_path = 'i:/Dev.Databases/mnist'
+def main():
+    data_path = 'i:/Dev.Databases/mnist'
 
-training_data_file = hdf5.File(os.path.join(data_path, 'mnist_train.hdf5'))
-training_dataset = MnistDataset(data=[list(range(training_data_file['/images'].shape[0]))],
-                                hparams=[training_data_file])
+    training_data_file = hdf5.File(os.path.join(data_path, 'mnist_train.hdf5'))
+    training_dataset = MnistDataset(data=[list(range(training_data_file['/images'].shape[0]))],
+                                    hparams=[training_data_file])
 
-test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
-test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
-                            hparams=[test_data_file])
+    test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
+    test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
+                                hparams=[test_data_file])
 
-model = MnistModel()
-model.train(training_data=training_dataset, batch_size=64,
-            training_data_sample=training_dataset.random_select(256)[:],
-            test_data_sample=test_dataset.random_select(256)[:])
-model.close()
+    model = MnistModel()
+    model.train(training_data=training_dataset, batch_size=64,
+                training_data_sample=training_dataset.random_select(256)[:],
+                test_data_sample=test_dataset.random_select(256)[:])
+    model.close()
 
-test_data_file.close()
-training_data_file.close()
+    test_data_file.close()
+    training_data_file.close()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

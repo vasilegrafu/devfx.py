@@ -96,31 +96,35 @@ class UnivariateLinearRegressionModel(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-# generating data
-generated_data = UnivariateLinearRegressionDataGenerator().generate()
-dataset = dc.Dataset(data=generated_data)
+def main():
+    # generating data
+    generated_data = UnivariateLinearRegressionDataGenerator().generate()
+    dataset = dc.Dataset(data=generated_data)
 
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(dataset[0], dataset[1])
-figure.show()
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(dataset[0], dataset[1])
+    figure.show()
 
-# splitting data
-(training_dataset, test_dataset) = dataset.split()
-# print(training_dataset, test_dataset)
+    # splitting data
+    (training_dataset, test_dataset) = dataset.split()
+    # print(training_dataset, test_dataset)
 
-# learning from data
-model = UnivariateLinearRegressionModel()
-model.train(training_data=training_dataset, batch_size=1024,
-            test_data=test_dataset)
+    # learning from data
+    model = UnivariateLinearRegressionModel()
+    model.train(training_data=training_dataset, batch_size=1024,
+                test_data=test_dataset)
 
-# validation
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(test_dataset[0], test_dataset[1], color='blue')
-chart.scatter(test_dataset[0], model.run_evaluator(name=model.devices[0]+'_hypothesis', feeds_data=[test_dataset[0]]), color='red')
-figure.show()
+    # validation
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(test_dataset[0], test_dataset[1], color='blue')
+    chart.scatter(test_dataset[0], model.run_evaluator(name=model.devices[0]+'_hypothesis', feeds_data=[test_dataset[0]]), color='red')
+    figure.show()
 
-model.close()
+    model.close()
 
-
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

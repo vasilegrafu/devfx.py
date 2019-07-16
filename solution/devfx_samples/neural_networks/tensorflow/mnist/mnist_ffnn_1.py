@@ -115,29 +115,35 @@ class MnistModel(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-data_path = 'i:/Dev.Databases/mnist'
+def main():
+    data_path = 'i:/Dev.Databases/mnist'
 
-training_data_file = hdf5.File(os.path.join(data_path, 'mnist_train.hdf5'))
-training_dataset = MnistDataset(data=[list(range(training_data_file['/images'].shape[0]))],
-                                hparams=[training_data_file])
+    training_data_file = hdf5.File(os.path.join(data_path, 'mnist_train.hdf5'))
+    training_dataset = MnistDataset(data=[list(range(training_data_file['/images'].shape[0]))],
+                                    hparams=[training_data_file])
 
-test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
-test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
-                            hparams=[test_data_file])
+    test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
+    test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
+                                hparams=[test_data_file])
 
-results = []
-i = 1
-while(i <= 20):
-    model = MnistModel()
-    result = model.train(hparams_values=[True],
-                         training_data=dc.Dataset(training_dataset[:]), batch_size=64,
-                         test_data=dc.Dataset(test_dataset[:]))
-    model.close()
+    results = []
+    i = 1
+    while(i <= 20):
+        model = MnistModel()
+        result = model.train(hparams_values=[True],
+                            training_data=dc.Dataset(training_dataset[:]), batch_size=64,
+                            test_data=dc.Dataset(test_dataset[:]))
+        model.close()
 
-    results.append(result)
-    print([_.iteration for _ in results], stats.series.mean([_.iteration for _ in results]))
+        results.append(result)
+        print([_.iteration for _ in results], stats.series.mean([_.iteration for _ in results]))
 
-    i += 1
+        i += 1
 
-test_data_file.close()
-training_data_file.close()
+    test_data_file.close()
+    training_data_file.close()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

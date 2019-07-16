@@ -1,7 +1,7 @@
 import devfx.exceptions as exceps
 
 class DatasetIterator(object):
-    def __init__(self, dataset, position, batch_size=None):
+    def __init__(self, dataset, batch_size, position):
         self.__dataset = dataset
         self.__batch_size = batch_size
         self.__position = position
@@ -15,15 +15,6 @@ class DatasetIterator(object):
     """----------------------------------------------------------------
     """
     @property
-    def position(self):
-        return self.__position
-
-    @position.setter
-    def position(self, position):
-        self.__position = position
-
-
-    @property
     def batch_size(self):
         return self.__batch_size
 
@@ -33,24 +24,33 @@ class DatasetIterator(object):
 
     """----------------------------------------------------------------
     """
-    def count(self):
-        return len(self.dataset)
+    @property
+    def position(self):
+        return self.__position
 
-    def __len__(self):
-       return self.count()
+    @position.setter
+    def position(self, position):
+        self.__position = position
+
+    """----------------------------------------------------------------
+    """
+    def get_relative_position(self):
+        if(self.__position < 0):
+            return 0.0
+        elif(self.__position > (len(self) - 1)):
+            return 1.0
+        else:
+            return (self.__position+1)/len(self)
 
     """----------------------------------------------------------------
     """
     def next(self, batch_size=None):
         raise exceps.NotImplementedError()
 
-    def __getitem__(self, key):
-        return self.dataset[key]
-
     """----------------------------------------------------------------
     """
     def __str__(self):
-        return "{n} | {batch_size} | {position}".format(n=len(self.__dataset), batch_size=self.__batch_size, position=self.__position)
+        return "{batch_size} | {position}".format(batch_size=self.__batch_size, position=self.__position)
 
     def __repr__(self):
         raise exceps.NotSupportedError()

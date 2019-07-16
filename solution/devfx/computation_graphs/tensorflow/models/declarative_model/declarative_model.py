@@ -356,7 +356,7 @@ class DeclarativeModel(object):
                     append_to_training_log_condition_result = append_to_training_log_condition(context=context)
                     # ----------------------------------------------------------------
                     if(append_to_training_log_condition_result):
-                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.position/training_data_iterator.count())
+                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.get_relative_position())
                         # ----------------------------------------------------------------
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed

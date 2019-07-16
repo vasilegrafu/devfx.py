@@ -73,32 +73,38 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-# generating data
-data_generator = QuadraticRegressionWithRegularizationDataGenerator()
-data = data_generator.generate()
+def main():
+    # generating data
+    data_generator = QuadraticRegressionWithRegularizationDataGenerator()
+    data = data_generator.generate()
 
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(data[0], data[1])
-figure.show()
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(data[0], data[1])
+    figure.show()
 
-# preprocessing data
-data[0] = stats.preprocessing.StandardScaler(data[0]).transform(data[0])
+    # preprocessing data
+    data[0] = stats.preprocessing.StandardScaler(data[0]).transform(data[0])
 
-# splitting data
-(training_data, test_data) = stats.preprocessing.Splitter().split(data)
-# print(training_data, test_data)
+    # splitting data
+    (training_data, test_data) = stats.preprocessing.Splitter().split(data)
+    # print(training_data, test_data)
 
-# learning from data
-model = QuadraticRegressionWithRegularizationModel()
-model.train(training_data=training_data, batch_size=256,
-            test_data=test_data)
+    # learning from data
+    model = QuadraticRegressionWithRegularizationModel()
+    model.train(training_data=training_data, batch_size=256,
+                test_data=test_data)
 
-# model validation
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(test_data[0], test_data[1], color='blue')
-chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
-figure.show()
+    # model validation
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(test_data[0], test_data[1], color='blue')
+    chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
+    figure.show()
 
-model.close()
+    model.close()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

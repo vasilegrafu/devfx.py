@@ -75,30 +75,35 @@ class UnivariateLinearRegressionModel(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
+def main():
+    # generating data
+    generated_data = UnivariateLinearRegressionDataGenerator().generate()
+    dataset = dc.Dataset(data=generated_data)
 
-# generating data
-generated_data = UnivariateLinearRegressionDataGenerator().generate()
-dataset = dc.Dataset(data=generated_data)
-
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(dataset[0], dataset[1])
-figure.show()
-
-# splitting data
-(training_dataset, test_dataset) = dataset.split()
-# print(training_dataset, test_dataset)
-
-# learning from data
-with UnivariateLinearRegressionModel() as model:
-    model.train(training_data=training_dataset, batch_size=256,
-                test_data=test_dataset)
-    model.export_to(os.file_info.parent_directorypath(__file__) + '/exports/_1')
-
-# validation
-with cg.models.ModelExecuter(os.file_info.parent_directorypath(__file__) + '/exports/_1') as model_executer:
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(test_dataset[0], test_dataset[1], color='blue')
-    chart.scatter(test_dataset[0], model_executer.evaluate(fetch_names='h', feed_dict={'x': test_dataset[0]}), color='red')
+    chart.scatter(dataset[0], dataset[1])
     figure.show()
+
+    # splitting data
+    (training_dataset, test_dataset) = dataset.split()
+    # print(training_dataset, test_dataset)
+
+    # learning from data
+    with UnivariateLinearRegressionModel() as model:
+        model.train(training_data=training_dataset, batch_size=256,
+                    test_data=test_dataset)
+        model.export_to(os.file_info.parent_directorypath(__file__) + '/exports/_1')
+
+    # validation
+    with cg.models.ModelExecuter(os.file_info.parent_directorypath(__file__) + '/exports/_1') as model_executer:
+        figure = dv.Figure(size=(8, 6))
+        chart = dv.Chart2d(figure=figure)
+        chart.scatter(test_dataset[0], test_dataset[1], color='blue')
+        chart.scatter(test_dataset[0], model_executer.evaluate(fetch_names='h', feed_dict={'x': test_dataset[0]}), color='red')
+        figure.show()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()

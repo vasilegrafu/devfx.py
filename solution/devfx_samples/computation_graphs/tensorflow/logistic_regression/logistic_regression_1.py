@@ -98,23 +98,29 @@ class LogisticRegression1Model(cg.models.DeclarativeModel):
 
 """------------------------------------------------------------------------------------------------
 """
-# generating data
-generated_data = LogisticRegression1DataGenerator().generate()
-dataset = dc.Dataset(data=generated_data)
+def main():
+    # generating data
+    generated_data = LogisticRegression1DataGenerator().generate()
+    dataset = dc.Dataset(data=generated_data)
 
-figure = dv.Figure(size=(8, 6))
-chart = dv.Chart2d(figure=figure)
-chart.scatter(dataset[1], dataset[0], color='red')
-chart.scatter(dataset[1], dataset[2])
-figure.show()
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(dataset[1], dataset[0], color='red')
+    chart.scatter(dataset[1], dataset[2])
+    figure.show()
 
-# splitting data
-(training_dataset, test_dataset) = dataset.split()
-print(training_dataset, test_dataset)
+    # splitting data
+    (training_dataset, test_dataset) = dataset.split()
+    print(training_dataset, test_dataset)
 
-model = LogisticRegression1Model()
-model.train(training_data=training_dataset[1, 2], batch_size=64,
-            test_data=test_dataset[1, 2])
+    model = LogisticRegression1Model()
+    model.train(training_data=training_dataset[1, 2], batch_size=64,
+                test_data=test_dataset[1, 2])
 
-model.close()
+    model.close()
+
+"""------------------------------------------------------------------------------------------------
+"""
+if __name__ == '__main__':
+    main()
 

@@ -51,8 +51,8 @@ from .types import cast_to_string
 
 """----------------------------------------------------------
 """
-from .scopes import scope
-from .scopes import get_scope
+from .variable_scopes import scope
+from .variable_scopes import get_scope
 
 """----------------------------------------------------------
 """

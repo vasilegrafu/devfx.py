@@ -2,7 +2,7 @@ import tensorflow as tf
 import devfx.exceptions as exceps
 from . import execution
 from . import types
-from . import scopes
+from . import variable_scopes
 
 """------------------------------------------------------------------------------------------------
 """
@@ -22,12 +22,12 @@ eagerVariableStore = tf.contrib.eager.EagerVariableStore()
 
 def create_variable(name, shape=None, dtype=types.float32, initializer=None, trainable=True, validate_shape=True):
     if(execution.is_declarative_execution_mode_enabled()):
-        with scopes.scope(scopes.get_scope(), variables_reuse=False):
+        with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=False):
             variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
             return variable
     elif(execution.is_imperative_execution_mode_enabled()):
         with eagerVariableStore.as_default():
-            with scopes.scope(scopes.get_scope(), variables_reuse=False):
+            with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=False):
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
@@ -35,12 +35,12 @@ def create_variable(name, shape=None, dtype=types.float32, initializer=None, tra
 
 def get_variable(name, shape=None, dtype=types.float32, initializer=None, trainable=True, validate_shape=True):
     if(execution.is_declarative_execution_mode_enabled()):
-        with scopes.scope(scopes.get_scope(), variables_reuse=True):
+        with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=True):
             variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
             return variable
     elif(execution.is_imperative_execution_mode_enabled()):
         with eagerVariableStore.as_default():
-            with scopes.scope(scopes.get_scope(), variables_reuse=True):
+            with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=True):
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
@@ -48,12 +48,12 @@ def get_variable(name, shape=None, dtype=types.float32, initializer=None, traina
 
 def create_or_get_variable(name, shape=None, dtype=types.float32, initializer=None, trainable=True, validate_shape=True):
     if(execution.is_declarative_execution_mode_enabled()):
-        with scopes.scope(scopes.get_scope(), variables_reuse=tf.AUTO_REUSE):
+        with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=tf.AUTO_REUSE):
             variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
             return variable
     elif(execution.is_imperative_execution_mode_enabled()):
         with eagerVariableStore.as_default():
-            with scopes.scope(scopes.get_scope(), variables_reuse=tf.AUTO_REUSE):
+            with variable_scopes.scope(variable_scopes.get_scope(), variables_reuse=tf.AUTO_REUSE):
                 variable = tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, validate_shape=validate_shape)
                 return variable
     else:
