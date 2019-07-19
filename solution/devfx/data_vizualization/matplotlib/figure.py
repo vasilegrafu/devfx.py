@@ -34,7 +34,7 @@ class Figure(object):
             return self.__figure.add_subplot(*position)
         elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position)
-        elif(refl.is_typeof_int(position)):
+        elif(refl.is_typeof(position, int)):
             return self.__figure.add_subplot(position)
         else:
             if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
@@ -50,7 +50,7 @@ class Figure(object):
             return self.__figure.add_subplot(*position, projection='3d')
         elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position, projection='3d')
-        elif(refl.is_typeof_int(position)):
+        elif(refl.is_typeof(position, int)):
             return self.__figure.add_subplot(position, projection='3d')
         else:
             if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
@@ -66,7 +66,7 @@ class Figure(object):
             return self.__figure.add_subplot(*position, projection='polar')
         elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position, projection='polar')
-        elif(refl.is_typeof_int(position)):
+        elif(refl.is_typeof(position, int)):
             return self.__figure.add_subplot(position)
         else:
             if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):

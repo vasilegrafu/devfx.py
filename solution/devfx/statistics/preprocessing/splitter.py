@@ -20,7 +20,7 @@ class Splitter(object):
         return self.__ratios
 
     def split(self, data):
-        if(refl.is_typeof_tuple(data)):
+        if(refl.is_typeof(data, tuple)):
             data_splitted_1 = []
             for data_i in data:
                 data_splitted_1.append(Splitter(ratios=self.ratios).split(data_i))
@@ -34,7 +34,7 @@ class Splitter(object):
                 data_splitted_2.append(tuple(_))
             return data_splitted_2
 
-        if(refl.is_typeof_list(data)):
+        if(refl.is_typeof(data, list)):
             data_splitted_1 = []
             for data_i in data:
                 data_splitted_1.append(Splitter(ratios=self.ratios).split(data_i))
@@ -48,7 +48,7 @@ class Splitter(object):
                 data_splitted_2.append(list(_))
             return data_splitted_2
 
-        if(refl.is_typeof_dict(data)):
+        if(refl.is_typeof(data, dict)):
             data_splitted_1 = {}
             for key in data:
                 data_splitted_1[key] = Splitter(ratios=self.ratios).split(data[key])

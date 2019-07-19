@@ -55,11 +55,11 @@ class ModelExecuter(object):
         def complete_name(name):
             return name if (':' in name) else name+':0'
 
-        if(refl.is_typeof_str(fetch_names)):
+        if(refl.is_typeof(fetch_names, str)):
             fetches = self.__graph.get_tensor_by_name(complete_name(fetch_names))
-        elif(refl.is_typeof_list(fetch_names)):
+        elif(refl.is_typeof(fetch_names, list)):
             fetches = [self.__graph.get_tensor_by_name(complete_name(fetch_name)) for fetch_name in fetch_names]
-        elif (refl.is_typeof_tuple(fetch_names)):
+        elif (refl.is_typeof(fetch_names, tuple)):
             fetches = [self.__graph.get_tensor_by_name(complete_name(fetch_name)) for fetch_name in fetch_names]
         else:
             raise exceps.NotSupportedError()
