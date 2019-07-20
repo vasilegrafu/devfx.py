@@ -12,7 +12,7 @@ class UnivariateLinearRegressionDataGenerator():
         pass
 
     def generate(self):
-        M = 1024*64
+        M = 1024
         a = 1.0
         b = 0.75
         x = np.random.normal(0.0, 0.5, size=M)
@@ -78,30 +78,48 @@ class UnivariateLinearRegressionModel(cg.models.DeclarativeModel):
 def main():
     # generating data
     generated_data = UnivariateLinearRegressionDataGenerator().generate()
-    dataset = dc.Dataset(data=generated_data)
 
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(dataset[0], dataset[1])
+    chart.scatter(generated_data[0], generated_data[1])
     figure.show()
 
     # splitting data
-    (training_dataset, test_dataset) = dataset.split()
-    # print(training_dataset, test_dataset)
+    split_bound = int(0.75*len(generated_data[0]))
+    training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
+    test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
+    # print(training_data, test_data)
+
+    # # learning from data
+    # model = UnivariateLinearRegressionModel()
+    # model.train(training_data=training_data, batch_size=256,
+    #             test_data=test_data)
+
+    # # validation
+    # figure = dv.Figure(size=(8, 6))
+    # chart = dv.Chart2d(figure=figure)
+    # chart.scatter(test_data[0], test_data[1], color='blue')
+    # chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
+    # figure.show()
+
+    # model.close()
 
     # learning from data
     with UnivariateLinearRegressionModel() as model:
-        model.train(training_data=training_dataset, batch_size=256,
-                    test_data=test_dataset)
+        model.train(training_data=training_data, batch_size=256,
+                    test_data=test_data)
         model.export_to(os.file_info.parent_directorypath(__file__) + '/exports/_1')
 
     # validation
     with cg.models.ModelExecuter(os.file_info.parent_directorypath(__file__) + '/exports/_1') as model_executer:
         figure = dv.Figure(size=(8, 6))
         chart = dv.Chart2d(figure=figure)
-        chart.scatter(test_dataset[0], test_dataset[1], color='blue')
-        chart.scatter(test_dataset[0], model_executer.evaluate(fetch_names='h', feed_dict={'x': test_dataset[0]}), color='red')
+        chart.scatter(test_data[0], test_data[1], color='blue')
+        chart.scatter(test_data[0], model_executer.evaluate(fetch_names='h', feed_dict={'x': test_data[0]}), color='red')
         figure.show()
+
+
+
 
 """------------------------------------------------------------------------------------------------
 """

@@ -1,8 +1,9 @@
+import itertools as it
+import numpy as np
 import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
-import devfx.data_containers as dc
 from ... import variables
 from ... import train
 from ..training_log import TrainingLog
@@ -220,10 +221,21 @@ class DeclarativeModel(object):
     """
     def train(self, hparams_values=(), training_data=None, batch_size=None, iterations=None, epochs=None, **kwargs):
         # ----------------------------------------------------------------
-        if(not refl.is_typeof(training_data, dc.Dataset)):
-            training_data = dc.Dataset(training_data)
+        if(not refl.is_iterable(training_data)):
+            raise exceps.ArgumentError()
+        if(len(training_data) != 2):
+            raise exceps.ArgumentError()
+        if(not refl.is_iterable(training_data[0])):
+            raise exceps.ArgumentError()
+        if(not refl.is_iterable(training_data[1])):
+            raise exceps.ArgumentError()
+        if(len(training_data[0]) != len(training_data[1])):
+            raise exceps.ArgumentError()
+        # ----------------------------------------------------------------
+
+        # ----------------------------------------------------------------
         if(batch_size is None):
-            batch_size = len(training_data)
+            batch_size = len(training_data[0])
         if(iterations is None):
             iterations = 1024**4
         if (epochs is None):
@@ -263,8 +275,17 @@ class DeclarativeModel(object):
             epoch = 0
             while((iteration < iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
-                training_data = training_data.shuffle()
-                training_data_iterator = training_data.iterator()
+                training_data_shuffled_indexes = np.random.choice(np.arange(0, len(training_data[0])), size=len(training_data[0]), replace=False)
+                training_data_shuffled = []
+                for training_data_column_index in range(0, len(training_data)):
+                    training_data_shuffled_c = [training_data[training_data_column_index][training_data_shuffled_index] for training_data_shuffled_index in training_data_shuffled_indexes]
+                    training_data_shuffled.append(training_data_shuffled_c)
+                training_data = training_data_shuffled
+                # ----------------------------------------------------------------
+
+                # ----------------------------------------------------------------
+                training_data_iterator_0 = iter(training_data[0])
+                training_data_iterator_1 = iter(training_data[1])
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -292,7 +313,11 @@ class DeclarativeModel(object):
                 while ((iteration < iterations) and (not cancellation_token.is_cancellation_requested())):
                     # ----------------------------------------------------------------
                     try:
-                        iteration_training_data = training_data_iterator.next(batch_size)
+                        iteration_training_data_0 = list(it.islice(training_data_iterator_0, batch_size))
+                        if(len(iteration_training_data_0) == 0):
+                            raise StopIteration
+                        iteration_training_data_1 = list(it.islice(training_data_iterator_1, batch_size))
+                        iteration_training_data = [iteration_training_data_0, iteration_training_data_1]
                     except StopIteration:
                         break
 
@@ -356,7 +381,7 @@ class DeclarativeModel(object):
                     append_to_training_log_condition_result = append_to_training_log_condition(context=context)
                     # ----------------------------------------------------------------
                     if(append_to_training_log_condition_result):
-                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.get_relative_position())
+                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+iteration/iterations)
                         # ----------------------------------------------------------------
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
