@@ -20,5 +20,5 @@ def trend(x, y, n_max=None):
     y = y[-n:]
 
     w = np.linalg.lstsq(np.vstack([x, np.ones(len(x))]).T, y)[0]
-    w = (np.arctan(w[0]), w[1])
+    w = ((np.arctan(w[0]), np.arctan(w[0])*360/(2.0*np.pi)), w[1])
     return w

@@ -33,7 +33,7 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
 
         # cost function
         y = cg.placeholder(shape=[None], name='y')
-        J = 0.5*cg.reduce_mean(cg.square(h-y)+1000.0*cg.square(w2)+1000.0*cg.square(w3))
+        J = 0.5*cg.reduce_mean(cg.square(h-y)) + 1000.0*cg.square(w2)+1000.0*cg.square(w3)
 
         # evaluators
         self.register_input_evaluator(input=input)
@@ -53,16 +53,18 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
+        training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data)
         if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0][1]
             context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
+
+        training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data)
 
         print(training_log.last_item)
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
         chart.plot(training_log.training_data_cost_list, color='green')
+        chart.plot(training_log.test_data_cost_list, color='red')
         figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
@@ -75,19 +77,20 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
 """
 def main():
     # generating data
-    data_generator = QuadraticRegressionWithRegularizationDataGenerator()
-    data = data_generator.generate()
+    generated_data = QuadraticRegressionWithRegularizationDataGenerator().generate()
 
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(data[0], data[1])
+    chart.scatter(generated_data[0], generated_data[1])
     figure.show()
 
     # preprocessing data
-    data[0] = stats.preprocessing.StandardScaler(data[0]).transform(data[0])
+    # generated_data[0] = (generated_data[0] - stats.series.center.mean(generated_data[0]))/stats.series.dispersion.stddev(generated_data[0])
 
     # splitting data
-    (training_data, test_data) = stats.preprocessing.Splitter().split(data)
+    split_bound = int(0.75*len(generated_data[0]))
+    training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
+    test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
     # print(training_data, test_data)
 
     # learning from data
@@ -98,7 +101,9 @@ def main():
     # model validation
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(test_data[0], test_data[1], color='blue')
+    chart.scatter(training_data[0], training_data[1], color='blue')
+    chart.scatter(training_data[0], model.run_hypothesis_evaluator(input_data=training_data[0]), color='blue')
+    chart.scatter(test_data[0], test_data[1], color='red')
     chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
     figure.show()
 

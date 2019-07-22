@@ -234,8 +234,13 @@ class DeclarativeModel(object):
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
+        training_data_column_count = len(training_data)
+        training_data_row_count = len(training_data[0])
+        # ----------------------------------------------------------------
+
+        # ----------------------------------------------------------------
         if(batch_size is None):
-            batch_size = len(training_data[0])
+            batch_size = training_data_row_count
         if(iterations is None):
             iterations = 1024**4
         if (epochs is None):
@@ -271,21 +276,15 @@ class DeclarativeModel(object):
             epochs = context.epochs
             # ----------------------------------------------------------------
 
+            # ----------------------------------------------------------------
+            training_data_row_indexes = np.random.choice(np.arange(0, training_data_row_count), size=training_data_row_count, replace=False)
+            # ----------------------------------------------------------------
+
             iteration = 0
             epoch = 0
             while((iteration < iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
-                training_data_shuffled_indexes = np.random.choice(np.arange(0, len(training_data[0])), size=len(training_data[0]), replace=False)
-                training_data_shuffled = []
-                for training_data_column_index in range(0, len(training_data)):
-                    training_data_shuffled_c = [training_data[training_data_column_index][training_data_shuffled_index] for training_data_shuffled_index in training_data_shuffled_indexes]
-                    training_data_shuffled.append(training_data_shuffled_c)
-                training_data = training_data_shuffled
-                # ----------------------------------------------------------------
-
-                # ----------------------------------------------------------------
-                training_data_iterator_0 = iter(training_data[0])
-                training_data_iterator_1 = iter(training_data[1])
+                training_data_row_indexes_iterator = iter(training_data_row_indexes)
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -310,18 +309,25 @@ class DeclarativeModel(object):
                 iteration = context.iteration
                 # ----------------------------------------------------------------
 
+                # ----------------------------------------------------------------
+                training_data_epoch_position = 0
+                # ----------------------------------------------------------------
+                
+                # ----------------------------------------------------------------
                 while ((iteration < iterations) and (not cancellation_token.is_cancellation_requested())):
                     # ----------------------------------------------------------------
-                    try:
-                        iteration_training_data_0 = list(it.islice(training_data_iterator_0, batch_size))
-                        if(len(iteration_training_data_0) == 0):
-                            raise StopIteration
-                        iteration_training_data_1 = list(it.islice(training_data_iterator_1, batch_size))
-                        iteration_training_data = [iteration_training_data_0, iteration_training_data_1]
-                    except StopIteration:
+                    training_data_row_indexes_batch = list(it.islice(training_data_row_indexes_iterator, batch_size))
+                    if(len(training_data_row_indexes_batch) == 0):
                         break
 
+                    batch = []
+                    for training_data_column_index in range(0, training_data_column_count):
+                        training_data_batch_column = [training_data[training_data_column_index][training_data_row_index] for training_data_row_index in training_data_row_indexes_batch]
+                        batch.append(training_data_batch_column)
+
                     iteration += 1
+
+                    training_data_epoch_position += len(training_data_row_indexes_batch)
                     # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
@@ -334,7 +340,7 @@ class DeclarativeModel(object):
                     context.hparams_values = hparams_values
                     context.training_data = training_data
                     context.batch_size = batch_size
-                    context.iteration_training_data = iteration_training_data
+                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
@@ -349,7 +355,7 @@ class DeclarativeModel(object):
 
                     # ----------------------------------------------------------------
                     if(self.exists_cost_optimizer_applier_evaluator()):
-                        self.run_cost_optimizer_applier_evaluator(input_data=iteration_training_data[0], output_data=iteration_training_data[1], hparams_values=hparams_values)
+                        self.run_cost_optimizer_applier_evaluator(input_data=batch[0], output_data=batch[1], hparams_values=hparams_values)
                     else:
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
@@ -360,7 +366,7 @@ class DeclarativeModel(object):
                         context.hparams_values = hparams_values
                         context.training_data = training_data
                         context.batch_size = batch_size
-                        context.iteration_training_data = iteration_training_data
+                        context.batch = batch
                         for key in kwargs: setattr(context, key, kwargs[key])
                         context.training_log = self.__training_log
                         context.cancellation_token = cancellation_token
@@ -381,7 +387,7 @@ class DeclarativeModel(object):
                     append_to_training_log_condition_result = append_to_training_log_condition(context=context)
                     # ----------------------------------------------------------------
                     if(append_to_training_log_condition_result):
-                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+iteration/iterations)
+                        self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_epoch_position/training_data_row_count)
                         # ----------------------------------------------------------------
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
@@ -392,7 +398,7 @@ class DeclarativeModel(object):
                         context.hparams_values = hparams_values
                         context.training_data = training_data
                         context.batch_size = batch_size
-                        context.iteration_training_data = iteration_training_data
+                        context.batch = batch
                         for key in kwargs: setattr(context, key, kwargs[key])
                         context.training_log = self.__training_log
                         context.cancellation_token = cancellation_token
@@ -415,7 +421,7 @@ class DeclarativeModel(object):
                     context.hparams_values = hparams_values
                     context.training_data = training_data
                     context.batch_size = batch_size
-                    context.iteration_training_data = iteration_training_data
+                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
@@ -427,6 +433,7 @@ class DeclarativeModel(object):
                     iterations = context.iterations
                     iteration = context.iteration
                     # ----------------------------------------------------------------
+                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
                 context = DeclarativeModel.TrainingContext()

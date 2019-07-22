@@ -3,6 +3,8 @@ import devfx.exceptions as exceps
 from ..series.dispersion import min
 from ..series.dispersion import max
 
+"""------------------------------------------------------------------------------------------------
+"""
 def normalized_trend(x, y, n_max=None):
     if(len(x) < 2):
         raise exceps.ArgumentError()
@@ -16,15 +18,15 @@ def normalized_trend(x, y, n_max=None):
     n = len(x) if(len(x) < n_max) else n_max
 
     x = np.asarray(x)
-    x_min = min(x)
-    x_max = max(x)
+    x_min = np.min(x)
+    x_max = np.max(x)
     x = (x[-n:] - x_min)/(x_max - x_min)
 
     y = np.asarray(y)
-    y_min = min(y)
-    y_max = max(y)
+    y_min = np.min(y)
+    y_max = np.max(y)
     y = (y[-n:] - y_min)/(y_max - y_min)
 
     w = np.linalg.lstsq(np.vstack([x, np.ones(len(x))]).T, y, rcond=None)[0]
-    w = (np.arctan(w[0]), w[1])
+    w = ((np.arctan(w[0]), np.arctan(w[0])*360/(2.0*np.pi)), w[1])
     return w

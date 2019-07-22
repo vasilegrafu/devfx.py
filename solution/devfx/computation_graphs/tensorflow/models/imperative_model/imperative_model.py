@@ -1,3 +1,5 @@
+import itertools as it
+import numpy as np
 import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.reflection as refl
@@ -135,10 +137,26 @@ class ImperativeModel(object):
     """
     def train(self, hparams=None, training_data=None, batch_size=None, iterations=None, epochs=None, **kwargs):
         # ----------------------------------------------------------------
-        if(not refl.is_typeof(training_data, dc.Dataset)):
-            training_data = dc.Dataset(training_data)
+        if(not refl.is_iterable(training_data)):
+            raise exceps.ArgumentError()
+        if(len(training_data) != 2):
+            raise exceps.ArgumentError()
+        if(not refl.is_iterable(training_data[0])):
+            raise exceps.ArgumentError()
+        if(not refl.is_iterable(training_data[1])):
+            raise exceps.ArgumentError()
+        if(len(training_data[0]) != len(training_data[1])):
+            raise exceps.ArgumentError()
+        # ----------------------------------------------------------------
+
+        # ----------------------------------------------------------------
+        training_data_column_count = len(training_data)
+        training_data_row_count = len(training_data[0])
+        # ----------------------------------------------------------------
+
+        # ----------------------------------------------------------------
         if(batch_size is None):
-            batch_size = len(training_data)
+            batch_size = training_data_row_count
         if(iterations is None):
             iterations = 1024**4
         if (epochs is None):
@@ -173,12 +191,15 @@ class ImperativeModel(object):
         epochs = context.epochs
         # ----------------------------------------------------------------
 
+        # ----------------------------------------------------------------
+        training_data_row_indexes = np.random.choice(np.arange(0, training_data_row_count), size=training_data_row_count, replace=False)
+        # ----------------------------------------------------------------
+
         iteration = 0
         epoch = 0
         while((iteration < iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
             # ----------------------------------------------------------------
-            training_data = training_data.shuffle()
-            training_data_iterator = training_data.iterator()
+            training_data_row_indexes_iterator = iter(training_data_row_indexes)
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
@@ -203,14 +224,24 @@ class ImperativeModel(object):
             iteration = context.iteration
             # ----------------------------------------------------------------
 
+            # ----------------------------------------------------------------
+            training_data_epoch_position = 0
+            # ----------------------------------------------------------------
+            
             while ((iteration < iterations) and (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
-                try:
-                    iteration_training_data = training_data_iterator.next(batch_size)
-                except StopIteration:
+                training_data_row_indexes_batch = list(it.islice(training_data_row_indexes_iterator, batch_size))
+                if(len(training_data_row_indexes_batch) == 0):
                     break
 
+                batch = []
+                for training_data_column_index in range(0, training_data_column_count):
+                    training_data_batch_column = [training_data[training_data_column_index][training_data_row_index] for training_data_row_index in training_data_row_indexes_batch]
+                    batch.append(training_data_batch_column)
+
                 iteration += 1
+
+                training_data_epoch_position += len(training_data_row_indexes_batch)
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -223,7 +254,7 @@ class ImperativeModel(object):
                 context.hparams = hparams
                 context.training_data = training_data
                 context.batch_size = batch_size
-                context.iteration_training_data = iteration_training_data
+                context.batch = batch
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token
@@ -239,9 +270,9 @@ class ImperativeModel(object):
                 # ----------------------------------------------------------------
                 if (self.exists_apply_cost_optimizer_function()):
                     if(hparams is None):
-                        self.run_apply_cost_optimizer_function(iteration_training_data[0], iteration_training_data[1])
+                        self.run_apply_cost_optimizer_function(batch[0], batch[1])
                     else:
-                        self.run_apply_cost_optimizer_function(iteration_training_data[0], iteration_training_data[1], hparams)
+                        self.run_apply_cost_optimizer_function(batch[0], batch[1], hparams)
                 else:
                     context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
@@ -252,7 +283,7 @@ class ImperativeModel(object):
                     context.hparams = hparams
                     context.training_data = training_data
                     context.batch_size = batch_size
-                    context.iteration_training_data = iteration_training_data
+                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
@@ -273,7 +304,7 @@ class ImperativeModel(object):
                 append_to_training_log_condition_result = append_to_training_log_condition(context=context)
                 # ----------------------------------------------------------------
                 if(append_to_training_log_condition_result):
-                    self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_iterator.get_relative_position())
+                    self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_epoch_position/training_data_row_count)
                     # ----------------------------------------------------------------
                     context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
@@ -284,7 +315,7 @@ class ImperativeModel(object):
                     context.hparams = hparams
                     context.training_data = training_data
                     context.batch_size = batch_size
-                    context.iteration_training_data = iteration_training_data
+                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
@@ -307,7 +338,7 @@ class ImperativeModel(object):
                 context.hparams = hparams
                 context.training_data = training_data
                 context.batch_size = batch_size
-                context.iteration_training_data = iteration_training_data
+                context.batch = batch
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token

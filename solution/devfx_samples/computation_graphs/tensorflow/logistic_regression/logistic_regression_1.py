@@ -77,17 +77,20 @@ class LogisticRegression1Model(cg.models.DeclarativeModel):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0], output_data=context.training_data[1])
+        training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data)
         if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
+            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0][1]
             context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0], output_data=context.test_data[1])
+
+        training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data)
+
         training_log.last_item.w = [_[0] for _ in self.run_evaluator(name='weight')]
 
         print(training_log.last_item)
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
         chart.plot(training_log.training_data_cost_list, color='green')
+        chart.plot(training_log.test_data_cost_list, color='red')
         figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
@@ -101,21 +104,22 @@ class LogisticRegression1Model(cg.models.DeclarativeModel):
 def main():
     # generating data
     generated_data = LogisticRegression1DataGenerator().generate()
-    dataset = dc.Dataset(data=generated_data)
 
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(dataset[1], dataset[0], color='red')
-    chart.scatter(dataset[1], dataset[2])
+    chart.scatter(generated_data[1], generated_data[0], color='red')
+    chart.scatter(generated_data[1], generated_data[2])
     figure.show()
 
     # splitting data
-    (training_dataset, test_dataset) = dataset.split()
-    print(training_dataset, test_dataset)
+    split_bound = int(0.75*len(generated_data[0]))
+    training_data = [generated_data[1][:split_bound], generated_data[2][:split_bound]]
+    test_data = [generated_data[1][split_bound:], generated_data[2][split_bound:]]
+    # print(training_data, test_data)
 
     model = LogisticRegression1Model()
-    model.train(training_data=training_dataset[1, 2], batch_size=64,
-                test_data=test_dataset[1, 2])
+    model.train(training_data=training_data, batch_size=64,
+                test_data=test_data)
 
     model.close()
 

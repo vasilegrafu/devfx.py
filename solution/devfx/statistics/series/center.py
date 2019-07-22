@@ -11,7 +11,7 @@ def mean(data):
         return data.mean()
     else:
         data = np.asarray(data)
-        return np.average(data, axis=None)
+        return np.mean(data, axis=None)
 
 """------------------------------------------------------------------------------------------------
 """
