@@ -89,23 +89,9 @@ def main():
 
     # splitting data
     split_bound = int(0.75*len(generated_data[0]))
-    training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
-    test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
+    training_data = [_[:split_bound] for _ in generated_data] 
+    test_data = [_[split_bound:] for _ in generated_data] 
     # print(training_data, test_data)
-
-    # # learning from data
-    # model = UnivariateLinearRegressionModel()
-    # model.train(training_data=training_data, batch_size=256,
-    #             test_data=test_data)
-
-    # # validation
-    # figure = dv.Figure(size=(8, 6))
-    # chart = dv.Chart2d(figure=figure)
-    # chart.scatter(test_data[0], test_data[1], color='blue')
-    # chart.scatter(test_data[0], model.run_hypothesis_evaluator(input_data=test_data[0]), color='red')
-    # figure.show()
-
-    # model.close()
 
     # learning from data
     with UnivariateLinearRegressionModel() as model:
@@ -120,9 +106,6 @@ def main():
         chart.scatter(test_data[0], test_data[1], color='blue')
         chart.scatter(test_data[0], model_executer.evaluate(fetch_names='h', feed_dict={'x': test_data[0]}), color='red')
         figure.show()
-
-
-
 
 """------------------------------------------------------------------------------------------------
 """

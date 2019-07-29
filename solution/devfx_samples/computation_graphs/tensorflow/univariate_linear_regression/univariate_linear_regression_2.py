@@ -110,8 +110,8 @@ def main():
 
     # splitting data
     split_bound = int(0.75*len(generated_data[0]))
-    training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
-    test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
+    training_data = [_[:split_bound] for _ in generated_data] 
+    test_data = [_[split_bound:] for _ in generated_data] 
     # print(training_data, test_data)
 
     # learning from data

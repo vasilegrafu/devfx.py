@@ -17,8 +17,6 @@ class FunctionAproximationDataGenerator(object):
 
         x = [[_] for _ in x]
         y = [[_] for _ in y]
-        x = np.asarray(x).astype(dtype=np.float32)
-        y = np.asarray(y).astype(dtype=np.float32)
 
         return [x, y]
 
@@ -81,18 +79,19 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
     def _on_append_to_training_log(self, training_log, context):
         training_log.last_item.batch_size = context.batch_size
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data_sample[0], output_data=context.training_data_sample[1])
-        # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0]*360/(2.0*np.pi)
-        #     context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data_sample[0], output_data=context.test_data_sample[1])
+        training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data_sample)
+        if(len(training_log.nr_list) >= 2):
+            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+
+        training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data_sample)
 
         print(training_log.last_item)
 
         figure, chart1, chart2 = dv.PersistentFigure(id='status', size=(12, 4), chart_fns=[lambda _: dv.Chart2d(figure=_, position=121), lambda _: dv.Chart2d(figure=_, position=122)])
         chart1.plot(training_log.training_data_cost_list, color='green')
-        chart2.scatter(context.test_data_sample[0][:,0], context.test_data_sample[1][:,0], color='blue')
-        chart2.plot(context.test_data_sample[0][:,0], self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])[:,0], color='red')
+        chart2.scatter([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in context.test_data_sample[1]], color='blue')
+        chart2.plot([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])], color='red')
         figure.refresh()
 
     def _on_training_iteration_end(self, iteration, context):
@@ -108,23 +107,29 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 """
 def main():
     # generating data
-    data_generator = FunctionAproximationDataGenerator()
-    dataset = dc.Dataset(data_generator.generate(M=1024*256))
+    generated_data = FunctionAproximationDataGenerator().generate(M=1024*4)
 
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(dataset[0], dataset[1])
+    chart.scatter(*[[__[0] for __ in _] for _ in generated_data])
     figure.show()
 
     # splitting data
-    (training_dataset, test_dataset) = dataset.split()
-    # print(training_dataset, test_dataset)
+    split_bound = int(0.75*len(generated_data[0]))
+    training_data = [_[:split_bound] for _ in generated_data] 
+    test_data = [_[split_bound:] for _ in generated_data] 
+    # print(training_data, test_data)
+
+    sample_count = 512
+    training_data_sample = [_[:sample_count] for _ in training_data] 
+    test_data_sample = [_[:sample_count] for _ in test_data] 
+    # print(training_data_sample, test_data_sample)
 
     # learning from data
     model = FunctionAproximationModel()
-    model.train(training_data=training_dataset, batch_size=32,
-                training_data_sample = training_dataset.random_select(512)[:],
-                test_data_sample = test_dataset.random_select(512)[:])
+    model.train(training_data=training_data, batch_size=32,
+                training_data_sample = training_data_sample,
+                test_data_sample = test_data_sample)
 
     model.close()
 

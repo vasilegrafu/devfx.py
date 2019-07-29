@@ -10,7 +10,7 @@ class QuadraticRegressionWithRegularizationDataGenerator(object):
         pass
 
     def generate(self):
-        M = 1024
+        M = 1024*256
         a = -1.0
         b = 8.0
         c = 0
@@ -43,11 +43,11 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
         self.register_cost_evaluator(cost=J, input=x, output=y)
 
         # cost minimizer
-        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-2))
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-3))
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.append_to_training_log_condition = lambda context: context.iteration % 100 == 0
+        context.append_to_training_log_condition = lambda context: context.iteration % 256 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
         pass
@@ -89,8 +89,8 @@ def main():
 
     # splitting data
     split_bound = int(0.75*len(generated_data[0]))
-    training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
-    test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
+    training_data = [_[:split_bound] for _ in generated_data] 
+    test_data = [_[split_bound:] for _ in generated_data] 
     # print(training_data, test_data)
 
     # learning from data

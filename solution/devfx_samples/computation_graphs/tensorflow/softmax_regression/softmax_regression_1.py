@@ -137,18 +137,18 @@ def main():
     # generating data
     generated_data = SoftmaxRegression1DataGenerator().generate(M=1024*256)
 
-    # # splitting data
-    # split_bound = int(0.75*len(generated_data[0]))
-    # training_data = [generated_data[0][:split_bound], generated_data[1][:split_bound]]
-    # test_data = [generated_data[0][split_bound:], generated_data[1][split_bound:]]
-    # # print(training_data, test_data)
+    # splitting data
+    split_bound = int(0.75*len(generated_data[0]))
+    training_data = [_[:split_bound] for _ in generated_data] 
+    test_data = [_[split_bound:] for _ in generated_data] 
+    # print(training_data, test_data)
 
-    # # learning from data
-    # model = SoftmaxRegression1Model()
-    # model.train(training_data=training_data, batch_size=64,
-    #             test_data=test_data)
+    # learning from data
+    model = SoftmaxRegression1Model()
+    model.train(training_data=training_data, batch_size=64,
+                test_data=test_data)
 
-    # model.close()
+    model.close()
 
 """------------------------------------------------------------------------------------------------
 """
