@@ -110,7 +110,13 @@ class LogisticRegression2Model(cg.models.DeclarativeModel):
 def main():
     # generating data
     generated_data = LogisticRegression2DataGenerator().generate()
+    
+    # shuffle
+    ris = np.random.permutation(len(generated_data[0]))
+    cis = np.arange(len(generated_data))
+    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
 
+    # chart
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
     chart.scatter(generated_data[1], generated_data[0], color='red')

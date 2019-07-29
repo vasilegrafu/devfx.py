@@ -277,7 +277,7 @@ class DeclarativeModel(object):
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            training_data_row_indexes = np.random.choice(np.arange(0, training_data_row_count), size=training_data_row_count, replace=False)
+            training_data_row_indexes =  np.random.permutation(training_data_row_count)
             # ----------------------------------------------------------------
 
             iteration = 0

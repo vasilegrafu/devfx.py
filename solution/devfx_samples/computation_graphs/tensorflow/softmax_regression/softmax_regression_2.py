@@ -122,7 +122,13 @@ class SoftmaxRegression2Model(cg.models.DeclarativeModel):
 def main():
     # generating data
     generated_data = SoftmaxRegression2DataGenerator().generate(M=1024*256)
+    
+    # shuffle
+    ris = np.random.permutation(len(generated_data[0]))
+    cis = np.arange(len(generated_data))
+    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
 
+    # chart
     # splitting data
     split_bound = int(0.75*len(generated_data[0]))
     training_data = [_[:split_bound] for _ in generated_data] 

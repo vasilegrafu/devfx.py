@@ -109,6 +109,12 @@ def main():
     # generating data
     generated_data = FunctionAproximationDataGenerator().generate(M=1024*4)
 
+    # shuffle
+    ris = np.random.permutation(len(generated_data[0]))
+    cis = np.arange(len(generated_data))
+    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
+
+    # chart
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
     chart.scatter(*[[__[0] for __ in _] for _ in generated_data])
@@ -120,6 +126,7 @@ def main():
     test_data = [_[split_bound:] for _ in generated_data] 
     # print(training_data, test_data)
 
+    # samples
     sample_count = 512
     training_data_sample = [_[:sample_count] for _ in training_data] 
     test_data_sample = [_[:sample_count] for _ in test_data] 
