@@ -219,7 +219,7 @@ class DeclarativeModel(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def train(self, hparams_values=(), training_data=None, batch_size=None, iterations=None, epochs=None, **kwargs):
+    def train(self, training_data, batch_size=None, iterations=None, epochs=None, hparams_values=(), **kwargs):
         # ----------------------------------------------------------------
         if(not refl.is_iterable(training_data)):
             raise exceps.ArgumentError()
@@ -234,7 +234,6 @@ class DeclarativeModel(object):
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        training_data_column_count = len(training_data)
         training_data_row_count = len(training_data[0])
         # ----------------------------------------------------------------
 
@@ -259,11 +258,11 @@ class DeclarativeModel(object):
             # ----------------------------------------------------------------
             context = DeclarativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
+            context.training_data = training_data
+            context.batch_size = batch_size
             context.iterations = iterations
             context.epochs = epochs
             context.hparams_values = hparams_values
-            context.training_data = training_data
-            context.batch_size = batch_size
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = self.__training_log
             context.cancellation_token = cancellation_token
@@ -271,9 +270,9 @@ class DeclarativeModel(object):
             self._on_training_begin(context)
             append_to_training_log_condition = context.append_to_training_log_condition
             batch_size = context.batch_size
-            hparams_values = context.hparams_values
             iterations = context.iterations
             epochs = context.epochs
+            hparams_values = context.hparams_values
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
@@ -282,7 +281,7 @@ class DeclarativeModel(object):
 
             iteration = 0
             epoch = 0
-            while((iteration < iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
+            while((iteration <= iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
                 training_data_row_indexes_iterator = iter(training_data_row_indexes)
                 # ----------------------------------------------------------------
@@ -290,23 +289,23 @@ class DeclarativeModel(object):
                 # ----------------------------------------------------------------
                 context = DeclarativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
+                context.training_data = training_data
+                context.batch_size = batch_size
                 context.iteration = iteration
                 context.iterations = iterations
                 context.epoch = epoch
                 context.epochs = epochs
                 context.hparams_values = hparams_values
-                context.training_data = training_data
-                context.batch_size = batch_size
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_epoch_begin(epoch, context)
                 batch_size = context.batch_size
-                hparams_values = context.hparams_values
-                epochs = context.epochs
-                epoch = context.epoch
                 iterations = context.iterations
                 iteration = context.iteration
+                epochs = context.epochs
+                epoch = context.epoch
+                hparams_values = context.hparams_values
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -314,17 +313,18 @@ class DeclarativeModel(object):
                 # ----------------------------------------------------------------
                 
                 # ----------------------------------------------------------------
-                while ((iteration < iterations) and (not cancellation_token.is_cancellation_requested())):
+                while ((iteration <= iterations) and (not cancellation_token.is_cancellation_requested())):
                     # ----------------------------------------------------------------
                     training_data_row_indexes_batch = list(it.islice(training_data_row_indexes_iterator, batch_size))
                     if(len(training_data_row_indexes_batch) == 0):
                         break
 
                     batch = []
-                    for training_data_column_index in range(0, training_data_column_count):
-                        training_data_batch_column = [training_data[training_data_column_index][training_data_row_index] for training_data_row_index in training_data_row_indexes_batch]
-                        batch.append(training_data_batch_column)
-
+                    training_data_batch_column0 = [training_data[0][_] if (not refl.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indexes_batch]
+                    batch.append(training_data_batch_column0)
+                    training_data_batch_column1 = [training_data[1][_] if (not refl.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indexes_batch]
+                    batch.append(training_data_batch_column1)
+  
                     iteration += 1
 
                     training_data_epoch_position += len(training_data_row_indexes_batch)
@@ -333,24 +333,24 @@ class DeclarativeModel(object):
                     # ----------------------------------------------------------------
                     context = DeclarativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
+                    context.training_data = training_data
+                    context.batch_size = batch_size
+                    context.batch = batch
                     context.iteration = iteration
                     context.iterations = iterations
                     context.epoch = epoch
                     context.epochs = epochs
                     context.hparams_values = hparams_values
-                    context.training_data = training_data
-                    context.batch_size = batch_size
-                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
                     self._on_training_iteration_begin(iteration, context)
                     batch_size = context.batch_size
-                    hparams_values = context.hparams_values
-                    epochs = context.epochs
-                    epoch = context.epoch
                     iterations = context.iterations
                     iteration = context.iteration
+                    epochs = context.epochs
+                    epoch = context.epoch
+                    hparams_values = context.hparams_values
                     # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
@@ -359,24 +359,24 @@ class DeclarativeModel(object):
                     else:
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
+                        context.training_data = training_data
+                        context.batch_size = batch_size
+                        context.batch = batch
                         context.iteration = iteration
                         context.iterations = iterations
                         context.epoch = epoch
                         context.epochs = epochs
                         context.hparams_values = hparams_values
-                        context.training_data = training_data
-                        context.batch_size = batch_size
-                        context.batch = batch
                         for key in kwargs: setattr(context, key, kwargs[key])
                         context.training_log = self.__training_log
                         context.cancellation_token = cancellation_token
                         self._on_training_apply_cost_optimizer(context)
                         batch_size = context.batch_size
-                        hparams_values = context.hparams_values
-                        epochs = context.epochs
-                        epoch = context.epoch
                         iterations = context.iterations
                         iteration = context.iteration
+                        epochs = context.epochs
+                        epoch = context.epoch
+                        hparams_values = context.hparams_values
                     # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
@@ -391,70 +391,70 @@ class DeclarativeModel(object):
                         # ----------------------------------------------------------------
                         context = DeclarativeModel.TrainingContext()
                         context.time_elapsed = stopwatch.elapsed
+                        context.training_data = training_data
+                        context.batch_size = batch_size
+                        context.batch = batch
                         context.iteration = iteration
                         context.iterations = iterations
                         context.epoch = epoch
                         context.epochs = epochs
                         context.hparams_values = hparams_values
-                        context.training_data = training_data
-                        context.batch_size = batch_size
-                        context.batch = batch
                         for key in kwargs: setattr(context, key, kwargs[key])
                         context.training_log = self.__training_log
                         context.cancellation_token = cancellation_token
                         self._on_append_to_training_log(self.__training_log, context)
                         batch_size = context.batch_size
-                        hparams_values = context.hparams_values
-                        epochs = context.epochs
-                        epoch = context.epoch
                         iterations = context.iterations
                         iteration = context.iteration
+                        epochs = context.epochs
+                        epoch = context.epoch
+                        hparams_values = context.hparams_values
                         # ----------------------------------------------------------------
 
                     # ----------------------------------------------------------------
                     context = DeclarativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
+                    context.training_data = training_data
+                    context.batch_size = batch_size
+                    context.batch = batch
                     context.iteration = iteration
                     context.iterations = iterations
                     context.epoch = epoch
                     context.epochs = epochs
                     context.hparams_values = hparams_values
-                    context.training_data = training_data
-                    context.batch_size = batch_size
-                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
                     self._on_training_iteration_end(iteration, context)
                     batch_size = context.batch_size
-                    hparams_values = context.hparams_values
-                    epochs = context.epochs
-                    epoch = context.epoch
                     iterations = context.iterations
                     iteration = context.iteration
+                    epochs = context.epochs
+                    epoch = context.epoch
+                    hparams_values = context.hparams_values
                     # ----------------------------------------------------------------
-                 # ----------------------------------------------------------------
+                # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
                 context = DeclarativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
+                context.training_data = training_data
+                context.batch_size = batch_size
                 context.iteration = iteration
                 context.iterations = iterations
                 context.epoch = epoch
                 context.epochs = epochs
                 context.hparams_values = hparams_values
-                context.training_data = training_data
-                context.batch_size = batch_size
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_epoch_end(epoch, context)
                 batch_size = context.batch_size
-                hparams_values = context.hparams_values
-                epochs = context.epochs
-                epoch = context.epoch
                 iterations = context.iterations
                 iteration = context.iteration
+                epochs = context.epochs
+                epoch = context.epoch
+                hparams_values = context.hparams_values
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -464,13 +464,13 @@ class DeclarativeModel(object):
             # ----------------------------------------------------------------
             context = DeclarativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
+            context.training_data = training_data
+            context.batch_size = batch_size
             context.iteration = iteration
             context.iterations = iterations
             context.epoch = epoch
             context.epochs = epochs
             context.hparams_values = hparams_values
-            context.training_data = training_data
-            context.batch_size = batch_size
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = self.__training_log
             self._on_training_end(context)
@@ -480,13 +480,13 @@ class DeclarativeModel(object):
 
         result = DeclarativeModel.TrainingResult()
         result.time_elapsed = stopwatch.elapsed
+        result.training_data = training_data
+        result.batch_size = batch_size
         result.iteration = iteration
         result.iterations = iterations
         result.epoch = epoch
         result.epochs = epochs
         result.hparams_values = hparams_values
-        result.training_data = training_data
-        result.batch_size = batch_size
         for key in kwargs: setattr(result, key, kwargs[key])
         result.training_log = self.__training_log
         return result

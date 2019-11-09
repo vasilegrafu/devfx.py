@@ -135,7 +135,7 @@ class ImperativeModel(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def train(self, hparams=None, training_data=None, batch_size=None, iterations=None, epochs=None, **kwargs):
+    def train(self, training_data, batch_size=None, iterations=None, epochs=None, hparams=None, **kwargs):
         # ----------------------------------------------------------------
         if(not refl.is_iterable(training_data)):
             raise exceps.ArgumentError()
@@ -150,7 +150,6 @@ class ImperativeModel(object):
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        training_data_column_count = len(training_data)
         training_data_row_count = len(training_data[0])
         # ----------------------------------------------------------------
 
@@ -174,11 +173,11 @@ class ImperativeModel(object):
         # ----------------------------------------------------------------
         context = ImperativeModel.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
+        context.training_data = training_data
+        context.batch_size = batch_size
         context.iterations = iterations
         context.epochs = epochs
         context.hparams = hparams
-        context.training_data = training_data
-        context.batch_size = batch_size
         for key in kwargs: setattr(context, key, kwargs[key])
         context.training_log = self.__training_log
         context.cancellation_token = cancellation_token
@@ -186,9 +185,9 @@ class ImperativeModel(object):
         self._on_training_begin(context)
         append_to_training_log_condition = context.append_to_training_log_condition
         batch_size = context.batch_size
-        hparams = context.hparams
         iterations = context.iterations
         epochs = context.epochs
+        hparams = context.hparams
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
@@ -197,7 +196,7 @@ class ImperativeModel(object):
 
         iteration = 0
         epoch = 0
-        while((iteration < iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
+        while((iteration <= iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
             # ----------------------------------------------------------------
             training_data_row_indexes_iterator = iter(training_data_row_indexes)
             # ----------------------------------------------------------------
@@ -205,39 +204,41 @@ class ImperativeModel(object):
             # ----------------------------------------------------------------
             context = ImperativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
+            context.training_data = training_data
+            context.batch_size = batch_size
             context.iteration = iteration
             context.iterations = iterations
             context.epoch = epoch
             context.epochs = epochs
             context.hparams = hparams
-            context.training_data = training_data
-            context.batch_size = batch_size
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = self.__training_log
             context.cancellation_token = cancellation_token
             self._on_training_epoch_begin(epoch, context)
             batch_size = context.batch_size
-            hparams = context.hparams
-            epochs = context.epochs
-            epoch = context.epoch
             iterations = context.iterations
             iteration = context.iteration
+            epochs = context.epochs
+            epoch = context.epoch
+            hparams = context.hparams
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
             training_data_epoch_position = 0
             # ----------------------------------------------------------------
             
-            while ((iteration < iterations) and (not cancellation_token.is_cancellation_requested())):
+            # ----------------------------------------------------------------
+            while ((iteration <= iterations) and (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
                 training_data_row_indexes_batch = list(it.islice(training_data_row_indexes_iterator, batch_size))
                 if(len(training_data_row_indexes_batch) == 0):
                     break
 
                 batch = []
-                for training_data_column_index in range(0, training_data_column_count):
-                    training_data_batch_column = [training_data[training_data_column_index][training_data_row_index] for training_data_row_index in training_data_row_indexes_batch]
-                    batch.append(training_data_batch_column)
+                training_data_batch_column0 = [training_data[0][_] if (not refl.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indexes_batch]
+                batch.append(training_data_batch_column0)
+                training_data_batch_column1 = [training_data[1][_] if (not refl.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indexes_batch]
+                batch.append(training_data_batch_column1)
 
                 iteration += 1
 
@@ -247,24 +248,24 @@ class ImperativeModel(object):
                 # ----------------------------------------------------------------
                 context = ImperativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
+                context.training_data = training_data
+                context.batch_size = batch_size
+                context.batch = batch
                 context.iteration = iteration
                 context.iterations = iterations
                 context.epoch = epoch
                 context.epochs = epochs
                 context.hparams = hparams
-                context.training_data = training_data
-                context.batch_size = batch_size
-                context.batch = batch
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_iteration_begin(iteration, context)
                 batch_size = context.batch_size
-                hparams = context.hparams
-                epochs = context.epochs
-                epoch = context.epoch
                 iterations = context.iterations
                 iteration = context.iteration
+                epochs = context.epochs
+                epoch = context.epoch
+                hparams = context.hparams
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -276,24 +277,24 @@ class ImperativeModel(object):
                 else:
                     context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
+                    context.training_data = training_data
+                    context.batch_size = batch_size
+                    context.batch = batch
                     context.iteration = iteration
                     context.iterations = iterations
                     context.epoch = epoch
                     context.epochs = epochs
                     context.hparams = hparams
-                    context.training_data = training_data
-                    context.batch_size = batch_size
-                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
                     self._on_training_apply_cost_optimizer(context)
                     batch_size = context.batch_size
-                    hparams = context.hparams
-                    epochs = context.epochs
-                    epoch = context.epoch
                     iterations = context.iterations
                     iteration = context.iteration
+                    epochs = context.epochs
+                    epoch = context.epoch
+                    hparams = context.hparams
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
@@ -308,69 +309,70 @@ class ImperativeModel(object):
                     # ----------------------------------------------------------------
                     context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
+                    context.training_data = training_data
+                    context.batch_size = batch_size
+                    context.batch = batch
                     context.iteration = iteration
                     context.iterations = iterations
                     context.epoch = epoch
                     context.epochs = epochs
                     context.hparams = hparams
-                    context.training_data = training_data
-                    context.batch_size = batch_size
-                    context.batch = batch
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = self.__training_log
                     context.cancellation_token = cancellation_token
                     self._on_append_to_training_log(self.__training_log, context)
                     batch_size = context.batch_size
-                    hparams = context.hparams
-                    epochs = context.epochs
-                    epoch = context.epoch
                     iterations = context.iterations
                     iteration = context.iteration
+                    epochs = context.epochs
+                    epoch = context.epoch
+                    hparams = context.hparams
                     # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
                 context = ImperativeModel.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
+                context.training_data = training_data
+                context.batch_size = batch_size
+                context.batch = batch
                 context.iteration = iteration
                 context.iterations = iterations
                 context.epoch = epoch
                 context.epochs = epochs
                 context.hparams = hparams
-                context.training_data = training_data
-                context.batch_size = batch_size
-                context.batch = batch
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = self.__training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_iteration_end(iteration, context)
                 batch_size = context.batch_size
-                hparams = context.hparams
-                epochs = context.epochs
-                epoch = context.epoch
                 iterations = context.iterations
                 iteration = context.iteration
+                epochs = context.epochs
+                epoch = context.epoch
+                hparams = context.hparams
                 # ----------------------------------------------------------------
+            # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
             context = ImperativeModel.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
+            context.training_data = training_data
+            context.batch_size = batch_size
             context.iteration = iteration
             context.iterations = iterations
             context.epoch = epoch
             context.epochs = epochs
             context.hparams = hparams
-            context.training_data = training_data
-            context.batch_size = batch_size
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = self.__training_log
             context.cancellation_token = cancellation_token
             self._on_training_epoch_end(epoch, context)
             batch_size = context.batch_size
-            hparams = context.hparams
-            epochs = context.epochs
-            epoch = context.epoch
             iterations = context.iterations
             iteration = context.iteration
+            epochs = context.epochs
+            epoch = context.epoch
+            hparams = context.hparams
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
@@ -380,13 +382,13 @@ class ImperativeModel(object):
         # ----------------------------------------------------------------
         context = ImperativeModel.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
+        context.training_data = training_data
+        context.batch_size = batch_size
         context.iteration = iteration
         context.iterations = iterations
         context.epoch = epoch
         context.epochs = epochs
         context.hparams = hparams
-        context.training_data = training_data
-        context.batch_size = batch_size
         for key in kwargs: setattr(context, key, kwargs[key])
         context.training_log = self.__training_log
         self._on_training_end(context)
@@ -396,13 +398,13 @@ class ImperativeModel(object):
 
         result = ImperativeModel.TrainingResult()
         result.time_elapsed = stopwatch.elapsed
+        result.training_data = training_data
+        result.batch_size = batch_size
         result.iteration = iteration
         result.iterations = iterations
         result.epoch = epoch
         result.epochs = epochs
         result.hparams = hparams
-        result.training_data = training_data
-        result.batch_size = batch_size
         for key in kwargs: setattr(result, key, kwargs[key])
         result.training_log = self.__training_log
         return result
