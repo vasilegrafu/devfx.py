@@ -1,7 +1,7 @@
 import numpy as np
 import devfx.exceptions as exceps
 import devfx.mathematics as math
-from ..distributions import distribution
+from .. import distributions
 
 """------------------------------------------------------------------------------------------------
 """
@@ -58,7 +58,7 @@ class cdhistogram(object):
         return histogram
 
     @classmethod
-    def from_distribution(cls, d, size=distribution.ndsize, ll=None, ul=None, olNx=None, bin_count=None, dx=None):
+    def from_distribution(cls, d, size=distributions.distribution.ndsize, ll=None, ul=None, olNx=None, bin_count=None, dx=None):
         data = d.nd(size=size, ll=ll, ul=ul, olNx=olNx)
         return cdhistogram.from_data(data, ll=ll, ul=ul, bin_count=bin_count, dx=dx)
 

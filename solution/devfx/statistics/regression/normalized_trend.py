@@ -1,7 +1,5 @@
 import numpy as np
 import devfx.exceptions as exceps
-from ..series.dispersion import min
-from ..series.dispersion import max
 
 """------------------------------------------------------------------------------------------------
 """

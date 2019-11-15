@@ -47,4 +47,3 @@ from .shape import kurtosis
 
 from .ops import get
 from .ops import shuffle
-

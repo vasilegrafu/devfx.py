@@ -4,6 +4,7 @@ import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.data_vizualization.seaborn as dv
+import devfx.statistics.mseries as mseries
 
 """------------------------------------------------------------------------------------------------
 """
@@ -83,9 +84,7 @@ def main():
     generated_data = UnivariateLinearRegressionDataGenerator().generate()
     
     # shuffle
-    ris = np.random.permutation(len(generated_data[0]))
-    cis = np.arange(len(generated_data))
-    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
+    generated_data = mseries.shuffle(generated_data)
 
     # chart
     figure = dv.Figure(size=(8, 6))

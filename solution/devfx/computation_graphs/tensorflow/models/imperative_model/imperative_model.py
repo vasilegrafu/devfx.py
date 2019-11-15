@@ -191,14 +191,14 @@ class ImperativeModel(object):
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        training_data_row_indexes = np.random.permutation(training_data_row_count)
+        training_data_row_indices = np.random.permutation(training_data_row_count)
         # ----------------------------------------------------------------
 
         iteration = 0
         epoch = 0
         while((iteration <= iterations) and (epoch < epochs) and  (not cancellation_token.is_cancellation_requested())):
             # ----------------------------------------------------------------
-            training_data_row_indexes_iterator = iter(training_data_row_indexes)
+            training_data_row_indices_iterator = iter(training_data_row_indices)
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
@@ -230,19 +230,19 @@ class ImperativeModel(object):
             # ----------------------------------------------------------------
             while ((iteration <= iterations) and (not cancellation_token.is_cancellation_requested())):
                 # ----------------------------------------------------------------
-                training_data_row_indexes_batch = list(it.islice(training_data_row_indexes_iterator, batch_size))
-                if(len(training_data_row_indexes_batch) == 0):
+                training_data_row_indices_batch = list(it.islice(training_data_row_indices_iterator, batch_size))
+                if(len(training_data_row_indices_batch) == 0):
                     break
 
                 batch = []
-                training_data_batch_column0 = [training_data[0][_] if (not refl.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indexes_batch]
+                training_data_batch_column0 = [training_data[0][_] if (not refl.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indices_batch]
                 batch.append(training_data_batch_column0)
-                training_data_batch_column1 = [training_data[1][_] if (not refl.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indexes_batch]
+                training_data_batch_column1 = [training_data[1][_] if (not refl.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indices_batch]
                 batch.append(training_data_batch_column1)
 
                 iteration += 1
 
-                training_data_epoch_position += len(training_data_row_indexes_batch)
+                training_data_epoch_position += len(training_data_row_indices_batch)
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------

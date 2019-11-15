@@ -11,11 +11,11 @@ class MnistDataset(dc.Dataset):
         super().__init__(*args, **kwargs)
 
     def _on_getitem_data_filter(self, data, hparams):
-        indexes = data[0]
+        indices = data[0]
         data_file = hparams[0]
 
-        images = np.asarray(data_file['/images'][sorted(indexes)])
-        labels = np.asarray(data_file['/labels'][sorted(indexes)])
+        images = np.asarray(data_file['/images'][sorted(indices)])
+        labels = np.asarray(data_file['/labels'][sorted(indices)])
 
         return [images, labels]
 
