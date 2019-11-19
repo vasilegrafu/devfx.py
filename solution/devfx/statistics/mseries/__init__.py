@@ -1,6 +1,3 @@
-from .rolling import *
-from .expanding import *
-
 from .aggregation import sum
 
 from .center import mean
@@ -45,5 +42,9 @@ from .dispersion import uol8x
 from .shape import skew
 from .shape import kurtosis
 
+from .ops import columns
+from .ops import columns_count
+from .ops import rows
+from .ops import rows_count
 from .ops import get
 from .ops import shuffle

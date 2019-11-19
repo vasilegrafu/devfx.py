@@ -45,6 +45,7 @@ from .dispersion import uol8x
 from .shape import skew
 from .shape import kurtosis
 
+from .ops import count
 from .ops import get
 from .ops import shuffle
-
+from .ops import split

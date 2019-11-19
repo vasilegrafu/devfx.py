@@ -4,7 +4,7 @@ import devfx.reflection as refl
 
 """------------------------------------------------------------------------------------------------
 """
-def len(data):
+def count(data):
     return len(data)
 
 """------------------------------------------------------------------------------------------------
@@ -20,12 +20,11 @@ def get(data, indices):
 """------------------------------------------------------------------------------------------------
 """
 def shuffle(data):
-    return get(data, len(data))
-
+    return get(data,  np.random.permutation(count(data)))
 
 
 """------------------------------------------------------------------------------------------------
 """
-def split(data, delimiter):
-    pass
+def split(data, index):
+    return [get(data, slice(index)), get(data, slice(index, count(data)))]
 

@@ -3,9 +3,9 @@ from .. import series
 """------------------------------------------------------------------------------------------------
 """
 def skew(data):
-    return [series.skew(data) for data in data]
+    return [series.skew(column_data) for column_data in data]
 
 """------------------------------------------------------------------------------------------------
 """
 def kurtosis(data):
-    return [series.kurtosis(data) for data in data]
+    return [series.kurtosis(column_data) for column_data in data]

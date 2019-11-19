@@ -7,8 +7,9 @@ from .center import rolling_ewmean
 from .center import rolling_median
 
 from .correlation import rolling_cov
-
+from .correlation import rolling_ewcov
 from .correlation import rolling_corr
+from .correlation import rolling_ewcorr
 
 from .dispersion import rolling_min
 from .dispersion import rolling_max
