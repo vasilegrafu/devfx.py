@@ -3,6 +3,7 @@ import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.data_vizualization.seaborn as dv
+import devfx.statistics.mseries as mseries
 
 cg.enable_imperative_execution_mode()
 
@@ -74,9 +75,7 @@ def main():
     generated_data = UnivariateLinearRegressionDataGenerator().generate()
     
     # shuffle
-    ris = np.random.permutation(len(generated_data[0]))
-    cis = np.arange(len(generated_data))
-    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
+    generated_data = mseries.shuffle(generated_data)
 
     # chart
     figure = dv.Figure(size=(8, 6))
@@ -85,9 +84,7 @@ def main():
     figure.show()
 
     # splitting data
-    split_bound = int(0.75*len(generated_data[0]))
-    training_data = [_[:split_bound] for _ in generated_data] 
-    test_data = [_[split_bound:] for _ in generated_data] 
+    (training_data, test_data) = mseries.split(generated_data, int(0.75*mseries.rows_count(generated_data)))
     # print(training_data, test_data)
 
     # learning from data

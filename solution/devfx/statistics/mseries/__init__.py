@@ -48,3 +48,4 @@ from .ops import rows
 from .ops import rows_count
 from .ops import get
 from .ops import shuffle
+from .ops import split

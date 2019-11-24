@@ -93,9 +93,7 @@ def main():
     figure.show()
 
     # splitting data
-    split_bound = int(0.75*len(generated_data[0]))
-    training_data = [_[:split_bound] for _ in generated_data] 
-    test_data = [_[split_bound:] for _ in generated_data] 
+    (training_data, test_data) = mseries.split(generated_data, int(0.75*mseries.rows_count(generated_data)))
     # print(training_data, test_data)
 
     # learning from data

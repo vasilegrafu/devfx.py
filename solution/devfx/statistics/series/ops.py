@@ -26,5 +26,5 @@ def shuffle(data):
 """------------------------------------------------------------------------------------------------
 """
 def split(data, index):
-    return [get(data, slice(index)), get(data, slice(index, count(data)))]
+    return [get(data, slice(None, index)), get(data, slice(index, None))]
 

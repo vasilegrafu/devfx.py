@@ -4,6 +4,7 @@ import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.data_vizualization.seaborn as dv
+import devfx.statistics.mseries as mseries
 
 """------------------------------------------------------------------------------------------------
 """
@@ -12,8 +13,8 @@ class LogisticRegression1DataGenerator(object):
         pass
 
     def generate(self):
-        M = 1024*4
-        w0 = 2.0
+        M = 1024*8
+        w0 = 3.0
         w1 = 0.75
         a = -16
         b = +16
@@ -40,7 +41,6 @@ class LogisticRegression1DataGenerator(object):
                 data.append([_[0], _[1], _[2]])
 
         data = np.asarray(data).astype(dtype=np.float32)
-        np.random.shuffle(data)
 
         return [data[:M,0], data[:M,1], data[:M,2]]
 
@@ -106,9 +106,7 @@ def main():
     generated_data = LogisticRegression1DataGenerator().generate()
     
     # shuffle
-    ris = np.random.permutation(len(generated_data[0]))
-    cis = np.arange(len(generated_data))
-    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
+    generated_data = mseries.shuffle(generated_data)
 
     # chart
     figure = dv.Figure(size=(8, 6))
@@ -118,13 +116,11 @@ def main():
     figure.show()
 
     # splitting data
-    split_bound = int(0.75*len(generated_data[0]))
-    training_data = [_[:split_bound] for _ in generated_data[1:3]] 
-    test_data = [_[split_bound:] for _ in generated_data[1:3]] 
+    (training_data, test_data) = mseries.split(generated_data[1:3], int(0.75*mseries.rows_count(generated_data[1:3])))
     # print(training_data, test_data)
 
     model = LogisticRegression1Model()
-    model.train(training_data=training_data, batch_size=64,
+    model.train(training_data=training_data, batch_size=256,
                 test_data=test_data)
 
     model.close()

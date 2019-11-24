@@ -3,6 +3,7 @@ import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
+import devfx.statistics.mseries as mseries
 
 """------------------------------------------------------------------------------------------------
 """
@@ -124,15 +125,10 @@ def main():
     generated_data = SoftmaxRegression2DataGenerator().generate(M=1024*256)
     
     # shuffle
-    ris = np.random.permutation(len(generated_data[0]))
-    cis = np.arange(len(generated_data))
-    generated_data = [[generated_data[ci][ri] for ri in ris] for ci in cis]
+    generated_data = mseries.shuffle(generated_data)
 
-    # chart
     # splitting data
-    split_bound = int(0.75*len(generated_data[0]))
-    training_data = [_[:split_bound] for _ in generated_data] 
-    test_data = [_[split_bound:] for _ in generated_data] 
+    (training_data, test_data) = mseries.split(generated_data, int(0.75*mseries.rows_count(generated_data))) 
     # print(training_data, test_data)
 
     # learning from data

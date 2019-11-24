@@ -16,10 +16,10 @@ print(f"get: {result}")
 result = stats.series.get(data, (1, 2))
 print(f"get: {result}")
 
-result = stats.series.get(data, slice(3))
+result = stats.series.get(data, slice(None, 3))
 print(f"get: {result}")
 
-result = stats.series.get(data, slice(3, stats.series.count(data)))
+result = stats.series.get(data, slice(3, None))
 print(f"get: {result}")
 
 
