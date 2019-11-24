@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from . import types
 from . import tensors
 
 """------------------------------------------------------------------------------------------------
@@ -137,14 +138,20 @@ einsum = tf.einsum
 
 """------------------------------------------------------------------------------------------------
 """
-def iverson(condition):
-    return tensors.where(condition, tensors.ones_like(condition), tensors.zeros_like(condition))
+def iverson(condition, dtype=None):
+    if (dtype is None):
+        return tensors.where(condition, tensors.ones_like(condition), tensors.zeros_like(condition))
+    else:
+        return tensors.where(condition, types.cast(tensors.ones_like(condition), dtype), types.cast(tensors.zeros_like(condition), dtype))
 
-def macaulay(x):
-    return tensors.where(tensors.greater_equal(x, 0), x, tensors.zeros_like(x))
+def macaulay(x, dtype=None):
+    if (dtype is None):
+        return tensors.where(tensors.greater_equal(x, 0), x, tensors.zeros_like(x))
+    else:
+        return tensors.where(tensors.greater_equal(x, 0), types.cast(x, dtype), types.cast(tensors.zeros_like(x), dtype))
 
-def kronecker(x_i, x_j):
-    return iverson(tensors.equal(x_i, x_j))
+def kronecker(x_i, x_j, dtype=None):
+    return iverson(tensors.equal(x_i, x_j), dtype=dtype)
 
 
 

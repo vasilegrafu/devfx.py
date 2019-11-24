@@ -11,40 +11,37 @@ class SoftmaxRegression1DataGenerator(object):
         pass
 
     def generate(self, M):
-        x11 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
-        x12 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
-        x21 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
-        x22 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
-        # print(x11, x12, x21, x22)
+        cmin = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
+        cmax = stats.distributions.normal(mu=8.0, sigma=1.0).rvs(M)
+        # print(cmin, cmax)
 
-        xs11 = np.array([x11, x21]).T
-        ys11 = np.array([[1] for _ in np.arange(0, M)])
-        print(xs11, ys11)
+        """ |21(3) 22(4)|
+            |11(1) 12(2)|
+        """
+        
+        xs11 = np.array([np.random.permutation(cmin), np.random.permutation(cmin)]).T
+        ys11 = np.repeat([[1]], [M], axis=0)
+        # print(xs11, ys11)
 
-        xs12 = np.array([x12, x21]).T
-        ys12 = np.array([[2] for _ in np.arange(0, M)])
+        xs12 = np.array([np.random.permutation(cmax), np.random.permutation(cmin)]).T
+        ys12 = np.repeat([[2]], [M], axis=0)
         # print(xs12, ys12)
 
-        xs21 = np.array([x11, x22]).T
-        ys21 = np.array([[3] for _ in np.arange(0, M)])
+        xs21 = np.array([np.random.permutation(cmin), np.random.permutation(cmax)]).T
+        ys21 = np.repeat([[3]], [M], axis=0)
         # print(xs21, ys21)
 
-        xs22 = np.array([x12, x22]).T
-        ys22 = np.array([[4] for _ in np.arange(0, M)])
+        xs22 = np.array([np.random.permutation(cmax), np.random.permutation(cmax)]).T
+        ys22 = np.repeat([[4]], [M], axis=0)
         # print(xs22, ys22)
 
         x = np.vstack((xs11, xs12, xs21, xs22))
         y = np.vstack((ys11, ys12, ys21, ys22))
         # print(x, y)
-
-        permutation = np.random.permutation(np.arange(start=0, stop=4*M, step=1))
-        # print(permutation)
-
-        x = x[permutation]
-        y = y[permutation]
-        # print(x, y)
+        # print(np.shape(x), np.shape(y))
 
         return [x, y]
+
 
 """------------------------------------------------------------------------------------------------
 """
@@ -52,27 +49,26 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         # hypothesis
-        x = cg.placeholder(shape=[None, 2], name='x')
+        x = cg.placeholder(shape=[None, 2], dtype=cg.float32, name='x')
 
-        w10 = cg.create_variable(name='w10', shape=[1], initializer=cg.zeros_initializer())
-        w11 = cg.create_variable(name='w11', shape=[1], initializer=cg.zeros_initializer())
-        w12 = cg.create_variable(name='w12', shape=[1], initializer=cg.zeros_initializer())
-
-        w20 = cg.create_variable(name='w20', shape=[1], initializer=cg.zeros_initializer())
-        w21 = cg.create_variable(name='w21', shape=[1], initializer=cg.zeros_initializer())
-        w22 = cg.create_variable(name='w22', shape=[1], initializer=cg.zeros_initializer())
-
-        w30 = cg.create_variable(name='w30', shape=[1], initializer=cg.zeros_initializer())
-        w31 = cg.create_variable(name='w31', shape=[1], initializer=cg.zeros_initializer())
-        w32 = cg.create_variable(name='w32', shape=[1], initializer=cg.zeros_initializer())
-
-        w40 = cg.create_variable(name='w40', shape=[1], initializer=cg.zeros_initializer())
-        w41 = cg.create_variable(name='w41', shape=[1], initializer=cg.zeros_initializer())
-        w42 = cg.create_variable(name='w42', shape=[1], initializer=cg.zeros_initializer())
-
+        w10 = cg.create_variable(name='w10', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w11 = cg.create_variable(name='w11', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w12 = cg.create_variable(name='w12', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
         z1 = w10 + w11*x[:, 0] + w12*x[:, 1]
+
+        w20 = cg.create_variable(name='w20', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w21 = cg.create_variable(name='w21', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w22 = cg.create_variable(name='w22', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
         z2 = w20 + w21*x[:, 0] + w22*x[:, 1]
+
+        w30 = cg.create_variable(name='w30', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w31 = cg.create_variable(name='w31', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w32 = cg.create_variable(name='w32', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
         z3 = w30 + w31*x[:, 0] + w32*x[:, 1]
+
+        w40 = cg.create_variable(name='w40', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w41 = cg.create_variable(name='w41', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
+        w42 = cg.create_variable(name='w42', shape=[1], dtype=cg.float32, initializer=cg.zeros_initializer())
         z4 = w40 + w41*x[:, 0] + w42*x[:, 1]
 
         h = cg.convert_to_tensor([
@@ -80,15 +76,15 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
             cg.exp(z2)/(cg.exp(z1) + cg.exp(z2) + cg.exp(z3) + cg.exp(z4)),
             cg.exp(z3)/(cg.exp(z1) + cg.exp(z2) + cg.exp(z3) + cg.exp(z4)),
             cg.exp(z4)/(cg.exp(z1) + cg.exp(z2) + cg.exp(z3) + cg.exp(z4)),
-        ])
+        ], dtype=cg.float32, name='h')
         y_pred = cg.reshape(tensor=cg.argmax(h, axis=0) + 1, shape=[None, 1])
 
         # cost function
         y = cg.placeholder(shape=[None, 1], dtype=cg.int32, name='y')
-        j1 = cg.cast(cg.iverson(cg.equal(y[:, 0], 1)), h.dtype)*cg.log(h[0])
-        j2 = cg.cast(cg.iverson(cg.equal(y[:, 0], 2)), h.dtype)*cg.log(h[1])
-        j3 = cg.cast(cg.iverson(cg.equal(y[:, 0], 3)), h.dtype)*cg.log(h[2])
-        j4 = cg.cast(cg.iverson(cg.equal(y[:, 0], 4)), h.dtype)*cg.log(h[3])
+        j1 = cg.iverson(cg.equal(y[:, 0], 1), cg.float32)*cg.log(h[0])
+        j2 = cg.iverson(cg.equal(y[:, 0], 2), cg.float32)*cg.log(h[1])
+        j3 = cg.iverson(cg.equal(y[:, 0], 3), cg.float32)*cg.log(h[2])
+        j4 = cg.iverson(cg.equal(y[:, 0], 4), cg.float32)*cg.log(h[3])
         J = -cg.reduce_mean(j1 + j2 + j3 + j4)
 
         # evaluators
@@ -132,11 +128,12 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
     def _on_training_end(self, context):
         pass
 
+
 """------------------------------------------------------------------------------------------------
 """
 def main():
     # generating data
-    generated_data = SoftmaxRegression1DataGenerator().generate(M=1024*256)
+    generated_data = SoftmaxRegression1DataGenerator().generate(M=1024*4)
     
     # shuffle
     generated_data = mseries.shuffle(generated_data)
@@ -151,6 +148,7 @@ def main():
                 test_data=test_data)
 
     model.close()
+
 
 """------------------------------------------------------------------------------------------------
 """

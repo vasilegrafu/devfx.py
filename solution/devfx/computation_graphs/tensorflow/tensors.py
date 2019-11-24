@@ -23,24 +23,36 @@ def zeros(shape, dtype=types.float32, name=None):
     return tf.zeros(shape, dtype=dtype, name=name)
 
 def zeros_like(tensor, dtype=None, name=None):
-    return tf.zeros_like(tensor, dtype=dtype, name=name)
+    if (dtype is None):
+        return tf.zeros_like(tensor, name=name)  
+    else:
+        return tf.cast(tf.zeros_like(tensor, name=name), dtype)
 
 def ones(shape, dtype=types.float32, name=None):
     return tf.ones(shape, dtype=dtype, name=name)
 
 def ones_like(tensor, dtype=None, name=None):
-    return tf.ones_like(tensor, dtype=dtype, name=name)
+    if (dtype is None):
+        return tf.ones_like(tensor, name=name)
+    else:
+        return tf.cast(tf.ones_like(tensor, name=name), dtype)
 
-def fill(shape, value, name=None):
-    return tf.fill(shape, value, name=name)
 
-def fill_like(tensor, value, name=None):
-    return fill(shape(tensor), value, name=name)
+"""------------------------------------------------------------------------------------------------
+"""
+def fill(shape, value, dtype=None, name=None):
+    if (dtype is None):
+        return tf.fill(shape, value, name=name)
+    else:
+        return tf.cast(tf.fill(shape, value, name=name), dtype)
+
+def fill_like(tensor, value, dtype=None, name=None):
+    return fill(shape(tensor), value, dtype=dtype, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
 def linspace(start, stop, n, dtype=types.float32, name=None):
-    return tf.linspace(types.cast(start, dtype=dtype), types.cast(stop, dtype=dtype), n, name=name)
+    return tf.linspace(types.cast(start, dtype), types.cast(stop, dtype), n, name=name)
 
 def range(start, stop, step, dtype=types.float32, name=None):
     return tf.range(start, limit=stop, delta=step, dtype=dtype, name=name)
@@ -60,18 +72,21 @@ def random_truncated_normal(shape, mean=0.0, stddev=1.0, dtype=types.float32, se
 """------------------------------------------------------------------------------------------------
 """
 def one_hot(indices, depth, on_value=None, off_value=None, axis=None, dtype=None, name=None):
-    return tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, dtype=dtype, name=name)
+    if (dtype is None):
+        return tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, name=name)
+    else:
+        return tf.cast(tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, name=name), dtype)
 
 """------------------------------------------------------------------------------------------------
 """
-def shape(tensor, dtype=None, name=None):
-    return tf.shape(tensor, name=name, out_type=dtype)
+def shape(tensor, name=None):
+    return tf.shape(tensor, name=name)
 
 def rank(tensor, name=None):
     return tf.rank(tensor, name=name)
 
-def size(tensor, dtype=None, name=None):
-    return tf.size(tensor, name=name, out_type=dtype)
+def size(tensor, name=None):
+    return tf.size(tensor, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
