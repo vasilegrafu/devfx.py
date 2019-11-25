@@ -5,6 +5,7 @@ import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
 import devfx.data_containers as dc
+from ..training_log_item import TrainingLogItem
 from ..training_log import TrainingLog
 
 class ImperativeModel(object):
@@ -305,7 +306,14 @@ class ImperativeModel(object):
                 append_to_training_log_condition_result = append_to_training_log_condition(context=context)
                 # ----------------------------------------------------------------
                 if(append_to_training_log_condition_result):
-                    self.__training_log.append_item(time_elapsed=stopwatch.elapsed, iteration=iteration, epoch=epoch+training_data_epoch_position/training_data_row_count)
+                    time_elapsed = stopwatch.elapsed
+                    training_log_item = TrainingLogItem(nr=(len(self.__training_log) + 1),
+                                                        time_elapsed=time_elapsed,
+                                                        time_delta=((time_elapsed - self.__training_log[-1].time_elapsed) if (len(self.__training_log) >= 1) else 0),
+                                                        iteration=iteration,
+                                                        epoch=(epoch + training_data_epoch_position / training_data_row_count))
+                    self.__training_log.append(training_log_item)
+
                     # ----------------------------------------------------------------
                     context = ImperativeModel.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed

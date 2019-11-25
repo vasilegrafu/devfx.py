@@ -54,18 +54,18 @@ class UnivariateLinearRegressionModel(cg.models.ImperativeModel):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.training_data_cost = self.run_cost_function(*context.training_data)
-        if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+        training_log[-1].training_data_cost = self.run_cost_function(*context.training_data)
+        if(len(training_log) >= 2):
+            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
             
-        training_log.last_item.test_data_cost = self.run_cost_function(*context.test_data)
+        training_log[-1].test_data_cost = self.run_cost_function(*context.test_data)
 
-        print(training_log.last_item)
+        print(training_log[-1])
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        chart.plot(training_log.training_data_cost_list, color='green')
-        chart.plot(training_log.test_data_cost_list, color='red')
+        chart.plot(training_log[:].training_data_cost, color='green')
+        chart.plot(training_log[:].test_data_cost, color='red')
         figure.refresh()
 
     def _on_training_iteration_end(self, iteration, context):

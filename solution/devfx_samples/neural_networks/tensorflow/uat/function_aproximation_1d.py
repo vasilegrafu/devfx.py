@@ -79,18 +79,18 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
             context.batch_size = int(context.batch_size + 0) if context.batch_size < 1024 else 1024
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.batch_size = context.batch_size
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data_sample)
-        if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+        training_log[-1].batch_size = context.batch_size
+        training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data_sample)
+        if(len(training_log) >= 2):
+            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
 
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data_sample)
+        training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data_sample)
 
-        print(training_log.last_item)
+        print(training_log[-1])
 
         figure, chart1, chart2 = dv.PersistentFigure(id='status', size=(12, 4), chart_fns=[lambda _: dv.Chart2d(figure=_, position=121), lambda _: dv.Chart2d(figure=_, position=122)])
-        chart1.plot(training_log.training_data_cost_list, color='green')
+        chart1.plot(training_log[:].training_data_cost, color='green')
         chart2.scatter([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in context.test_data_sample[1]], color='blue')
         chart2.plot([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])], color='red')
         figure.refresh()
@@ -108,7 +108,7 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 """
 def main():
     # generating data
-    generated_data = FunctionAproximationDataGenerator().generate(M=1024*4)
+    generated_data = FunctionAproximationDataGenerator().generate(M=1024*16)
 
     # shuffle
     generated_data = mseries.shuffle(generated_data)
@@ -124,7 +124,7 @@ def main():
     # print(training_data, test_data)
 
     # samples
-    sample_count = 512
+    sample_count = 1024
     training_data_sample = mseries.get(training_data, slice(None, sample_count)) 
     test_data_sample = mseries.get(test_data, slice(None, sample_count)) 
     # print(training_data_sample, test_data_sample)

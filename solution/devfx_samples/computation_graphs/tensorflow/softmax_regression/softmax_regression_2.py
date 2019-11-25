@@ -12,38 +12,34 @@ class SoftmaxRegression2DataGenerator(object):
         pass
 
     def generate(self, M):
-        x11 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
-        x12 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
-        x21 = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
-        x22 = stats.distributions.normal(mu=6.0, sigma=1.0).rvs(M)
-        # print(x11, x12, x21, x22)
+        cmin = stats.distributions.normal(mu=2.0, sigma=1.0).rvs(M)
+        cmax = stats.distributions.normal(mu=8.0, sigma=1.0).rvs(M)
+        # print(cmin, cmax)
 
-        xs11 = np.array([x11, x21]).T
-        ys11 = np.array([[1] for _ in np.arange(0, M)])
+        """ |21(3) 22(4)|
+            |11(1) 12(2)|
+        """
+        
+        xs11 = np.array([np.random.permutation(cmin), np.random.permutation(cmin)]).T
+        ys11 = np.repeat([[1]], [M], axis=0)
         # print(xs11, ys11)
 
-        xs12 = np.array([x12, x21]).T
-        ys12 = np.array([[2] for _ in np.arange(0, M)])
+        xs12 = np.array([np.random.permutation(cmax), np.random.permutation(cmin)]).T
+        ys12 = np.repeat([[2]], [M], axis=0)
         # print(xs12, ys12)
 
-        xs21 = np.array([x11, x22]).T
-        ys21 = np.array([[3] for _ in np.arange(0, M)])
+        xs21 = np.array([np.random.permutation(cmin), np.random.permutation(cmax)]).T
+        ys21 = np.repeat([[3]], [M], axis=0)
         # print(xs21, ys21)
 
-        xs22 = np.array([x12, x22]).T
-        ys22 = np.array([[4] for _ in np.arange(0, M)])
+        xs22 = np.array([np.random.permutation(cmax), np.random.permutation(cmax)]).T
+        ys22 = np.repeat([[4]], [M], axis=0)
         # print(xs22, ys22)
 
         x = np.vstack((xs11, xs12, xs21, xs22))
         y = np.vstack((ys11, ys12, ys21, ys22))
         # print(x, y)
-
-        permutation = np.random.permutation(np.arange(start=0, stop=4*M, step=1))
-        # print(permutation)
-
-        x = x[permutation]
-        y = y[permutation]
-        # print(x, y)
+        # print(np.shape(x), np.shape(y))
 
         return [x, y]
 
@@ -95,21 +91,21 @@ class SoftmaxRegression2Model(cg.models.DeclarativeModel):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data)
-        if(len(training_log.nr_list) >= 2):
-            training_log.last_item.trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=64)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log.last_item.trend_of_training_data_cost) <= 1e-2))
+        training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data)
+        if(len(training_log) >= 2):
+            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
 
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data)
+        training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data)
 
-        output_pred, output = (self.run_evaluator(name='output_pred', feeds_data=[context.test_data[0]]), context.test_data[1])
-        training_log.last_item.accuracy = np.mean([output_pred[:,0] == output[:,0]])
+        predicted_output, output = (self.run_evaluator(name='output_pred', feeds_data=[context.test_data[0]]), context.test_data[1])
+        training_log[-1].accuracy = np.mean([predicted_output[:, 0] == output[:, 0]])
 
-        print(training_log.last_item)
+        print(training_log[-1])
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        chart.plot(training_log.training_data_cost_list, color='green')
-        chart.plot(training_log.test_data_cost_list, color='red')
+        chart.plot(training_log[:].training_data_cost, color='green')
+        chart.plot(training_log[:].test_data_cost, color='red')
         figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
