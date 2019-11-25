@@ -108,7 +108,7 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
         training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data)
         if(len(training_log) >= 2):
             training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-1))
 
         training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data)
 
@@ -116,6 +116,8 @@ class SoftmaxRegression1Model(cg.models.DeclarativeModel):
         training_log[-1].accuracy = np.mean([predicted_output[:, 0] == output[:, 0]])
 
         print(training_log[-1])
+
+        x = training_log[:].training_data_cost[-1]
 
         figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
         chart.plot(training_log[:].training_data_cost, color='green')
