@@ -39,7 +39,6 @@ def test():
     [chart22_line2] = chart22.plot(x, f2, label=f2_label)
     chart22.set_legend(loc=(0.65, 0.0))
 
-
     figure2.show()
 
 

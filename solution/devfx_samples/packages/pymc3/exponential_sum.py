@@ -22,4 +22,4 @@ stats.estimators.dhistogram.from_data(trace['x'], bin_count=24).on_chart(chart).
 # chart = dv.chart2d(figure=figure, position=(2, 1, 2))
 # stats.estimators.cdhistogram.from_data(exponential_1.random(size=1024*64)).on_chart(chart).bar()
 
-dv.Figures.show()
+figure.show()

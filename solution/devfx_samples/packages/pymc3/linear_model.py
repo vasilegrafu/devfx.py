@@ -73,4 +73,4 @@ stats.estimators.dhistogram.from_data(trace['beta']).on_chart(chart).bar()
 chart = dv.Chart2D(figure=figure, position=(3, 1, 3))
 stats.estimators.dhistogram.from_data(trace['sigma']).on_chart(chart).bar()
 
-dv.Figures.show()
+figure.show()

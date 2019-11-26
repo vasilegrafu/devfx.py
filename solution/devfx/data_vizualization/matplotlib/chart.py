@@ -45,9 +45,6 @@ class Chart(object):
     def get_title(self):
         return self.axes.get_title()
         
-    def title(self):
-        return self.get_title()
-
     def set_title(self, *args, **kwargs):
         self.axes.set_title(*args, **kwargs)
 
@@ -55,10 +52,7 @@ class Chart(object):
     """  
     def get_grid(self):
         return self.axes.get_grid()
-        
-    def grid(self):
-        return self.get_grid()
-    
+          
     def set_grid(self, *args, **kwargs):     
         self.axes.grid(*args, **kwargs)
                   
@@ -67,9 +61,6 @@ class Chart(object):
     def get_legend(self):
         return self.axes.get_legend()
         
-    def legend(self):
-        return self.get_legend()
-
     def set_legend(self, *args, **kwargs):
         """
         *loc*
@@ -99,7 +90,7 @@ class Chart(object):
     """------------------------------------------------------------------------------------------------
     """
     def clear(self):
-        self.figure.clear(chart=self)
+        self.axes.clear()
 
-    def clear_data(self):
-        self.figure.clear_data(chart=self)
+    def remove(self):
+        self.axes.clear()

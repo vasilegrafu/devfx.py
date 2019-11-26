@@ -4,9 +4,24 @@ import matplotlib.gridspec
 import matplotlib.animation
 import devfx.reflection as refl
 from .figuregrid import FigureGrid
-from .figures import Figures
 
 class Figure(object):
+    """------------------------------------------------------------------------------------------------
+    """
+    @classmethod
+    def ion(cls):
+        mpl.pyplot.ion()
+
+    @classmethod
+    def ioff(cls):
+        mpl.pyplot.ioff()
+
+    @classmethod
+    def istatus(cls):
+        return mpl.pyplot.isinteractive()
+
+    """------------------------------------------------------------------------------------------------
+    """
     def __init__(self, size=(8, 4), dpi=None,
                        grid=(1, 1),
                        facecolor=None,
@@ -20,7 +35,7 @@ class Figure(object):
             self.__grid = FigureGrid(*grid)
 
         self.__animation = None
-
+       
     """----------------------------------------------------------------
     """
     def __getitem__(self, position):
@@ -77,42 +92,34 @@ class Figure(object):
     """------------------------------------------------------------------------------------------------
     """
     def show(self, block=True):
-        Figures.show(figure=self.__figure, block=block)
-
-    def refresh(self):
-        self.__figure.canvas.update()
-        self.__figure.canvas.draw()
-        self.__figure.canvas.flush_events()
+        mpl.pyplot.figure(self.__figure.number)
+        mpl.pyplot.gcf().tight_layout(pad=1.0)
+        mpl.pyplot.show(block=block)
+        mpl.pyplot.pause(0.001)
 
     def clear(self, chart=None):
-        if (chart is not None):
-            chart.axes.clear()
-        else:
-            for axes in self.__figure.get_axes():
-                axes.clear()
-
-    def clear_data(self, chart=None):
-        if (chart is not None):
-            chart.axes.lines = []
-            chart.axes.patches = []
-            chart.axes.collections = []
-            chart.axes.images = []
-        else:
-            for axes in self.__figure.get_axes():
-                axes.lines = []
-                axes.patches = []
-                axes.collections = []
-                axes.images = []
-
-    def empty(self, chart=None):
-        if (chart is not None):
-            self.__figure.delaxes(chart.axes)
-        else:
-            for axes in self.__figure.get_axes():
-                self.__figure.delaxes(axes)
+        mpl.pyplot.figure(self.__figure.number)
+        mpl.pyplot.clf()
 
     def close(self):
-        Figures.close(figure=self.__figure)
+        mpl.pyplot.figure(self.__figure.number)
+        mpl.pyplot.close()
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def clear_chart(self, chart):
+        chart.axes.clear()
+
+    def clear_charts(self):
+        for axes in self.__figure.get_axes():
+            axes.clear()
+
+    def remove_chart(self, chart):
+        chart.axes.remove()
+
+    def remove_charts(self):
+        for axes in self.__figure.get_axes():
+            axes.remove()
 
     """------------------------------------------------------------------------------------------------
     """     

@@ -1,4 +1,5 @@
 import numpy as np
+import devfx.core as core
 import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
@@ -57,10 +58,12 @@ class UnivariateLinearRegressionModel(cg.models.ImperativeModel):
 
         print(training_log[-1])
 
-        figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
+        figure = core.staticvariable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.staticvariable('chart', lambda: dv.Chart2d(figure=figure))
+        figure.clear_charts()
         chart.plot(training_log[:].training_data_cost, color='green')
         chart.plot(training_log[:].test_data_cost, color='red')
-        figure.refresh()
+        figure.show(block=False)
 
     def _on_training_epoch_end(self, epoch, context):
         pass

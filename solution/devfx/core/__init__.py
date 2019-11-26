@@ -1,0 +1,1 @@
+from .staticvariable import staticvariable

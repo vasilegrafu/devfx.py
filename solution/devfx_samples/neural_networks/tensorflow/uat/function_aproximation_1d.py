@@ -1,4 +1,5 @@
 import numpy as np
+import devfx.core as core
 import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
@@ -89,11 +90,14 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
         print(training_log[-1])
 
-        figure, chart1, chart2 = dv.PersistentFigure(id='status', size=(12, 4), chart_fns=[lambda _: dv.Chart2d(figure=_, position=121), lambda _: dv.Chart2d(figure=_, position=122)])
+        figure = core.staticvariable('figure', lambda: dv.Figure(size=(12, 4)))
+        chart1 = core.staticvariable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
+        chart2 = core.staticvariable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
+        figure.clear_charts()
         chart1.plot(training_log[:].training_data_cost, color='green')
         chart2.scatter([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in context.test_data_sample[1]], color='blue')
         chart2.plot([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])], color='red')
-        figure.refresh()
+        figure.show(block=False)
 
     def _on_training_iteration_end(self, iteration, context):
         pass

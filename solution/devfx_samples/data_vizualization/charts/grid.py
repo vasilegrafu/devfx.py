@@ -26,7 +26,7 @@ def test1():
     chart.plot(x, f2, label=f2_label)
     chart.set_legend(loc='lower right')
 
-    dv.Figures.show()
+    figure.show()
 
 """------------------------------------------------------------------------------------------------
 """
@@ -52,7 +52,7 @@ def test2():
     chart.plot(x, f2, label=f2_label)
     chart.set_legend(loc='lower right')
 
-    dv.Figures.show()
+    figure.show()
 
 """------------------------------------------------------------------------------------------------
 """
