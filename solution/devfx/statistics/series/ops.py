@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 
 """------------------------------------------------------------------------------------------------
@@ -19,12 +20,18 @@ def get(data, indices):
 
 """------------------------------------------------------------------------------------------------
 """
-def shuffle(data):
-    return get(data,  np.random.permutation(count(data)))
+def sample(data, size=None):
+    return get(data, np.random.choice(count(data), size=size))
 
+def shuffle(data):
+    return get(data, np.random.permutation(count(data)))
 
 """------------------------------------------------------------------------------------------------
 """
-def split(data, index):
-    return [get(data, slice(None, index)), get(data, slice(index, None))]
-
+def split(data, delimeter):
+    if(refl.is_typeof(delimeter, int)):
+        return [get(data, slice(None, delimeter)), get(data, slice(delimeter, None))]
+    elif(refl.is_typeof(delimeter, float)):
+        return [get(data, slice(None, int(delimeter*count(data)))), get(data, slice(int(delimeter*count(data)), None))]
+    else:
+        raise exceps.NotSupportedError()

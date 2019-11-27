@@ -3,7 +3,6 @@ import devfx.core as core
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.data_vizualization.seaborn as dv
-import devfx.statistics.mseries as mseries
 
 """------------------------------------------------------------------------------------------------
 """
@@ -64,8 +63,8 @@ class QuadraticRegressionWithRegularizationModel(cg.models.DeclarativeModel):
 
         print(training_log[-1])
 
-        figure = core.staticvariable('figure', lambda: dv.Figure(size=(8, 6)))
-        chart = core.staticvariable('chart', lambda: dv.Chart2d(figure=figure))
+        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.persistentvariable('chart', lambda: dv.Chart2d(figure=figure))
         figure.clear_charts()
         chart.plot(training_log[:].training_data_cost, color='green')
         chart.plot(training_log[:].test_data_cost, color='red')
@@ -84,7 +83,7 @@ def main():
     generated_data = QuadraticRegressionWithRegularizationDataGenerator().generate()
     
     # shuffle
-    generated_data = mseries.shuffle(generated_data)
+    generated_data = stats.mseries.shuffle(generated_data)
 
     # chart
     figure = dv.Figure(size=(8, 6))
@@ -96,7 +95,7 @@ def main():
     # generated_data[0] = (generated_data[0] - stats.series.center.mean(generated_data[0]))/stats.series.dispersion.stddev(generated_data[0])
 
     # splitting data
-    (training_data, test_data) = mseries.split(generated_data, int(0.75*mseries.rows_count(generated_data)))
+    (training_data, test_data) = stats.mseries.split(generated_data, 0.75)
     # print(training_data, test_data)
 
     # learning from data

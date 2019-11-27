@@ -47,5 +47,6 @@ from .shape import kurtosis
 
 from .ops import count
 from .ops import get
+from .ops import sample
 from .ops import shuffle
 from .ops import split

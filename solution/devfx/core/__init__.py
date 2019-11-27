@@ -1,1 +1,1 @@
-from .staticvariable import staticvariable
+from .persistentvariable import persistentvariable

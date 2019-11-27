@@ -1,4 +1,6 @@
 import numpy as np
+import devfx.exceptions as exceps
+import devfx.reflection as refl
 from .. import series
 
 """------------------------------------------------------------------------------------------------
@@ -8,7 +10,6 @@ def columns(data):
 
 def columns_count(data):
     return len(data)
-
 
 def rows_count(data):
     return len(data[0])
@@ -23,11 +24,20 @@ def get(data, indexes):
 
 """------------------------------------------------------------------------------------------------
 """
-def shuffle(data):
-    return get(data, series.shuffle(range(rows_count(data))))
+def sample(data, size=None):
+    return get(data, np.random.choice(rows_count(data), size=size))
 
+def shuffle(data):
+    return get(data, np.random.permutation(rows_count(data)))
 
 """------------------------------------------------------------------------------------------------
 """
-def split(data, index):
-    return [get(data, slice(None, index)), get(data, slice(index, None))]
+def split(data, delimeter):
+    if(refl.is_typeof(delimeter, int)):
+        return [get(data, slice(None, delimeter)), get(data, slice(delimeter, None))]
+    elif(refl.is_typeof(delimeter, float)):
+        return [get(data, slice(None, int(delimeter*rows_count(data)))), get(data, slice(int(delimeter*rows_count(data)), None))]
+    else:
+        raise exceps.NotSupportedError()
+
+

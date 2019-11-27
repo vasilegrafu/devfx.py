@@ -25,11 +25,17 @@ print(f"get: {result}")
 
 """------------------------------------------------------------------------------------------------
 """
+result = stats.series.sample(data, 4)
+print(f"sample: {result}")
+
 result = stats.series.shuffle(data)
 print(f"shuffle: {result}")
 
 """------------------------------------------------------------------------------------------------
 """
 result = stats.series.split(data, 4)
+print(f"split: {result}")
+
+result = stats.series.split(data, 0.4)
 print(f"split: {result}")
 

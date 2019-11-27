@@ -35,10 +35,16 @@ print(f"get: {result}")
 
 """------------------------------------------------------------------------------------------------
 """
+result = stats.mseries.sample(data, 4)
+print(f"sample: {result}")
+
 result = stats.mseries.shuffle(data)
-print(f"get: {result}")
+print(f"shuffle: {result}")
 
 """------------------------------------------------------------------------------------------------
 """
 result = stats.mseries.split(data, 4)
+print(f"split: {result}")
+
+result = stats.mseries.split(data, 0.4)
 print(f"split: {result}")

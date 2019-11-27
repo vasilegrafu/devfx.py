@@ -1,11 +1,9 @@
 import numpy as np
 import devfx.core as core
-import devfx.data_containers as dc
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
-import devfx.statistics.mseries as mseries
 
 """------------------------------------------------------------------------------------------------
 """
@@ -90,9 +88,9 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
         print(training_log[-1])
 
-        figure = core.staticvariable('figure', lambda: dv.Figure(size=(12, 4)))
-        chart1 = core.staticvariable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
-        chart2 = core.staticvariable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
+        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(12, 4)))
+        chart1 = core.persistentvariable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
+        chart2 = core.persistentvariable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
         figure.clear_charts()
         chart1.plot(training_log[:].training_data_cost, color='green')
         chart2.scatter([_[0] for _ in context.test_data_sample[0]], [_[0] for _ in context.test_data_sample[1]], color='blue')
@@ -112,25 +110,25 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 """
 def main():
     # generating data
-    generated_data = FunctionAproximationDataGenerator().generate(M=1024*16)
+    generated_data = FunctionAproximationDataGenerator().generate(M=1024*4)
 
     # shuffle
-    generated_data = mseries.shuffle(generated_data)
+    generated_data = stats.mseries.shuffle(generated_data)
 
     # chart
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
-    chart.scatter(*[[__[0] for __ in _] for _ in generated_data])
+    chart.scatter([_[0] for _ in generated_data[0]], [_[0] for _ in generated_data[1]])
     figure.show()
 
     # splitting data
-    (training_data, test_data) = mseries.split(generated_data, int(0.75*mseries.rows_count(generated_data)))
+    (training_data, test_data) = stats.mseries.split(generated_data, 0.75)
     # print(training_data, test_data)
 
     # samples
-    sample_count = 1024
-    training_data_sample = mseries.get(training_data, slice(None, sample_count)) 
-    test_data_sample = mseries.get(test_data, slice(None, sample_count)) 
+    sample_count = 256
+    training_data_sample = stats.mseries.sample(training_data, sample_count) 
+    test_data_sample = stats.mseries.sample(test_data, sample_count) 
     # print(training_data_sample, test_data_sample)
 
     # learning from data

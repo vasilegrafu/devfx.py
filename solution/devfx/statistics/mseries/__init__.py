@@ -47,5 +47,6 @@ from .ops import columns_count
 from .ops import rows
 from .ops import rows_count
 from .ops import get
+from .ops import sample
 from .ops import shuffle
 from .ops import split
