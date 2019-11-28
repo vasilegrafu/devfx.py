@@ -73,21 +73,20 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
             context.batch_size = int(context.batch_size + 0) if context.batch_size < 1024 else 1024
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log[-1].batch_size = context.batch_size
-        training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data_sample)
+        training_log[-1].training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0][:1024], output_data=context.training_data[1][:1024])
         if(len(training_log) >= 2):
             training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
             context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
             
-        training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data_sample)
+        training_log[-1].test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0][:1024], output_data=context.test_data[1][:1024])
 
         print(training_log[-1])
 
         figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
         chart = core.persistentvariable('chart', lambda: dv.Chart3d(figure=figure))
         figure.clear_charts()
-        chart.scatter(*zip(*context.test_data_sample[0]), *zip(*context.test_data_sample[1]), color='blue')
-        chart.scatter(*zip(*context.test_data_sample[0]), *zip(*self.run_hypothesis_evaluator(input_data=context.test_data_sample[0])), color='red')
+        chart.scatter([_[0] for _ in context.test_data[0][:1024]], [_[1] for _ in context.test_data[0][:1024]], [_[0] for _ in context.test_data[1][:1024]], color='blue')
+        chart.scatter([_[0] for _ in context.test_data[0][:1024]], [_[1] for _ in context.test_data[0][:1024]], [_[0] for _ in self.run_hypothesis_evaluator(input_data=context.test_data[0][:1024])], color='red')
         figure.show(block=False)
 
     def _on_training_iteration_end(self, iteration, context):
@@ -111,24 +110,17 @@ def main():
     # chart
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart3d(figure=figure)
-    chart.scatter(*zip(*generated_data[0]), *zip(*generated_data[1]))
+    chart.scatter([_[0] for _ in generated_data[0]], [_[1] for _ in generated_data[0]], [_[0] for _ in generated_data[1]])
     figure.show()
 
     # splitting data
     (training_data, test_data) = stats.mseries.split(generated_data, 0.75)
     # print(training_dataset, test_dataset)
 
-    # samples
-    sample_count = 1024
-    training_data_sample = stats.mseries.sample(training_data, sample_count) 
-    test_data_sample = stats.mseries.sample(test_data, sample_count) 
-    # print(training_data_sample, test_data_sample)
-
     # learning from data
     model = FunctionAproximationModel()
     model.train(training_data=training_data, batch_size=64,
-                training_data_sample=training_data_sample,
-                test_data_sample=test_data_sample)
+                test_data=test_data)
 
     model.close()
 

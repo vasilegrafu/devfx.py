@@ -17,6 +17,8 @@ class GroupAdapter(object):
         return self.set(path, value)
 
     def get(self, path):
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
         item = self.__group[path]
         if(refl.is_typeof(item, hdf5.Group)):
             return GroupAdapter(item)
@@ -35,43 +37,47 @@ class GroupAdapter(object):
         del self.__group[path]
 
     def is_group(self, path):
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
         item = self.__group[path]
         return refl.is_typeof(item, hdf5.Group)
 
-    def check_is_group(self, path):
-        if (not self.is_group(path)):
-            raise exceps.ArgumentError()
-
     def is_dataset(self, path):
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
         item = self.__group[path]
         return refl.is_typeof(item, hdf5.Dataset)
-
-    def check_is_dataset(self, path):
-        if (not self.is_dataset(path)):
-            raise exceps.ArgumentError()
 
     """----------------------------------------------------------------
     """
     def create_group(self, path):
         return GroupAdapter(self.__group.create_group(path))
 
-    def create_if_not_exists_group(self, path):
-        if(not self.exists(path)):
-            return self.create_group(path)
-        else:
-            self.check_is_group(path)
+    def get_or_create_group(self, path):
+        if(self.exists(path)):
+            if (not self.is_group(path)):
+                raise exceps.ArgumentError()
             return self.get(path)
+        else:
+            return self.create_group(path)
 
     def get_group(self, path):
-        self.check_is_group(path)
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
+        if (not self.is_group(path)):
+            raise exceps.ArgumentError()
         return self.get(path)
 
     def exists_group(self, path):
-        self.check_is_group(path)
-        return self.exists(path)
+        if(not self.exists(path)):
+            return False
+        return self.is_group(path)
 
     def remove_group(self, path):
-        self.check_is_group(path)
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
+        if (not self.is_group(path)):
+            raise exceps.ArgumentError()
         self.remove(path)
 
     """----------------------------------------------------------------
@@ -79,23 +85,31 @@ class GroupAdapter(object):
     def create_dataset(self, path, shape=None, max_shape=None, dtype=None, initial_data=None):
         return DatasetAdapter(self.__group.create_dataset(name=path, shape=shape, maxshape=max_shape, dtype=dtype, data=initial_data))
 
-    def create_if_not_exists_dataset(self, path, shape=None, max_shape=None, dtype=None, initial_data=None):
-        if(not self.exists(path)):
-            return self.create_dataset(path=path, shape=shape, max_shape=max_shape, dtype=dtype, initial_data=initial_data)
-        else:
-            self.check_is_dataset(path)
+    def get_or_create_dataset(self, path):
+        if(self.exists(path)):
+            if (not self.is_dataset(path)):
+                raise exceps.ArgumentError()
             return self.get(path)
+        else:
+            return self.create_dataset(path=path, shape=shape, max_shape=max_shape, dtype=dtype, initial_data=initial_data)
 
     def get_dataset(self, path):
-        self.check_is_dataset(path)
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
+        if (not self.is_dataset(path)):
+            raise exceps.ArgumentError()
         return self.get(path)
 
     def exists_dataset(self, path):
-        self.check_is_dataset(path)
-        return self.exists(path)
+        if(not self.exists(path)):
+            return False
+        return self.is_dataset(path)
 
     def remove_dataset(self, path):
-        self.check_is_dataset(path)
+        if(not self.exists(path)):
+            raise exceps.ArgumentError()
+        if (not self.is_dataset(path)):
+            raise exceps.ArgumentError()
         self.remove(path)
 
     """----------------------------------------------------------------

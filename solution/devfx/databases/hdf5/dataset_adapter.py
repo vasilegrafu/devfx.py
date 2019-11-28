@@ -29,6 +29,11 @@ class DatasetAdapter(object):
 
     """----------------------------------------------------------------
     """
+    def __len__(self):
+        return len(self.__dataset)
+
+    """----------------------------------------------------------------
+    """
     @property
     def attributes(self):
         return AttributesManager(self.__dataset.attrs)

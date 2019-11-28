@@ -5,11 +5,6 @@ class AttributesManager(object):
 
     """----------------------------------------------------------------
     """
-    def __len__(self):
-        return len(self.__attributes)
-
-    """----------------------------------------------------------------
-    """
     def set(self, name, value):
         self.__attributes[name] = value
 
@@ -22,6 +17,13 @@ class AttributesManager(object):
     def __getitem__(self, name):
         return self.get(name)
 
+    """----------------------------------------------------------------
+    """
+    def __len__(self):
+        return len(self.__attributes)
+
+    """----------------------------------------------------------------
+    """
     def exists(self, name):
         return name in self.__attributes.keys()
 
