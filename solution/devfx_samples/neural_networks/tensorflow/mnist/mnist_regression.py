@@ -1,9 +1,10 @@
+import numpy as np
 import devfx.os as os
-import devfx.databases.hdf5 as hdf5
+import devfx.core as core
+import devfx.databases.hdf5 as db
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
-from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import MnistDataset
 
 """------------------------------------------------------------------------------------------------
 """
@@ -49,15 +50,18 @@ class MnistModel(cg.models.DeclarativeModel):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log.last_item.training_data_cost = self.run_cost_evaluator(input_data=context.training_data_sample[0], output_data=context.training_data_sample[1])
-        training_log.last_item.test_data_cost = self.run_cost_evaluator(input_data=context.test_data_sample[0], output_data=context.test_data_sample[1])
-        training_log.last_item.accuracy = self.run_evaluator(name='accuracy', feeds_data=[context.test_data_sample[0], context.test_data_sample[1]])
+        indices = np.random.permutation(1024)
+        training_log[-1].training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0][indices], output_data=context.training_data[1][indices])
+        training_log[-1].test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0][:1024], output_data=context.test_data[1][:1024])
+        training_log[-1].accuracy = self.run_evaluator(name='accuracy', feeds_data=[context.test_data[0][:1024], context.test_data[1][:1024]])
 
-        print(training_log.last_item)
+        print(training_log[-1])
 
-        figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        chart.plot(training_log.training_data_cost_list, color='green')
-        figure.refresh()
+        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.persistentvariable('chart', lambda: dv.Chart2d(figure=figure))
+        figure.clear_charts()
+        chart.plot(training_log[:].training_data_cost, color='green')
+        figure.show(block=False)
 
     def _on_training_epoch_end(self, epoch, context):
         pass
@@ -70,18 +74,15 @@ class MnistModel(cg.models.DeclarativeModel):
 def main():
     data_path = 'i:/Dev.Databases/mnist'
 
-    training_data_file = hdf5.File(os.path.join(data_path, 'mnist_train.hdf5'))
-    training_dataset = MnistDataset(data=[list(range(training_data_file['/images'].shape[0]))],
-                                    hparams=[training_data_file])
+    training_data_file = db.File(os.path.join(data_path, 'mnist_train.hdf5'))
+    training_data = [training_data_file.get_dataset('/images'), training_data_file.get_dataset('/labels')]
 
-    test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
-    test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
-                                hparams=[test_data_file])
+    test_data_file = db.File(os.path.join(data_path, 'mnist_test.hdf5'))
+    test_data = [test_data_file.get_dataset('/images'), test_data_file.get_dataset('/labels')]
 
     model = MnistModel()
-    model.train(training_data=training_dataset, batch_size=64,
-                training_data_sample=training_dataset.random_select(256)[:],
-                test_data_sample=test_dataset.random_select(256)[:])
+    model.train(training_data=training_data, batch_size=64,
+                test_data=test_data)
     model.close()
 
     test_data_file.close()

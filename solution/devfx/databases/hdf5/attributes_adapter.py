@@ -1,5 +1,5 @@
 
-class AttributesManager(object):
+class AttributesAdapter(object):
     def __init__(self, attributes):
         self.__attributes = attributes
 

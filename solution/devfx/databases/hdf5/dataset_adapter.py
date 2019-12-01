@@ -1,4 +1,4 @@
-from .attributes_manager import AttributesManager
+from .attributes_adapter import AttributesAdapter
 
 class DatasetAdapter(object):
     def __init__(self, dataset):
@@ -36,4 +36,4 @@ class DatasetAdapter(object):
     """
     @property
     def attributes(self):
-        return AttributesManager(self.__dataset.attrs)
+        return AttributesAdapter(self.__dataset.attrs)
