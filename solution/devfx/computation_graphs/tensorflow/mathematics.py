@@ -132,7 +132,12 @@ matrix_multiply = tf.matmul
 
 """------------------------------------------------------------------------------------------------
 """
-tensordot = tf.tensordot
+def tensordot(a, b, axes, dtype=None, name=None):
+    if(dtype is None):
+        return tf.tensordot(a=a, b=b, axes=axes, name=name)
+    else:
+        return tf.tensordot(a=tf.cast(a, dtype), b=tf.cast(b, dtype), axes=axes, name=name)
+
 einsum = tf.einsum
 
 

@@ -81,6 +81,9 @@ class LogisticRegression2Model(cg.models.DeclarativeModel):
     def _on_training_epoch_begin(self, epoch, context):
         pass
 
+    def _on_training_iteration_begin(self, iteration, context):
+        pass
+
     def _on_append_to_training_log(self, training_log, context):
         training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data)
         if(len(training_log) >= 2):
@@ -99,6 +102,9 @@ class LogisticRegression2Model(cg.models.DeclarativeModel):
         chart.plot(training_log[:].training_data_cost, color='green')
         chart.plot(training_log[:].test_data_cost, color='red')
         figure.show(block=False)
+
+    def _on_training_iteration_end(self, iteration, context):
+        pass
 
     def _on_training_epoch_end(self, epoch, context):
         pass

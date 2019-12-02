@@ -15,25 +15,25 @@ class MnistDataImporter(object):
         labels = []
         for entry in data:
             entrybits = entry.split(',')
-            image = np.asarray(entrybits[1:], dtype=np.uint8).reshape(28,28,1)
-            label = np.asarray([int(entrybits[0])])
+            image = np.asarray(entrybits[1:], dtype=np.uint8).reshape(28,28)
+            label = int(entrybits[0])
             images.append(image)
             labels.append(label)
         return [images, labels]
 
     def __save_data_to(self, data, destination_path):
         with db.File(destination_path) as file:
-            images_dataset = file.create_dataset(path='/images', shape=(0,28,28,1), max_shape=(None,28,28,1), dtype=np.uint8)
-            labels_dataset = file.create_dataset(path='/labels', shape=(0,1), max_shape=(None,1), dtype=np.uint8)
+            images_dataset = file.create_dataset(path='/images', shape=(0,28,28), max_shape=(None,28,28), dtype=np.uint8)
+            labels_dataset = file.create_dataset(path='/labels', shape=(0,), max_shape=(None,), dtype=np.uint8)
             for i in range(0, len(data[0])):
                 if (len(images_dataset) < (i + 1)):
-                    images_dataset.resize(((i + 1),28,28,1))
+                    images_dataset.resize((i + 1, 28, 28))
                 images_dataset[i] = data[0][i]
                 if (len(labels_dataset) < (i + 1)):
-                    labels_dataset.resize(((i + 1),1))
+                    labels_dataset.resize((i + 1,))
                 labels_dataset[i] = data[1][i]
-                if (i % 100 == 0):
-                    print(i)
+                if ((i + 1) % 100 == 0):
+                    print(i + 1)
 
     def import_data(self, source_path, destination_path):
         training_data = self.__load_data_from(os.path.join(source_path, 'mnist_train.csv'))

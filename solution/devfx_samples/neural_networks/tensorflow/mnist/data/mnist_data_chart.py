@@ -16,5 +16,5 @@ if __name__ == '__main__':
 
     figure = dv.Figure(size=(8, 8))
     chart = dv.Chart2d(figure=figure)
-    chart.image(training_data[0][1].reshape(28,28), cmap='Greys', interpolation='None')
+    chart.image(training_data[0][1], cmap='Greys', interpolation='None')
     figure.show()

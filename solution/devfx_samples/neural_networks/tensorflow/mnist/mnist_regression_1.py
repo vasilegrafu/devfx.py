@@ -1,6 +1,7 @@
 import numpy as np
 import devfx.os as os
 import devfx.core as core
+import devfx.statistics as stats
 import devfx.databases.hdf5 as db
 import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
@@ -12,25 +13,24 @@ class MnistModel(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
         # hypothesis
+        x = cg.placeholder(shape=[None, 28, 28], name='x')
 
-        x = cg.placeholder(shape=[None, 28, 28, 1], name='x')
-
-        w = cg.create_variable(name='w', shape=[10, 28, 28, 1], initializer=cg.random_truncated_normal_initializer(stddev=1e-3, dtype=cg.float32))
+        w = cg.create_variable(name='w', shape=[10, 28, 28], initializer=cg.random_truncated_normal_initializer(stddev=1e-3, dtype=cg.float32))
         b = cg.create_variable(name='b', shape=[10], initializer=cg.random_truncated_normal_initializer(stddev=1e-3, dtype=cg.float32))
-        z = cg.tensordot(x, w, axes=([1, 2, 3], [1, 2, 3])) + b
+        z = cg.tensordot(x, w, axes=([1, 2], [1, 2])) + b
 
         h = nn.activation.softmax(z, axis=1)
 
-        y_pred = cg.cast_to_int32(cg.reshape(tensor=cg.argmax(h, axis=1), shape=[None, 1]))
+        y_pred = cg.cast_to_uint8(cg.argmax(h, axis=1))
         self.register_evaluator(name='output_pred', evaluatee=y_pred, feeds=[x])
 
         # cost function
-        y = cg.placeholder(shape=[None, 1], dtype=cg.int32, name='y')
-        y_one_hot = cg.one_hot(indices=y[:,0], depth=10, on_value=1, off_value=0)
+        y = cg.placeholder(shape=[None], dtype=cg.uint8, name='y')
+        y_one_hot = cg.one_hot(indices=y, depth=10, on_value=1, off_value=0)
         J = -cg.reduce_mean(cg.reduce_sum(cg.cast_to_float32(y_one_hot)*cg.log(h+1e-16), axis=1))
 
         # accuracy
-        accuracy = cg.reduce_mean(cg.cast_to_float32(cg.equal(y_pred[:,0], y[:,0])))
+        accuracy = cg.reduce_mean(cg.cast_to_float32(cg.equal(y_pred, y)))
         self.register_evaluator(name='accuracy', evaluatee=accuracy, feeds=[x, y])
 
         # evaluators
@@ -49,11 +49,13 @@ class MnistModel(cg.models.DeclarativeModel):
     def _on_training_epoch_begin(self, epoch, context):
         pass
 
+    def _on_training_iteration_begin(self, iteration, context):
+        pass
+
     def _on_append_to_training_log(self, training_log, context):
-        indices = np.random.permutation(1024)
-        training_log[-1].training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0][indices], output_data=context.training_data[1][indices])
-        training_log[-1].test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0][:1024], output_data=context.test_data[1][:1024])
-        training_log[-1].accuracy = self.run_evaluator(name='accuracy', feeds_data=[context.test_data[0][:1024], context.test_data[1][:1024]])
+        training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data_sample)
+        training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data_sample)
+        training_log[-1].accuracy = self.run_evaluator(name='accuracy', feeds_data=context.test_data_sample)
 
         print(training_log[-1])
 
@@ -62,6 +64,9 @@ class MnistModel(cg.models.DeclarativeModel):
         figure.clear_charts()
         chart.plot(training_log[:].training_data_cost, color='green')
         figure.show(block=False)
+
+    def _on_training_iteration_end(self, iteration, context):
+        pass
 
     def _on_training_epoch_end(self, epoch, context):
         pass
@@ -81,8 +86,10 @@ def main():
     test_data = [test_data_file.get_dataset('/images'), test_data_file.get_dataset('/labels')]
 
     model = MnistModel()
-    model.train(training_data=training_data, batch_size=64,
-                test_data=test_data)
+    model.train(training_data=training_data, batch_size=32,
+                test_data=test_data,
+                training_data_sample = stats.mseries.sample(training_data, 1024),
+                test_data_sample = stats.mseries.sample(test_data, 1024))
     model.close()
 
     test_data_file.close()
@@ -92,3 +99,4 @@ def main():
 """
 if __name__ == '__main__':
     main()
+

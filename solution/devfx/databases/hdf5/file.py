@@ -3,15 +3,7 @@ import devfx.exceptions as exceps
 from .group_adapter import GroupAdapter
 
 class File(GroupAdapter):
-    def __init__(self, path, mode='rw'):
-        if(mode == 'r'):
-            mode = 'r'
-        elif(mode == 'w'):
-            mode = 'w'
-        elif (mode == 'rw'):
-            mode = 'a'
-        else:
-            raise exceps.ArgumentError()
+    def __init__(self, path, mode='a'):
         self.__file = hdf5.File(name=path, mode=mode)
         super().__init__(group=self.__file)
 

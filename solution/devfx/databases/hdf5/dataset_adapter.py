@@ -37,3 +37,9 @@ class DatasetAdapter(object):
     @property
     def attributes(self):
         return AttributesAdapter(self.__dataset.attrs)
+
+    
+    """----------------------------------------------------------------
+    """
+    def astype(self, dtype):
+        return self.__dataset.astype(dtype)
