@@ -4,21 +4,17 @@ import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
-import devfx.data_containers as dc
-from .. import train
-from .training_log_item import TrainingLogItem
-from .training_log import TrainingLog
 
 class Model(object):
+    """------------------------------------------------------------------------------------------------
+    """
     def __init__(self):
         self.__functions = {}
 
         self._build_model()
 
-        self.__training_log = TrainingLog()
-
     def close(self):
-        self.__training_log = None
+        pass
 
     """------------------------------------------------------------------------------------------------
     """
@@ -91,8 +87,10 @@ class Model(object):
         if(optimizer is None):
             raise exceps.ArgumentError()
         def __apply_cost_optimizer(*args, **kwargs):
-            grads_and_vars = train.implicit_gradients(self.get_cost_function())(*args, **kwargs)
-            optimizer.apply_gradients(grads_and_vars)
+            with tf.GradientTape() as gradient_tape:
+                cost = self.get_cost_function()(*args, **kwargs)
+            gradients = gradient_tape.gradient(cost, persistent_variables)
+            optimizer.apply_gradients(zip(gradients, persistent_variables))
         self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
 
     def get_apply_cost_optimizer_function(self):
@@ -137,6 +135,94 @@ class Model(object):
 
     """------------------------------------------------------------------------------------------------
     """
+    class TrainingLogItem(object):
+        def __init__(self, nr, time_elapsed, time_delta, iteration, epoch):
+            self.__attr_list__ = []
+
+            self.nr = int(nr)
+            self.time_elapsed = time_elapsed
+            self.time_delta = time_delta
+            self.iteration = iteration
+            self.epoch = epoch
+
+        def __setattr__(self, name, value):
+            if(name == '__attr_list__'):
+                super().__setattr__(name, value)
+            else:
+                super().__setattr__(name, value)
+                self.__attr_list__.append((name, value))
+
+        def __str__(self):
+            name_value_list = []
+            for attr in self.__attr_list__:
+                name = attr[0]
+                value = attr[1]
+
+                if(name == 'time_elapsed'):
+                    name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
+                elif(name == 'time_delta'):
+                    name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
+                elif (name == 'iteration'):
+                    name_value_list.append("{name}={value}".format(name=name, value=value))
+                elif (name == 'epoch'):
+                    name_value_list.append("{name}={value:.3f}".format(name=name, value=value))
+                elif(value is None):
+                    name_value_list.append("{name}={value}".format(name=name, value=None))
+                elif(refl.is_typeof(value, str)):
+                    name_value_list.append("{name}={value}".format(name=name, value=value))
+                elif (refl.is_typeof(value, int)):
+                    name_value_list.append("{name}={value}".format(name=name, value=value))
+                else:
+                    try:
+                        value = float(value)
+                        name_value_list.append("{name}={value:.6f}".format(name=name, value=value))
+                    except:
+                        name_value_list.append("{name}={value}".format(name=name, value=value))
+            return ', '.join(name_value_list)
+
+        def __repr__(self):
+            raise exceps.NotSupportedError()
+
+    """------------------------------------------------------------------------------------------------
+    """
+    class TrainingLog(object):
+        def __init__(self):
+            self.__items = []
+
+        def append(self, item):
+            self.__items.append(item)
+
+        def remove(self, index_or_indices):
+            del self.__items[index_or_indices]
+
+        def __delitem__(self, index_or_indices):
+            self.remove(index_or_indices)
+
+        def clear(self):
+            self.__items.clear()
+
+        def get(self, index_or_indices):
+            class __TrainingLogItemsProxy(object):
+                def __init__(self, items):
+                    self.__items = items
+
+                def __getattr__(self, name):
+                    return [getattr(_, name) for _ in self.__items]
+
+            item_or_items = self.__items[index_or_indices]
+            if(not refl.is_iterable(item_or_items)):
+                return item_or_items
+            else:
+                return __TrainingLogItemsProxy(item_or_items)
+
+        def __getitem__(self, index_or_indices):
+            return self.get(index_or_indices)
+
+        def __len__(self):
+            return len(self.__items)
+
+    """------------------------------------------------------------------------------------------------
+    """
     def train(self, training_data, batch_size=None, iterations=None, epochs=None, hparams=None, **kwargs):
         # ----------------------------------------------------------------
         if(not refl.is_iterable(training_data)):
@@ -169,6 +255,8 @@ class Model(object):
 
         cancellation_token = Model.CancellationToken()
 
+        training_log = Model.TrainingLog()
+
         append_to_training_log_condition = lambda context: True
         # ----------------------------------------------------------------
 
@@ -181,7 +269,7 @@ class Model(object):
         context.epochs = epochs
         context.hparams = hparams
         for key in kwargs: setattr(context, key, kwargs[key])
-        context.training_log = self.__training_log
+        context.training_log = training_log
         context.cancellation_token = cancellation_token
         context.append_to_training_log_condition = append_to_training_log_condition
         self._on_training_begin(context)
@@ -214,7 +302,7 @@ class Model(object):
             context.epochs = epochs
             context.hparams = hparams
             for key in kwargs: setattr(context, key, kwargs[key])
-            context.training_log = self.__training_log
+            context.training_log = training_log
             context.cancellation_token = cancellation_token
             self._on_training_epoch_begin(epoch, context)
             batch_size = context.batch_size
@@ -259,7 +347,7 @@ class Model(object):
                 context.epochs = epochs
                 context.hparams = hparams
                 for key in kwargs: setattr(context, key, kwargs[key])
-                context.training_log = self.__training_log
+                context.training_log = training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_iteration_begin(iteration, context)
                 batch_size = context.batch_size
@@ -288,7 +376,7 @@ class Model(object):
                     context.epochs = epochs
                     context.hparams = hparams
                     for key in kwargs: setattr(context, key, kwargs[key])
-                    context.training_log = self.__training_log
+                    context.training_log = training_log
                     context.cancellation_token = cancellation_token
                     self._on_training_apply_cost_optimizer(context)
                     batch_size = context.batch_size
@@ -308,12 +396,12 @@ class Model(object):
                 # ----------------------------------------------------------------
                 if(append_to_training_log_condition_result):
                     time_elapsed = stopwatch.elapsed
-                    training_log_item = TrainingLogItem(nr=(len(self.__training_log) + 1),
-                                                        time_elapsed=time_elapsed,
-                                                        time_delta=((time_elapsed - self.__training_log[-1].time_elapsed) if (len(self.__training_log) >= 1) else 0),
-                                                        iteration=iteration,
-                                                        epoch=(epoch + training_data_epoch_position / training_data_row_count))
-                    self.__training_log.append(training_log_item)
+                    training_log_item = Model.TrainingLogItem(nr=(len(training_log) + 1),
+                                                              time_elapsed=time_elapsed,
+                                                              time_delta=((time_elapsed - training_log[-1].time_elapsed) if (len(training_log) >= 1) else 0),
+                                                              iteration=iteration,
+                                                              epoch=(epoch + training_data_epoch_position / training_data_row_count))
+                    training_log.append(training_log_item)
 
                     # ----------------------------------------------------------------
                     context = Model.TrainingContext()
@@ -327,9 +415,9 @@ class Model(object):
                     context.epochs = epochs
                     context.hparams = hparams
                     for key in kwargs: setattr(context, key, kwargs[key])
-                    context.training_log = self.__training_log
+                    context.training_log = training_log
                     context.cancellation_token = cancellation_token
-                    self._on_append_to_training_log(self.__training_log, context)
+                    self._on_append_to_training_log(training_log, context)
                     batch_size = context.batch_size
                     iterations = context.iterations
                     iteration = context.iteration
@@ -350,7 +438,7 @@ class Model(object):
                 context.epochs = epochs
                 context.hparams = hparams
                 for key in kwargs: setattr(context, key, kwargs[key])
-                context.training_log = self.__training_log
+                context.training_log = training_log
                 context.cancellation_token = cancellation_token
                 self._on_training_iteration_end(iteration, context)
                 batch_size = context.batch_size
@@ -373,7 +461,7 @@ class Model(object):
             context.epochs = epochs
             context.hparams = hparams
             for key in kwargs: setattr(context, key, kwargs[key])
-            context.training_log = self.__training_log
+            context.training_log = training_log
             context.cancellation_token = cancellation_token
             self._on_training_epoch_end(epoch, context)
             batch_size = context.batch_size
@@ -399,7 +487,7 @@ class Model(object):
         context.epochs = epochs
         context.hparams = hparams
         for key in kwargs: setattr(context, key, kwargs[key])
-        context.training_log = self.__training_log
+        context.training_log = training_log
         self._on_training_end(context)
         # ----------------------------------------------------------------
 
@@ -415,7 +503,7 @@ class Model(object):
         result.epochs = epochs
         result.hparams = hparams
         for key in kwargs: setattr(result, key, kwargs[key])
-        result.training_log = self.__training_log
+        result.training_log = training_log
         return result
 
     """
