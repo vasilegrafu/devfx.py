@@ -5,10 +5,11 @@ import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
 import devfx.data_containers as dc
-from ..training_log_item import TrainingLogItem
-from ..training_log import TrainingLog
+from .. import train
+from .training_log_item import TrainingLogItem
+from .training_log import TrainingLog
 
-class ImperativeModel(object):
+class Model(object):
     def __init__(self):
         self.__functions = {}
 
@@ -90,7 +91,7 @@ class ImperativeModel(object):
         if(optimizer is None):
             raise exceps.ArgumentError()
         def __apply_cost_optimizer(*args, **kwargs):
-            grads_and_vars = tf.contrib.eager.implicit_gradients(self.get_cost_function())(*args, **kwargs)
+            grads_and_vars = train.implicit_gradients(self.get_cost_function())(*args, **kwargs)
             optimizer.apply_gradients(grads_and_vars)
         self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
 
@@ -166,13 +167,13 @@ class ImperativeModel(object):
         # ----------------------------------------------------------------
         stopwatch = dgn.stopwatch().start()
 
-        cancellation_token = ImperativeModel.CancellationToken()
+        cancellation_token = Model.CancellationToken()
 
         append_to_training_log_condition = lambda context: True
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        context = ImperativeModel.TrainingContext()
+        context = Model.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
         context.training_data = training_data
         context.batch_size = batch_size
@@ -203,7 +204,7 @@ class ImperativeModel(object):
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = ImperativeModel.TrainingContext()
+            context = Model.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.training_data = training_data
             context.batch_size = batch_size
@@ -247,7 +248,7 @@ class ImperativeModel(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModel.TrainingContext()
+                context = Model.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.training_data = training_data
                 context.batch_size = batch_size
@@ -276,7 +277,7 @@ class ImperativeModel(object):
                     else:
                         self.run_apply_cost_optimizer_function(batch[0], batch[1], hparams)
                 else:
-                    context = ImperativeModel.TrainingContext()
+                    context = Model.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.training_data = training_data
                     context.batch_size = batch_size
@@ -299,7 +300,7 @@ class ImperativeModel(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModel.TrainingContext()
+                context = Model.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.iteration = iteration
                 context.epoch = epoch
@@ -315,7 +316,7 @@ class ImperativeModel(object):
                     self.__training_log.append(training_log_item)
 
                     # ----------------------------------------------------------------
-                    context = ImperativeModel.TrainingContext()
+                    context = Model.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.training_data = training_data
                     context.batch_size = batch_size
@@ -338,7 +339,7 @@ class ImperativeModel(object):
                     # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                context = ImperativeModel.TrainingContext()
+                context = Model.TrainingContext()
                 context.time_elapsed = stopwatch.elapsed
                 context.training_data = training_data
                 context.batch_size = batch_size
@@ -362,7 +363,7 @@ class ImperativeModel(object):
             # ----------------------------------------------------------------
 
             # ----------------------------------------------------------------
-            context = ImperativeModel.TrainingContext()
+            context = Model.TrainingContext()
             context.time_elapsed = stopwatch.elapsed
             context.training_data = training_data
             context.batch_size = batch_size
@@ -388,7 +389,7 @@ class ImperativeModel(object):
             # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        context = ImperativeModel.TrainingContext()
+        context = Model.TrainingContext()
         context.time_elapsed = stopwatch.elapsed
         context.training_data = training_data
         context.batch_size = batch_size
@@ -404,7 +405,7 @@ class ImperativeModel(object):
 
         stopwatch.stop()
 
-        result = ImperativeModel.TrainingResult()
+        result = Model.TrainingResult()
         result.time_elapsed = stopwatch.elapsed
         result.training_data = training_data
         result.batch_size = batch_size

@@ -11,71 +11,50 @@ def convert_to_tensor(value, dtype=None, name=None):
 """------------------------------------------------------------------------------------------------
 """
 def constant(value, shape=None, dtype=types.float32, name=None):
-    return tf.constant(value, shape=shape, dtype=dtype, name=name)
+    return tf.constant(value=value, shape=shape, dtype=dtype, name=name)
 
-def placeholder(shape=None, dtype=types.float32, name=None):
-    return tf.placeholder(dtype, shape=shape, name=name)
+def fill(value, shape=None, dtype=types.float32, name=None):
+    return tf.cast(tf.fill(dims=shape, value=value, name=name), dtype=dtype)
 
 
 """------------------------------------------------------------------------------------------------
 """
 def zeros(shape, dtype=types.float32, name=None):
-    return tf.zeros(shape, dtype=dtype, name=name)
+    return tf.zeros(shape=shape, dtype=dtype, name=name)
 
-def zeros_like(tensor, dtype=None, name=None):
-    if (dtype is None):
-        return tf.zeros_like(tensor, name=name)  
-    else:
-        return tf.cast(tf.zeros_like(tensor, name=name), dtype)
+def zeros_like(input, dtype=None, name=None):
+    return tf.zeros_like(input=input, dtype=dtype, name=None)  
 
 def ones(shape, dtype=types.float32, name=None):
-    return tf.ones(shape, dtype=dtype, name=name)
+    return tf.ones(shape=shape, dtype=dtype, name=name)
 
-def ones_like(tensor, dtype=None, name=None):
-    if (dtype is None):
-        return tf.ones_like(tensor, name=name)
-    else:
-        return tf.cast(tf.ones_like(tensor, name=name), dtype)
-
+def ones_like(input, dtype=None, name=None):
+    return tf.ones_like(input=input, dtype=dtype, name=None)  
 
 """------------------------------------------------------------------------------------------------
 """
-def fill(shape, value, dtype=None, name=None):
-    if (dtype is None):
-        return tf.fill(shape, value, name=name)
-    else:
-        return tf.cast(tf.fill(shape, value, name=name), dtype)
+def linspace(start, stop, n, name=None):
+    return tf.linspace(start=start, stop=stop, num=n, name=name)
 
-def fill_like(tensor, value, dtype=None, name=None):
-    return fill(shape(tensor), value, dtype=dtype, name=name)
-
-"""------------------------------------------------------------------------------------------------
-"""
-def linspace(start, stop, n, dtype=types.float32, name=None):
-    return tf.linspace(types.cast(start, dtype), types.cast(stop, dtype), n, name=name)
-
-def range(start, stop, step, dtype=types.float32, name=None):
+def range(start, stop, step=1, dtype=types.int32, name=None):
     return tf.range(start, limit=stop, delta=step, dtype=dtype, name=name)
 
 
 """------------------------------------------------------------------------------------------------
 """
 def random_uniform(shape, min=0.0, max=None, dtype=types.float32, seed=None, name=None):
-    return tf.random_uniform(shape, minval=min, maxval=max, dtype=dtype, seed=seed, name=name)
+    return tf.random.uniform(shape, minval=min, maxval=max, dtype=dtype, seed=seed, name=name)
 
 def random_normal(shape, mean=0.0, stddev=1.0, dtype=types.float32, seed=None, name=None):
-    return tf.random_normal(shape, mean=mean, stddev=stddev, dtype=dtype, seed=seed, name=name)
+    return tf.random.normal(shape, mean=mean, stddev=stddev, dtype=dtype, seed=seed, name=name)
 
 def random_truncated_normal(shape, mean=0.0, stddev=1.0, dtype=types.float32, seed=None, name=None):
-    return tf.truncated_normal(shape=shape, mean=mean, stddev=stddev, dtype=dtype, seed=seed, name=name)
+    return tf.random.truncated_normal(shape=shape, mean=mean, stddev=stddev, dtype=dtype, seed=seed, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
 def one_hot(indices, depth, on_value=None, off_value=None, axis=None, dtype=None, name=None):
-    if (dtype is None):
-        return tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, name=name)
-    else:
-        return tf.cast(tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, name=name), dtype)
+    return tf.one_hot(indices, depth, on_value=on_value, off_value=off_value, axis=axis, dtype=dtype, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
@@ -94,15 +73,6 @@ def reshape(tensor, shape, name=None):
     if(refl.is_iterable(shape)):
         shape = [(_ if _ is not None else -1) for _ in shape]
     return tf.reshape(tensor, shape, name=name)
-
-def transpose(tensor, permutation=None, name=None):
-    return tf.transpose(tensor, perm=permutation, name=name)
-
-def pad(tensor, paddings, mode="CONSTANT", name=None):
-    return tf.pad(tensor, paddings, mode=mode, name=name)
-
-def reverse(tensor, axis, name=None):
-    return tf.reverse(tensor, axis, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
@@ -138,15 +108,8 @@ less_equal = tf.less_equal
 greater = tf.greater
 greater_equal = tf.greater_equal
 
-"""------------------------------------------------------------------------------------------------
-"""
-logical_not = tf.logical_not
-logical_and = tf.logical_and
-logical_or = tf.logical_or
-logical_xor = tf.logical_xor
 
-"""------------------------------------------------------------------------------------------------
-"""
-assign = tf.assign
+
+
 
 

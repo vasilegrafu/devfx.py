@@ -10,4 +10,4 @@ from .asserts import assert_greater
 from .asserts import assert_greater_equal
 
 from .asserts import assert_type
-from .asserts import assert_rank
+from .asserts import assert_shapes

@@ -7,11 +7,9 @@ import devfx.computation_graphs.tensorflow as cg
 import devfx.neural_networks.tensorflow as nn
 import devfx.data_vizualization.seaborn as dv
 
-cg.enable_imperative_execution_mode()
-
 """------------------------------------------------------------------------------------------------
 """
-class MnistModel(cg.models.ImperativeModel):
+class MnistModel(cg.Model):
     # ----------------------------------------------------------------
     def _build_model(self):
         def h(x):
@@ -86,12 +84,12 @@ def main():
     test_data_file = db.File(os.path.join(data_path, 'mnist_test.hdf5'))
     test_data = [test_data_file.get_dataset('/images'), test_data_file.get_dataset('/labels')]
 
-    model = MnistModel()
-    result = model.train(training_data=training_data, batch_size=32,
-                test_data=test_data,
-                training_data_sample = stats.mseries.sample(training_data, 256),
-                test_data_sample = stats.mseries.sample(test_data, 256))
-    model.close()
+    # model = MnistModel()
+    # model.train(training_data=training_data, batch_size=32,
+    #             test_data=test_data,
+    #             training_data_sample = stats.mseries.sample(training_data, 256),
+    #             test_data_sample = stats.mseries.sample(test_data, 256))
+    # model.close()
 
     # results = []
     # i = 1

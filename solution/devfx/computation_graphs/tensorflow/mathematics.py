@@ -6,19 +6,19 @@ from . import tensors
 """------------------------------------------------------------------------------------------------
 """
 def is_finite(x, name=None):
-    return tf.is_finite(x, name=name)
+    return tf.math.is_finite(x, name=name)
 
 def is_inf(x, name=None):
-    return tf.is_inf(x, name=name)
+    return tf.math.is_inf(x, name=name)
 
 def is_neginf(x, name=None):
-    return tf.equal(x, -np.inf, name=name)
+    return tf.math.equal(x, -np.inf, name=name)
 
 def is_posinf(x, name=None):
     return tf.equal(x, +np.inf, name=name)
 
 def is_nan(x, name=None):
-    return tf.is_nan(x, name=name)
+    return tf.math.is_nan(x, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
@@ -46,89 +46,95 @@ def clip_by_min_poshalfinf(min, x, name=None):
 
 """------------------------------------------------------------------------------------------------
 """
-add = tf.add
-add_n = tf.add_n
-subtract = tf.subtract
-multiply = tf.multiply
-scalar_multiply = tf.scalar_mul
-divide = tf.divide
-mod = tf.mod
+add = tf.math.add
+add_n = tf.math.add_n
+subtract = tf.math.subtract
+multiply = tf.math.multiply
+scalar_multiply = tf.math.scalar_mul
+divide = tf.math.divide
+mod = tf.math.mod
 
 """------------------------------------------------------------------------------------------------
 """
-min = tf.minimum
-max = tf.maximum
+min = tf.math.minimum
+max = tf.math.maximum
 
-argmin = tf.argmin
-argmax = tf.argmax
+argmin = tf.math.argmin
+argmax = tf.math.argmax
 
 """------------------------------------------------------------------------------------------------
 """
-cumulative_sum = tf.cumsum
-cumulative_product = tf.cumprod
+cumulative_sum = tf.math.cumsum
+cumulative_product = tf.math.cumprod
 
 """------------------------------------------------------------------------------------------------
 """
 def reduce_sum(x, axis=None, keepdims=False, name=None):
-    return tf.reduce_sum(x, axis=axis, keepdims=keepdims, name=name)
+    return tf.math.reduce_sum(x, axis=axis, keepdims=keepdims, name=name)
 
-def reduce_prod(x, axis=None, keep_dims=False, name=None):
-    return tf.reduce_prod(x, axis=axis, keep_dims=keep_dims, name=name)
+def reduce_prod(x, axis=None, keepdims=False, name=None):
+    return tf.math.reduce_prod(x, axis=axis, keepdims=keepdims, name=name)
 
-def reduce_min(x, axis=None, keep_dims=False, name=None):
-    return tf.reduce_min(x, axis=axis, keep_dims=keep_dims, name=name)
+def reduce_min(x, axis=None, keepdims=False, name=None):
+    return tf.math.reduce_min(x, axis=axis, keepdims=keepdims, name=name)
 
-def reduce_max(x, axis=None, keep_dims=False, name=None):
-    return tf.reduce_max(x, axis=axis, keep_dims=keep_dims, name=name)
+def reduce_max(x, axis=None, keepdims=False, name=None):
+    return tf.math.reduce_max(x, axis=axis, keepdims=keepdims, name=name)
 
-def reduce_all(x, axis=None, keep_dims=False, name=None):
-    return tf.reduce_all(x, axis=axis, keep_dims=keep_dims, name=name)
+def reduce_all(x, axis=None, keepdims=False, name=None):
+    return tf.math.reduce_all(x, axis=axis, keepdims=keepdims, name=name)
 
-def reduce_any(x, axis=None, keep_dims=False, name=None):
-    return tf.reduce_any(x, axis=axis, keep_dims=keep_dims, name=name)
+def reduce_any(x, axis=None, keepdims=False, name=None):
+    return tf.math.reduce_any(x, axis=axis, keepdims=keepdims, name=name)
 
 
 def reduce_mean(x, axis=None, keepdims=False):
-    return tf.reduce_mean(x, axis=axis, keepdims=keepdims)
+    return tf.math.reduce_mean(x, axis=axis, keepdims=keepdims)
 
-def reduce_var(x, axis=None, keep_dims=False):
-    mean = reduce_mean(x, axis=axis, keepdims=True)
-    return reduce_mean(square(x - mean), axis=axis, keepdims=keep_dims)
+def reduce_var(x, axis=None, keepdims=False):
+    return tf.math.reduce_variance(x, axis=axis, keepdims=keepdims)
 
-def reduce_std(x, axis=None, keep_dims=False):
-    return sqrt(reduce_var(x, axis=axis, keep_dims=keep_dims))
+def reduce_std(x, axis=None, keepdims=False):
+    return tf.math.reduce_std(x, axis=axis, keepdims=keepdims)
 
 """------------------------------------------------------------------------------------------------
 """
-sign = tf.sign
-reciprocal = tf.reciprocal
-round = tf.round
-ceil = tf.ceil
-floor = tf.floor
+sign = tf.math.sign
+reciprocal = tf.math.reciprocal
+round = tf.math.round
+ceil = tf.math.ceil
+floor = tf.math.floor
 
 """------------------------------------------------------------------------------------------------
 """
 identity = tf.identity
-exp = tf.exp
-log = tf.log
-abs = tf.abs
-sqrt = tf.sqrt
-square = tf.square
-pow = tf.pow
-sin = tf.sin
-cos = tf.cos
-arcsin = tf.asin
-arccos = tf.acos
-tan = tf.tan
-arctan = tf.atan
+exp = tf.math.exp
+log = tf.math.log
+abs = tf.math.abs
+sqrt = tf.math.sqrt
+square = tf.math.square
+pow = tf.math.pow
+sin = tf.math.sin
+cos = tf.math.cos
+arcsin = tf.math.asin
+arccos = tf.math.acos
+tan = tf.math.tan
+arctan = tf.math.atan
 
 """------------------------------------------------------------------------------------------------
 """
 matrix_eye = tf.eye
-matrix_determinant = tf.matrix_determinant
-matrix_transpose = tf.matrix_transpose
-matrix_inverse = tf.matrix_inverse
-matrix_multiply = tf.matmul
+matrix_determinant = tf.linalg.det
+matrix_transpose = tf.linalg.matrix_transpose
+matrix_inverse = tf.linalg.inv
+matrix_multiply = tf.linalg.matmul
+
+"""------------------------------------------------------------------------------------------------
+"""
+logical_not = tf.math.logical_not
+logical_and = tf.math.logical_and
+logical_or = tf.math.logical_or
+logical_xor = tf.math.logical_xor
 
 """------------------------------------------------------------------------------------------------
 """

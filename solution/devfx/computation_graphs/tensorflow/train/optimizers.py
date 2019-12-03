@@ -4,11 +4,10 @@ from .. import mathematics
 
 """------------------------------------------------------------------------------------------------
 """
-GradientDescentOptimizer = tf.train.GradientDescentOptimizer
-MomentumOptimizer = tf.train.MomentumOptimizer
-AdadeltaOptimizer = tf.train.AdadeltaOptimizer
-AdagradOptimizer = tf.train.AdagradOptimizer
-AdamOptimizer = tf.train.AdamOptimizer
+GradientDescentOptimizer = tf.optimizers.SGD
+AdadeltaOptimizer = tf.optimizers.Adadelta
+AdagradOptimizer = tf.optimizers.Adagrad
+AdamOptimizer = tf.optimizers.Adam
 
 """------------------------------------------------------------------------------------------------
 """

@@ -23,9 +23,6 @@ def random_uniform_initializer(min=0.0, max=None, dtype=types.float32, seed=None
 def random_normal_initializer(mean=0.0, stddev=1.0, dtype=types.float32, seed=None):
     return tf.random_normal_initializer(mean=mean, stddev=stddev, dtype=dtype, seed=seed)
 
-def random_truncated_normal_initializer(mean=0.0, stddev=1.0, dtype=types.float32, seed=None):
-    return tf.truncated_normal_initializer(mean=mean, stddev=stddev, dtype=dtype, seed=seed)
-
 """------------------------------------------------------------------------------------------------
 """
 class XavierGlorotRandomUniformInitializer(object):
@@ -33,7 +30,7 @@ class XavierGlorotRandomUniformInitializer(object):
         self.dtype = dtype
         self.seed = seed
 
-    def __call__(self, shape, dtype=None, partition_info=None):
+    def __call__(self, shape, dtype=types.float32):
         if dtype is None:
             dtype = self.dtype
         r = types.cast(mathematics.sqrt(6.0 / (np.prod(shape[:-1]) + shape[-1])), dtype=dtype)
@@ -50,7 +47,7 @@ class XavierGlorotRandomNormalInitializer(object):
         self.dtype = dtype
         self.seed = seed
 
-    def __call__(self, shape, dtype=None, partition_info=None):
+    def __call__(self, shape, dtype=types.float32):
         if dtype is None:
             dtype = self.dtype
         mean = 0.0
@@ -69,7 +66,7 @@ class XavierGlorotRandomTruncatedNormalInitializer(object):
         self.dtype = dtype
         self.seed = seed
 
-    def __call__(self, shape, dtype=None, partition_info=None):
+    def __call__(self, shape, dtype=types.float32):
         if dtype is None:
             dtype = self.dtype
         mean = 0.0

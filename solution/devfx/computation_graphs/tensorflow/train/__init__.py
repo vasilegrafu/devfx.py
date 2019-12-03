@@ -1,7 +1,6 @@
 from .moving_averages import ema
 
 from .optimizers import GradientDescentOptimizer
-from .optimizers import MomentumOptimizer
 from .optimizers import AdadeltaOptimizer
 from .optimizers import AdagradOptimizer
 from .optimizers import AdamOptimizer

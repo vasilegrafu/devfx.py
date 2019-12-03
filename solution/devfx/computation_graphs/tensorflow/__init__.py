@@ -4,13 +4,6 @@ from . import errors
 
 """----------------------------------------------------------
 """
-from .execution import enable_declarative_execution_mode
-from .execution import enable_imperative_execution_mode
-from .execution import is_declarative_execution_mode_enabled
-from .execution import is_imperative_execution_mode_enabled
-
-"""----------------------------------------------------------
-"""
 from .types import bool
 from .types import int8
 from .types import int16
@@ -51,21 +44,15 @@ from .types import cast_to_string
 
 """----------------------------------------------------------
 """
-from .variable_scopes import scope
-from .variable_scopes import get_scope
-
-"""----------------------------------------------------------
-"""
 from .tensors import convert_to_tensor
+
 from .tensors import constant
-from .tensors import placeholder
+from .tensors import fill
 
 from .tensors import zeros
 from .tensors import zeros_like
 from .tensors import ones
 from .tensors import ones_like
-from .tensors import fill
-from .tensors import fill_like
 
 from .tensors import linspace
 from .tensors import range
@@ -81,9 +68,6 @@ from .tensors import rank
 from .tensors import size
 
 from .tensors import reshape
-from .tensors import transpose
-from .tensors import pad
-from .tensors import reverse
 
 from .tensors import tile
 from .tensors import slice
@@ -101,21 +85,9 @@ from .tensors import less_equal
 from .tensors import greater
 from .tensors import greater_equal
 
-from .tensors import logical_not
-from .tensors import logical_and
-from .tensors import logical_or
-from .tensors import logical_xor
-
-from .tensors import assign
-
 """----------------------------------------------------------
 """
 from .variables import Variable
-from .variables import create_variable
-from .variables import get_variable
-from .variables import create_or_get_variable
-
-from .variables import global_variables_initializer
 
 """----------------------------------------------------------
 """
@@ -125,7 +97,6 @@ from .initializers import constant_initializer
 
 from .initializers import random_uniform_initializer
 from .initializers import random_normal_initializer
-from .initializers import random_truncated_normal_initializer
 
 from .initializers import xavier_glorot_random_uniform_initializer
 from .initializers import xavier_glorot_random_normal_initializer
@@ -192,6 +163,11 @@ from .mathematics import arccos
 from .mathematics import tan
 from .mathematics import arctan
 
+from .mathematics import logical_not
+from .mathematics import logical_and
+from .mathematics import logical_or
+from .mathematics import logical_xor
+
 from .mathematics import matrix_eye
 from .mathematics import matrix_determinant
 from .mathematics import matrix_transpose
@@ -224,7 +200,6 @@ from . import diagnostics
 """----------------------------------------------------------
 """
 from . import logging
-from . import summary
 
 """----------------------------------------------------------
 """
@@ -232,7 +207,8 @@ from . import train
 
 """----------------------------------------------------------
 """
-from . import models
+from .models import Model
+from .models import model_executer
 
 
 
