@@ -13,8 +13,8 @@ class MnistModel(cg.Model):
     # ----------------------------------------------------------------
     def _build_model(self):
         def h(x):
-            w = cg.get_or_create_persistent_variable(model=self, name='w', shape=(10, 28, 28), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer(stddev=1e-5))
-            b = cg.get_or_create_persistent_variable(model=self, name='b', shape=(10, ), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer(stddev=1e-5))
+            w = cg.get_or_create_persistent_variable(model=self, name='w', shape=(10, 28, 28), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
+            b = cg.get_or_create_persistent_variable(model=self, name='b', shape=(10, ), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
             z = cg.tensordot(cg.cast_to_float32(x), w, axes=([1, 2], [1, 2])) + b
             r = nn.activation.softmax(z, axis=1)
             return r

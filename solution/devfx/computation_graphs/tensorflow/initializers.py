@@ -22,13 +22,13 @@ def identity_initializer(gain=1.0):
 
 """------------------------------------------------------------------------------------------------
 """
-def random_uniform_initializer(minval=-0.05, maxval=+0.05, seed=None):
+def random_uniform_initializer(minval=-1e-8, maxval=+1e-8, seed=None):
     return tf.initializers.RandomUniform(minval=minval, maxval=maxval, seed=seed)
 
-def random_normal_initializer(mean=0.0, stddev=0.05, seed=None):
+def random_normal_initializer(mean=0.0, stddev=1e-8, seed=None):
     return tf.initializers.RandomNormal(mean=mean, stddev=stddev, seed=seed)
 
-def random_truncated_normal_initializer(mean=0.0, stddev=0.05, seed=None):
+def random_truncated_normal_initializer(mean=0.0, stddev=1e-8, seed=None):
     return tf.initializers.TruncatedNormal(mean=mean, stddev=stddev, seed=seed)
 
 """------------------------------------------------------------------------------------------------
