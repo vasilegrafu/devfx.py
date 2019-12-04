@@ -13,8 +13,8 @@ class MnistModel(cg.Model):
     # ----------------------------------------------------------------
     def _build_model(self):
         def h(x):
-            w = cg.Variable(name='w', initial_value=cg.random_truncated_normal(shape=(10, 28, 28), stddev=1e-3))
-            b = cg.Variable(name='b', initial_value=cg.random_truncated_normal(shape=(10,), stddev=1e-3))
+            w = cg.get_or_create_persistent_variable(model=self, name='w', shape=(10, 28, 28), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer(stddev=1e-5))
+            b = cg.get_or_create_persistent_variable(model=self, name='b', shape=(10, ), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer(stddev=1e-5))
             z = cg.tensordot(cg.cast_to_float32(x), w, axes=([1, 2], [1, 2])) + b
             r = nn.activation.softmax(z, axis=1)
             return r
@@ -22,7 +22,7 @@ class MnistModel(cg.Model):
         def J(x, y):
             y_one_hot = cg.one_hot(indices=y, depth=10, on_value=1, off_value=0)
             hr = h(x)
-            r = -cg.reduce_mean(cg.reduce_sum(cg.cast_to_float32(y_one_hot)*cg.log(hr), axis=1))
+            r = -cg.reduce_mean(cg.reduce_sum(cg.cast_to_float32(y_one_hot)*cg.log(hr+1e-16), axis=1))
             return r
 
         def y_pred(x):
@@ -37,7 +37,7 @@ class MnistModel(cg.Model):
 
         self.register_hypothesis_function(fn=h)
         self.register_cost_function(fn=J)
-        self.register_apply_cost_optimizer_function(optimizer=cg.train.AdamOptimizer(learning_rate=1e-5))
+        self.register_apply_cost_optimizer_function(optimizer=cg.AdamOptimizer(learning_rate=1e-5))
         self.register_function(name='y_pred', fn=y_pred)
         self.register_function(name='accuracy', fn=accuracy)
 
@@ -58,8 +58,8 @@ class MnistModel(cg.Model):
 
         print(training_log[-1])
 
-        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
-        chart = core.persistentvariable('chart', lambda: dv.Chart2d(figure=figure))
+        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.persistent_variable('chart', lambda: dv.Chart2d(figure=figure))
         figure.clear_charts()
         chart.plot(training_log[:].training_data_cost, color='green')
         figure.show(block=False)
@@ -79,17 +79,17 @@ def main():
     data_path = 'i:/Dev.Databases/mnist'
 
     training_data_file = db.File(os.path.join(data_path, 'mnist_train.hdf5'))
-    training_data = [training_data_file.get_dataset('/images'), training_data_file.get_dataset('/labels')]
+    training_data = [training_data_file.get_dataset('/images')[:], training_data_file.get_dataset('/labels')[:]]
 
     test_data_file = db.File(os.path.join(data_path, 'mnist_test.hdf5'))
-    test_data = [test_data_file.get_dataset('/images'), test_data_file.get_dataset('/labels')]
+    test_data = [test_data_file.get_dataset('/images')[:], test_data_file.get_dataset('/labels')[:]]
 
-    # model = MnistModel()
-    # model.train(training_data=training_data, batch_size=32,
-    #             test_data=test_data,
-    #             training_data_sample = stats.mseries.sample(training_data, 256),
-    #             test_data_sample = stats.mseries.sample(test_data, 256))
-    # model.close()
+    model = MnistModel()
+    model.train(training_data=training_data, batch_size=32,
+                test_data=test_data,
+                training_data_sample = stats.mseries.sample(training_data, 256),
+                test_data_sample = stats.mseries.sample(test_data, 256))
+    model.close()
 
     # results = []
     # i = 1

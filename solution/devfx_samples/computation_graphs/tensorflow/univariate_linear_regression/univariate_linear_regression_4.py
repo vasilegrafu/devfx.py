@@ -61,8 +61,8 @@ class UnivariateLinearRegressionModel(cg.models.ImperativeModel):
 
         print(training_log[-1])
 
-        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
-        chart = core.persistentvariable('chart', lambda: dv.Chart2d(figure=figure))
+        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.persistent_variable('chart', lambda: dv.Chart2d(figure=figure))
         figure.clear_charts()
         chart.plot(training_log[:].training_data_cost, color='green')
         chart.plot(training_log[:].test_data_cost, color='red')

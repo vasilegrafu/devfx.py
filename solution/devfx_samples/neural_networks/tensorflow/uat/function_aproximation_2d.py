@@ -82,8 +82,8 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
         print(training_log[-1])
 
-        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(8, 6)))
-        chart = core.persistentvariable('chart', lambda: dv.Chart3d(figure=figure))
+        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(8, 6)))
+        chart = core.persistent_variable('chart', lambda: dv.Chart3d(figure=figure))
         figure.clear_charts()
         chart.scatter([_[0] for _ in context.test_data[0][:1024]], [_[1] for _ in context.test_data[0][:1024]], [_[0] for _ in context.test_data[1][:1024]], color='blue')
         chart.scatter([_[0] for _ in context.test_data[0][:1024]], [_[1] for _ in context.test_data[0][:1024]], [_[0] for _ in self.run_hypothesis_evaluator(input_data=context.test_data[0][:1024])], color='red')

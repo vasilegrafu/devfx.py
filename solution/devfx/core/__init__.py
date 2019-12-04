@@ -1,1 +1,1 @@
-from .persistentvariable import persistentvariable
+from .persistent_variable import persistent_variable

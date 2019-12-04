@@ -81,9 +81,9 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
 
         print(training_log[-1])
 
-        figure = core.persistentvariable('figure', lambda: dv.Figure(size=(12, 4)))
-        chart1 = core.persistentvariable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
-        chart2 = core.persistentvariable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
+        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(12, 4)))
+        chart1 = core.persistent_variable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
+        chart2 = core.persistent_variable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
         figure.clear_charts()
         chart1.plot(training_log[:].training_data_cost, color='green')
         chart2.scatter([_[0] for _ in context.test_data[0][:1024]], [_[0] for _ in context.test_data[1][:1024]], color='blue')

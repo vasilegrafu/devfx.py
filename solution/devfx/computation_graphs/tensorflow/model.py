@@ -4,6 +4,7 @@ import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
+from . import variables
 
 class Model(object):
     """------------------------------------------------------------------------------------------------
@@ -88,9 +89,9 @@ class Model(object):
             raise exceps.ArgumentError()
         def __apply_cost_optimizer(*args, **kwargs):
             with tf.GradientTape() as gradient_tape:
-                cost = self.get_cost_function()(*args, **kwargs)
-            gradients = gradient_tape.gradient(cost, persistent_variables)
-            optimizer.apply_gradients(zip(gradients, persistent_variables))
+                cost = (self.get_cost_function())(*args, **kwargs)
+            gradients = gradient_tape.gradient(cost, variables.get_persistent_variables(self))
+            optimizer.apply_gradients(zip(gradients, variables.get_persistent_variables(self)))
         self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
 
     def get_apply_cost_optimizer_function(self):
