@@ -4,64 +4,76 @@ from . import types
 
 """------------------------------------------------------------------------------------------------
 """
-def create_variable(shape, dtype=None, initializer=None, trainable=True, name=None):
-    if(dtype is None):
+def __create_variable(name=None, shape=None, dtype=None, initializer=None, trainable=True):
+    if((shape is None) and (dtype is None)):
+        initial_value = initializer()
+    elif((shape is None) and (dtype is not None)):
+        initial_value = initializer(dtype=dtype)
+    elif((shape is not None) and (dtype is None)):
         initial_value = initializer(shape=shape)
-    else:
+    elif((shape is not None) and (dtype is not None)):
         initial_value = initializer(shape=shape, dtype=dtype)
-    variable = tf.Variable(initial_value=initial_value, trainable=trainable, name=name)
+    else:
+        raise exceps.NotSupportedError()
+    variable = tf.Variable(name=name, initial_value=initial_value, trainable=trainable)
     return variable
 
 """------------------------------------------------------------------------------------------------
 """
-__persistent_variables_storage = {}
-def create_persistent_variable(model, name, shape, dtype=None, initializer=None, trainable=True):
-    if(id(model) not in __persistent_variables_storage):
-        __persistent_variables_storage[id(model)] = {}
-    if(name in __persistent_variables_storage[id(model)]):
-        raise exceps.ArgumentError()
-    __persistent_variables_storage[id(model)][name] = create_variable(shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, name=name)
-    variable = __persistent_variables_storage[id(model)][name]
-    return variable
+__variables_storage = {}
+__variables_storage['default'] = {}
 
-def get_or_create_persistent_variable(model, name, shape, dtype=None, initializer=None, trainable=True):
-    model_id = id(model)
-    if(model_id not in __persistent_variables_storage):
-        __persistent_variables_storage[model_id] = {}
-    if(name not in __persistent_variables_storage[model_id]):
-        __persistent_variables_storage[model_id][name] = create_variable(shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, name=name)
-    variable = __persistent_variables_storage[model_id][name]
-    return variable
-
-def get_persistent_variable(model, name):
-    if(id(model) not in __persistent_variables_storage):
+def exists_variable(name, partition='default'):
+    if(partition not in __variables_storage):
         raise exceps.ArgumentError()
-    if(name not in __persistent_variables_storage[id(model)]):
-        raise exceps.ArgumentError()
-    variable = __persistent_variables_storage[id(model)][name]
-    return variable
-
-def exists_persistent_variable(model, name):
-    if(id(model) not in __persistent_variables_storage):
-        raise exceps.ArgumentError()
-    if(name in __persistent_variables_storage[id(model)]):
+    if(name in __variables_storage[partition]):
         return True
     else:
         return False
 
-def remove_persistent_variable(model, name):
-    if(id(model) not in __persistent_variables_storage):
+
+def create_variable(name, partition='default', shape=None, dtype=None, initializer=None, trainable=True):
+    if(partition not in __variables_storage):
+        __variables_storage[partition] = {}
+    if(name in __variables_storage[partition]):
         raise exceps.ArgumentError()
-    del __persistent_variables_storage[id(model)][name]
+    __variables_storage[partition][name] = __create_variable(name=f'{partition}__{name}', shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+    variable = __variables_storage[partition][name]
+    return variable
+
+def get_variable(name, partition='default'):
+    if(partition not in __variables_storage):
+        raise exceps.ArgumentError()
+    if(name not in __variables_storage[partition]):
+        raise exceps.ArgumentError()
+    variable = __variables_storage[partition][name]
+    return variable
+
+def get_or_create_variable(name, partition='default', shape=None, dtype=None, initializer=None, trainable=True):
+    if(exists_variable(name=name, partition=partition)):
+        variable = get_variable(name=name, partition=partition)
+        return variable
+    else:
+        variable = create_variable(name=name, partition=partition, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+        return variable
+
+def remove_variable(name, partition='default'):
+    if(partition not in __variables_storage):
+        raise exceps.ArgumentError()
+    del __variables_storage[partition][name]
 
 
-def get_persistent_variables(model):
-    if(id(model) not in __persistent_variables_storage):
+def get_variables(partition='default'):
+    if(partition not in __variables_storage):
         raise exceps.ArgumentError()
-    return list(__persistent_variables_storage[id(model)].values())
+    return list(__variables_storage[partition].values())
 
-def remove_persistent_variables(model):
-    if(id(model) not in __persistent_variables_storage):
+def remove_variables(partition='default'):
+    if(partition not in __variables_storage):
         raise exceps.ArgumentError()
-    del __persistent_variables_storage[id(model)]
+    if(partition == 'default'):
+        for name in  __variables_storage[partition]:
+            del __variables_storage[partition][name]
+    else:
+        del __variables_storage[partition]
     

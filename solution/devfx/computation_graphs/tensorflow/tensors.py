@@ -1,12 +1,51 @@
 import tensorflow as tf
+import devfx.exceptions as exceps
 import devfx.reflection as refl
 from . import types
 
-
 """------------------------------------------------------------------------------------------------
 """
-def convert_to_tensor(value, dtype=None, name=None):
-    return tf.convert_to_tensor(value, dtype=dtype, name=name)
+def convert_to_tensor(value, dtype=None, dtype_hint=None, name=None):
+    return tf.convert_to_tensor(value, dtype=dtype, dtype_hint=dtype_hint, name=name)
+
+def input_as(*targs, **tkwargs):
+    def _(fn):
+        def __(*args, **kwargs):
+            if(len(targs) != len(args)):
+                raise exceps.ArgumentError()
+            if(len(tkwargs) != len(tkwargs)):
+                raise exceps.ArgumentError()
+            tensor_args = []
+            for i in range(0, len(args)):
+                tensor = convert_to_tensor(args[i], dtype_hint=targs[i][0])
+                if(tensor.dtype != targs[i][0]):
+                    tensor = types.cast(tensor, dtype=targs[i][0])
+                tensor = reshape(tensor, shape=targs[i][1])
+                tensor_args.append(tensor)
+            tensor_kwargs = {}
+            for karg in kwargs.keys():
+                tensor = convert_to_tensor(kwargs[karg], dtype_hint=tkwargs[karg][0])
+                if(tensor.dtype != tkwargs[i][0]):
+                    tensor = types.cast(tensor, dtype=tkwargs[i][0])
+                tensor = reshape(tensor, shape=tkwargs[i][1])
+                tensor_kwargs[karg] = tensor
+            output = fn(*tensor_args, **tensor_kwargs)
+            return output
+        return __
+    return _
+
+def output_as(targ):
+    def _(fn):
+        def __(*args, **kwargs):
+            output = fn(*args, **kwargs)
+            tensor = convert_to_tensor(output, dtype_hint=targ[0])
+            if(tensor.dtype != targ[0]):
+                tensor = types.cast(tensor, dtype=targ[0])
+            tensor = reshape(tensor, shape=targ[1])
+            return tensor
+        return __
+    return _
+
 
 """------------------------------------------------------------------------------------------------
 """

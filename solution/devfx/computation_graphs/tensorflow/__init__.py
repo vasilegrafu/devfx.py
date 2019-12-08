@@ -15,7 +15,6 @@ from .optimizers import *
 from .train import *
 
 from .model import *
-from .model_executer import *
 
 from .errors import *
 from .logging import *

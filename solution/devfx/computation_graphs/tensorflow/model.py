@@ -5,6 +5,7 @@ import devfx.exceptions as exceps
 import devfx.reflection as refl
 import devfx.diagnostics as dgn
 from . import variables
+from . import tensors
 
 class Model(object):
     """------------------------------------------------------------------------------------------------
@@ -84,14 +85,14 @@ class Model(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def register_apply_cost_optimizer_function(self, optimizer=None):
+    def register_apply_cost_optimizer_function(self, optimizer):
         if(optimizer is None):
             raise exceps.ArgumentError()
         def __apply_cost_optimizer(*args, **kwargs):
             with tf.GradientTape() as gradient_tape:
                 cost = (self.get_cost_function())(*args, **kwargs)
-            gradients = gradient_tape.gradient(cost, variables.get_persistent_variables(self))
-            optimizer.apply_gradients(zip(gradients, variables.get_persistent_variables(self)))
+            gradients = gradient_tape.gradient(cost, variables.get_variables())
+            optimizer.apply_gradients(zip(gradients, variables.get_variables()))
         self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
 
     def get_apply_cost_optimizer_function(self):

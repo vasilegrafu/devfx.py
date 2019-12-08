@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 import devfx.core as core
 import devfx.statistics as stats
 import devfx.computation_graphs.tensorflow as cg
@@ -24,12 +23,16 @@ class UnivariateLinearRegressionDataGenerator():
 class UnivariateLinearRegressionModel(cg.Model):
     # ----------------------------------------------------------------
     def _build_model(self):
+        @cg.input_as((cg.float32, (None,)))
+        @cg.output_as((cg.float32, (None,)))
         def h(x):
-            w0 = cg.get_or_create_persistent_variable(model=self, name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-            w1 = cg.get_or_create_persistent_variable(model=self, name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
+            w0 = cg.get_or_create_variable(name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
+            w1 = cg.get_or_create_variable(name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
             r = w0 + w1*x
             return r
 
+        @cg.input_as((cg.float32, (None,)), (cg.float32, (None,)))
+        @cg.output_as((cg.float32, ()))
         def J(x, y):
             hr = h(x)
             r = cg.reduce_mean(cg.square(hr - y))
@@ -84,7 +87,7 @@ def main():
     # shuffle
     generated_data = stats.mseries.shuffle(generated_data)
 
-    # chart
+     # chart
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
     chart.scatter(generated_data[0], generated_data[1])
