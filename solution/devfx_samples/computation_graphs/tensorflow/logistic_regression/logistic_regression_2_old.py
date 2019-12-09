@@ -12,8 +12,8 @@ class LogisticRegression2DataGenerator(object):
         pass
 
     def generate(self):
-        M = 1024*64
-        w0 = 3.0
+        M = 1024*4
+        w0 = 2.0
         w1 = 0.75
         a = -16
         b = +16
@@ -40,41 +40,43 @@ class LogisticRegression2DataGenerator(object):
                 data.append([_[0], _[1], _[2]])
 
         data = np.asarray(data).astype(dtype=np.float32)
-
+  
         return [data[:M,0], data[:M,1], data[:M,2]]
 
 """------------------------------------------------------------------------------------------------
 """
-class LogisticRegression2Model(cg.Model):
+class LogisticRegression2Model(cg.models.DeclarativeModel):
     # ----------------------------------------------------------------
     def _build_model(self):
-        @cg.output_as((cg.float32, (None,)))
-        @cg.input_as(x=(cg.float32, (None,)))
-        def h(x):
-            w0 = cg.get_or_create_variable(name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-            w1 = cg.get_or_create_variable(name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-            r = 1.0/(1.0 + cg.exp(-(w0 + w1*x)))
-            return r
+        # hypothesis
+        x = cg.placeholder(shape=[None], name='x')
+        w0 = cg.create_variable(name='w0', shape=[1], initializer=cg.zeros_initializer())
+        w1 = cg.create_variable(name='w1', shape=[1], initializer=cg.zeros_initializer())
+        h = cg.stack([
+            cg.exp(w0 + w1*x)/(1 + cg.exp(w0 + w1*x)),
+                            1/(1 + cg.exp(w0 + w1*x))
+        ])
 
-        @cg.output_as((cg.float32, ()))
-        @cg.input_as(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
-        def J(x, y):
-            hr = h(x)
-            r = -cg.reduce_mean(y*cg.log(hr)+(1.0-y)*cg.log(1-hr))
-            return r
+        # cost function
+        y = cg.placeholder(shape=[None], name='y')
 
-        def weights():
-            r = [v.numpy() for v in cg.get_variables()]
-            return r
+        j1 = cg.cast(cg.iverson(cg.equal(y, 1)), h.dtype)*cg.log(h[0])
+        j2 = cg.cast(cg.iverson(cg.equal(y, 0)), h.dtype)*cg.log(h[1])
+        J = -cg.reduce_mean(j1 + j2)
 
-        self.register_hypothesis_function(fn=h)
-        self.register_cost_function(fn=J)
-        self.register_apply_cost_optimizer_function(optimizer=cg.AdamOptimizer(learning_rate=1e-3))
-        self.register_function(name='weights', fn=weights)
-  
+        # evaluators
+        self.register_input_evaluator(input=input)
+        self.register_evaluator(name='weight', evaluatee=[w0, w1])
+        self.register_output_evaluator(output=y)
+        self.register_hypothesis_evaluator(hypothesis=h, input=x)
+        self.register_cost_evaluator(cost=J, input=x, output=y)
+
+        # cost minimizer
+        self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, optimizer=cg.train.AdamOptimizer(learning_rate=1e-4))
+
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
+        context.append_to_training_log_condition = lambda context: context.iteration % 100 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
         pass
@@ -83,14 +85,14 @@ class LogisticRegression2Model(cg.Model):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log[-1].training_data_cost = self.run_cost_function(*context.training_data)
+        training_log[-1].training_data_cost = self.run_cost_evaluator(*context.training_data)
         if(len(training_log) >= 2):
-            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=64)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-3))
+            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
 
-        training_log[-1].test_data_cost = self.run_cost_function(*context.test_data)
+        training_log[-1].test_data_cost = self.run_cost_evaluator(*context.test_data)
         
-        training_log[-1].w = self.run_function('weights')
+        training_log[-1].w = [_[0] for _ in self.run_evaluator(name='weight')]
 
         print(training_log[-1])
 
@@ -130,6 +132,7 @@ def main():
     (training_data, test_data) = stats.mseries.split(generated_data[1:3], 0.75)
     # print(training_data, test_data)
 
+    # learning from data
     model = LogisticRegression2Model()
     model.train(training_data=training_data, batch_size=64,
                 test_data=test_data)

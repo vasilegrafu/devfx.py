@@ -1,3 +1,4 @@
+import types as types
 import itertools as it
 import numpy as np
 import tensorflow as tf
@@ -7,15 +8,10 @@ import devfx.diagnostics as dgn
 from . import variables
 from . import tensors
 
-class Model(object):
+class Model(tf.Module):
     """------------------------------------------------------------------------------------------------
     """
     def __init__(self):
-        self.__functions = {}
-
-        self._build_model()
-
-    def close(self):
         pass
 
     """------------------------------------------------------------------------------------------------
@@ -24,85 +20,7 @@ class Model(object):
         return self
 
     def __exit__(self, *args):
-        self.close()
-
-    """------------------------------------------------------------------------------------------------
-    """
-    @property
-    def functions(self):
-        return self.__functions
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _build_model(self):
-        raise exceps.NotImplementedError()
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def register_function(self, name, fn):
-        self.__functions[name] = fn
-
-    def get_function(self, name):
-        return self.__functions[name]
-
-    def unregister_function(self, name):
-        del self.__functions[name]
-
-    def exists_function(self, name):
-        return name in self.__functions
-
-    def run_function(self, name, *args, **kwargs):
-        result = self.__functions[name](*args, **kwargs)
-        return result
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def register_hypothesis_function(self, fn):
-        self.register_function('__hypothesis', fn=fn)
-
-    def get_hypothesis_function(self):
-        return self.get_function('__hypothesis')
-
-    def exists_hypothesis_function(self):
-        return self.exists_function('__hypothesis')
-
-    def run_hypothesis_function(self, *args, **kwargs):
-        return self.run_function('__hypothesis', *args, **kwargs)
-
-    # ----------------------------------------------------------------
-
-    def register_cost_function(self, fn):
-        self.register_function('__cost', fn=fn)
-
-    def get_cost_function(self):
-        return self.get_function('__cost')
-
-    def exists_cost_function(self):
-        return self.exists_function('__cost')
-
-    def run_cost_function(self, *args, **kwargs):
-        return self.run_function('__cost', *args, **kwargs)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def register_apply_cost_optimizer_function(self, optimizer):
-        if(optimizer is None):
-            raise exceps.ArgumentError()
-        def __apply_cost_optimizer(*args, **kwargs):
-            with tf.GradientTape() as gradient_tape:
-                cost = (self.get_cost_function())(*args, **kwargs)
-            gradients = gradient_tape.gradient(cost, variables.get_variables())
-            optimizer.apply_gradients(zip(gradients, variables.get_variables()))
-        self.register_function('__apply_cost_optimizer', fn=__apply_cost_optimizer)
-
-    def get_apply_cost_optimizer_function(self):
-        return self.get_function('__apply_cost_optimizer')
-
-    def exists_apply_cost_optimizer_function(self):
-        return self.exists_function('__apply_cost_optimizer')
-
-    def run_apply_cost_optimizer_function(self, *args, **kwargs):
-        return self.run_function('__apply_cost_optimizer', *args, **kwargs)
+        pass
 
     """------------------------------------------------------------------------------------------------
     """
@@ -260,6 +178,19 @@ class Model(object):
         training_log = Model.TrainingLog()
 
         append_to_training_log_condition = lambda context: True
+
+        apply_cost_optimizer = None
+        def register_apply_cost_optimizer_function(self, cost_fn, cost_optimizer):
+            if(cost_fn is None):
+                raise exceps.ArgumentError()
+            if(cost_optimizer is None):
+                raise exceps.ArgumentError()
+            def __apply_cost_optimizer(*args, **kwargs):
+                with tf.GradientTape() as gradient_tape:
+                    cost = cost_fn(*args, **kwargs)
+                gradients = gradient_tape.gradient(cost, variables.get_variables())
+                cost_optimizer.apply_gradients(zip(gradients, variables.get_variables()))
+            self.apply_cost_optimizer = __apply_cost_optimizer
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
@@ -274,7 +205,10 @@ class Model(object):
         context.training_log = training_log
         context.cancellation_token = cancellation_token
         context.append_to_training_log_condition = append_to_training_log_condition
+        context.register_apply_cost_optimizer_function = types.MethodType(register_apply_cost_optimizer_function, context)
+        context.apply_cost_optimizer = apply_cost_optimizer
         self._on_training_begin(context)
+        apply_cost_optimizer = context.apply_cost_optimizer
         append_to_training_log_condition = context.append_to_training_log_condition
         batch_size = context.batch_size
         iterations = context.iterations
@@ -361,11 +295,11 @@ class Model(object):
                 # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
-                if (self.exists_apply_cost_optimizer_function()):
+                if (apply_cost_optimizer is not None):
                     if(hparams is None):
-                        self.run_apply_cost_optimizer_function(batch[0], batch[1])
+                        apply_cost_optimizer(batch[0], batch[1])
                     else:
-                        self.run_apply_cost_optimizer_function(batch[0], batch[1], hparams)
+                        apply_cost_optimizer(batch[0], batch[1], hparams)
                 else:
                     context = Model.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
@@ -395,7 +329,6 @@ class Model(object):
                 context.iteration = iteration
                 context.epoch = epoch
                 append_to_training_log_condition_result = append_to_training_log_condition(context=context)
-                # ----------------------------------------------------------------
                 if(append_to_training_log_condition_result):
                     time_elapsed = stopwatch.elapsed
                     training_log_item = Model.TrainingLogItem(nr=(len(training_log) + 1),
@@ -405,7 +338,6 @@ class Model(object):
                                                               epoch=(epoch + training_data_epoch_position / training_data_row_count))
                     training_log.append(training_log_item)
 
-                    # ----------------------------------------------------------------
                     context = Model.TrainingContext()
                     context.time_elapsed = stopwatch.elapsed
                     context.training_data = training_data
@@ -426,7 +358,7 @@ class Model(object):
                     epochs = context.epochs
                     epoch = context.epoch
                     hparams = context.hparams
-                    # ----------------------------------------------------------------
+                # ----------------------------------------------------------------
 
                 # ----------------------------------------------------------------
                 context = Model.TrainingContext()

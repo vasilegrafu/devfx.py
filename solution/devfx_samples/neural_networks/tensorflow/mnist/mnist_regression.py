@@ -12,8 +12,8 @@ import devfx.data_vizualization.seaborn as dv
 class MnistModel(cg.Model):
     # ----------------------------------------------------------------
     def _build_model(self):
-        @cg.input_as((cg.float32, (None, 28, 28)))
         @cg.output_as((cg.float32, (None, 10)))
+        @cg.input_as(x=(cg.float32, (None, 28, 28)))
         def h(x):
             w = cg.get_or_create_variable(name='w', shape=(10, 28, 28), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
             b = cg.get_or_create_variable(name='b', shape=(10, ), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
@@ -21,23 +21,23 @@ class MnistModel(cg.Model):
             r = nn.activation.softmax(z, axis=1)
             return r
 
-        @cg.input_as((cg.float32, (None, 28, 28)), (cg.int64, (None,)))
         @cg.output_as((cg.float32, ()))
+        @cg.input_as(x=(cg.float32, (None, 28, 28)), y=(cg.int64, (None,)))
         def J(x, y):
             y_one_hot = cg.one_hot(indices=y, depth=10, on_value=1, off_value=0)
             hr = h(x)
             r = -cg.reduce_mean(cg.reduce_sum(cg.cast_to_float32(y_one_hot)*cg.log(hr+1e-16), axis=1))
             return r
 
-        @cg.input_as((cg.float32, (None, 28, 28)))
         @cg.output_as((cg.int64, (None,)))
+        @cg.input_as(x=(cg.float32, (None, 28, 28)))
         def y_pred(x):
             hr = h(x)
             r = cg.argmax(hr, axis=1)
             return r
 
-        @cg.input_as((cg.float32, (None, 28, 28)), (cg.int64, (None,)))
         @cg.output_as((cg.float32, ()))
+        @cg.input_as(x=(cg.float32, (None, 28, 28)), y=(cg.int64, (None,)))
         def accuracy(x, y):
             y_predr = y_pred(x)
             r = cg.reduce_mean(cg.cast_to_float32(cg.equal(y_predr, y)))

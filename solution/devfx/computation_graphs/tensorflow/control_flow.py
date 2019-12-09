@@ -2,6 +2,11 @@ import tensorflow as tf
 
 """------------------------------------------------------------------------------------------------
 """
+def function(input_signature=None):
+    return tf.function(input_signature=input_signature)
+
+"""------------------------------------------------------------------------------------------------
+"""
 
 def control_dependencies(control_inputs):
     return tf.control_dependencies(control_inputs=control_inputs)

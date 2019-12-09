@@ -11,7 +11,7 @@ class UnivariateLinearRegressionDataGenerator():
         pass
 
     def generate(self):
-        M = 1024
+        M = 1024*64
         a = 1.0
         b = 0.75
         x = np.random.normal(0.0, 0.5, size=M)
@@ -21,29 +21,26 @@ class UnivariateLinearRegressionDataGenerator():
 """------------------------------------------------------------------------------------------------
 """
 class UnivariateLinearRegressionModel(cg.Model):
-    # ----------------------------------------------------------------
-    def _build_model(self):
-        @cg.input_as((cg.float32, (None,)))
-        @cg.output_as((cg.float32, (None,)))
-        def h(x):
-            w0 = cg.get_or_create_variable(name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-            w1 = cg.get_or_create_variable(name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-            r = w0 + w1*x
-            return r
+    # @cg.output_as((cg.float32, (None,)))
+    # @cg.input_as(x=(cg.float32, (None,)))
+    # @cg.function()
+    def h(self, x):
+        w0 = cg.get_or_create_variable(name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
+        w1 = cg.get_or_create_variable(name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
+        r = w0 + w1*x
+        return r
 
-        @cg.input_as((cg.float32, (None,)), (cg.float32, (None,)))
-        @cg.output_as((cg.float32, ()))
-        def J(x, y):
-            hr = h(x)
-            r = cg.reduce_mean(cg.square(hr - y))
-            return r
-
-        self.register_hypothesis_function(fn=h)
-        self.register_cost_function(fn=J)
-        self.register_apply_cost_optimizer_function(optimizer=cg.AdamOptimizer(learning_rate=1e-2))
+    # @cg.output_as((cg.float32, ()))
+    @cg.input_as(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
+    @cg.function()
+    def J(self, x, y):
+        hr = self.h(x)
+        r = cg.reduce_mean(cg.square(hr - y))
+        return r
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=cg.AdamOptimizer(learning_rate=1e-2))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
@@ -53,12 +50,12 @@ class UnivariateLinearRegressionModel(cg.Model):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log[-1].training_data_cost = self.run_cost_function(*context.training_data)
+        training_log[-1].training_data_cost = self.J(*context.training_data)
         if(len(training_log) >= 2):
             training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
             context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
             
-        training_log[-1].test_data_cost = self.run_cost_function(*context.test_data)
+        training_log[-1].test_data_cost = self.J(*context.test_data)
 
         print(training_log[-1])
 
@@ -106,7 +103,7 @@ def main():
     figure = dv.Figure(size=(8, 6))
     chart = dv.Chart2d(figure=figure)
     chart.scatter(test_data[0], test_data[1], color='blue')
-    chart.scatter(test_data[0], model.run_hypothesis_function(test_data[0]), color='red')
+    chart.scatter(test_data[0], model.h(test_data[0]), color='red')
     figure.show()
 
     model.close()
