@@ -24,16 +24,15 @@ def output_as(targ):
 def input_as(**tkwargs):
     def _(fn):
         def __(*args, **kwargs):
-            bound_fn_args = inspect.signature(fn).bind(*args, **kwargs)
-            bound_fn_args.apply_defaults()
-            kwargs = dict(bound_fn_args.arguments)
-
+            signature = inspect.signature(fn)
+            bound_arguments = signature.bind(*args, **kwargs)
+            bound_arguments.apply_defaults()
             for tkarg in tkwargs.keys():
-                kwargs[tkarg] = convert_to_tensor(kwargs[tkarg], dtype_hint=tkwargs[tkarg][0])
-                if(kwargs[tkarg].dtype != tkwargs[tkarg][0]):
-                    kwargs[tkarg] = types.cast(kwargs[tkarg], dtype=tkwargs[tkarg][0])
-                kwargs[tkarg] = reshape(kwargs[tkarg], shape=tkwargs[tkarg][1])
-            output = fn(**kwargs)
+                bound_arguments.arguments[tkarg] = convert_to_tensor(bound_arguments.arguments[tkarg], dtype_hint=tkwargs[tkarg][0])
+                if(bound_arguments.arguments[tkarg].dtype != tkwargs[tkarg][0]):
+                    bound_arguments.arguments[tkarg] = types.cast(bound_arguments.arguments[tkarg], dtype=tkwargs[tkarg][0])
+                bound_arguments.arguments[tkarg] = reshape(bound_arguments.arguments[tkarg], shape=tkwargs[tkarg][1])
+            output = fn(*bound_arguments.args, **bound_arguments.kwargs)
             return output
         return __
     return _

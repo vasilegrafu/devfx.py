@@ -24,7 +24,15 @@ class Model(tf.Module):
 
     """------------------------------------------------------------------------------------------------
     """
-    class CancellationToken(object):
+    class TrainingContext(object):
+        pass
+
+    class TrainingResult(object):
+        pass
+
+    """------------------------------------------------------------------------------------------------
+    """
+    class TrainingCancellationToken(object):
         def __init__(self):
             self.__is_cancellation_requested = False
 
@@ -44,14 +52,6 @@ class Model(tf.Module):
 
         def is_cancellation_requested(self):
             return (self.__is_cancellation_requested == True)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    class TrainingContext(object):
-        pass
-
-    class TrainingResult(object):
-        pass
 
     """------------------------------------------------------------------------------------------------
     """
@@ -173,7 +173,7 @@ class Model(tf.Module):
         # ----------------------------------------------------------------
         stopwatch = dgn.stopwatch().start()
 
-        cancellation_token = Model.CancellationToken()
+        cancellation_token = Model.TrainingCancellationToken()
 
         training_log = Model.TrainingLog()
 

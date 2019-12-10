@@ -20,25 +20,26 @@ class UnivariateLinearRegressionDataGenerator():
 
 """------------------------------------------------------------------------------------------------
 """
+import tensorflow as tf
+
 class UnivariateLinearRegressionModel(cg.Model):
-    # @cg.output_as((cg.float32, (None,)))
-    # @cg.input_as(x=(cg.float32, (None,)))
-    # @cg.function()
+    @cg.output_as((cg.float32, (None,)))
+    @cg.input_as(x=(cg.float32, (None,)))
+    @cg.function()
     def h(self, x):
         w0 = cg.get_or_create_variable(name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
         w1 = cg.get_or_create_variable(name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
         r = w0 + w1*x
         return r
 
-    # @cg.output_as((cg.float32, ()))
+    @cg.output_as((cg.float32, ()))
     @cg.input_as(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
-    @cg.function()
     def J(self, x, y):
         hr = self.h(x)
         r = cg.reduce_mean(cg.square(hr - y))
         return r
 
-    # ----------------------------------------------------------------
+    # ----------------------------------------------------------------face
     def _on_training_begin(self, context):
         context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=cg.AdamOptimizer(learning_rate=1e-2))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
@@ -85,10 +86,10 @@ def main():
     generated_data = stats.mseries.shuffle(generated_data)
 
      # chart
-    figure = dv.Figure(size=(8, 6))
-    chart = dv.Chart2d(figure=figure)
-    chart.scatter(generated_data[0], generated_data[1])
-    figure.show()
+    # figure = dv.Figure(size=(8, 6))
+    # chart = dv.Chart2d(figure=figure)
+    # chart.scatter(generated_data[0], generated_data[1])
+    # figure.show()
 
     # splitting data
     (training_data, test_data) = stats.mseries.split(generated_data, 0.75)
