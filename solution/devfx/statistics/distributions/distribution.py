@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.mathematics as math
 from .distribution_algebra_operation_node import distribution_algebra_operation_node
 
@@ -60,7 +60,7 @@ class distribution(distribution_algebra_operation_node):
     """------------------------------------------------------------------------------------------------
     """ 
     def cdf(self, x):
-        if(refl.is_iterable(x)):
+        if(core.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
                 raise exceps.ArgumentOutOfRangeError()
             return self._cdf(x)
@@ -75,7 +75,7 @@ class distribution(distribution_algebra_operation_node):
     """------------------------------------------------------------------------------------------------
     """ 
     def icdf(self, p):
-        if(refl.is_iterable(p)):
+        if(core.is_iterable(p)):
             if (np.where((p < self.cdf_a) | (p > self.cdf_b))[0].size > 0):
                 raise exceps.ArgumentOutOfRangeError()
             return self._icdf(p)

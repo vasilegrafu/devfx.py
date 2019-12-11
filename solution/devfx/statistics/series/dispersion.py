@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
-import devfx.reflection as refl
+import devfx.core as core
 from .center import mean
 
 """------------------------------------------------------------------------------------------------
 """
 def mad(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.mad()
     else:
         data = np.asarray(data)
@@ -15,14 +15,14 @@ def mad(data):
 """------------------------------------------------------------------------------------------------
 """
 def var(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.var(ddof=1, axis=None)
     else:
         data = np.asarray(data)
         return np.var(data, ddof=1, axis=None)
 
 def stddev(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.std(ddof=1, axis=None)
     else:
         data = np.asarray(data)
@@ -31,14 +31,14 @@ def stddev(data):
 """------------------------------------------------------------------------------------------------
 """
 def min(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.min()
     else:
         data = np.asarray(data)
         return np.amin(data, axis=None)
 
 def max(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.max()
     else:
         data = np.asarray(data)
@@ -50,7 +50,7 @@ def range(data):
 """------------------------------------------------------------------------------------------------
 """
 def percentile(data, p100):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.quantile(p100/100.0)
     else:
         data = np.asarray(data)

@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from . import types
 from . import tensors
 
 """------------------------------------------------------------------------------------------------
@@ -153,13 +152,13 @@ def iverson(condition, dtype=None):
     if (dtype is None):
         return tensors.where(condition, tensors.ones_like(condition), tensors.zeros_like(condition))
     else:
-        return tensors.where(condition, types.cast(tensors.ones_like(condition), dtype), types.cast(tensors.zeros_like(condition), dtype))
+        return tensors.where(condition, tensors.cast(tensors.ones_like(condition), dtype), tensors.cast(tensors.zeros_like(condition), dtype))
 
 def macaulay(x, dtype=None):
     if (dtype is None):
         return tensors.where(tensors.greater_equal(x, 0), x, tensors.zeros_like(x))
     else:
-        return tensors.where(tensors.greater_equal(x, 0), types.cast(x, dtype), types.cast(tensors.zeros_like(x), dtype))
+        return tensors.where(tensors.greater_equal(x, 0), tensors.cast(x, dtype), tensors.cast(tensors.zeros_like(x), dtype))
 
 def kronecker(x_i, x_j, dtype=None):
     return iverson(tensors.equal(x_i, x_j), dtype=dtype)

@@ -2,7 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot
 import matplotlib.gridspec
 import matplotlib.animation
-import devfx.reflection as refl
+import devfx.core as core
 from .figuregrid import FigureGrid
 
 class Figure(object):
@@ -47,14 +47,14 @@ class Figure(object):
         if(position is None):
             position=(1, 1, 1)
             return self.__figure.add_subplot(*position)
-        elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
+        elif(core.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position)
-        elif(refl.is_typeof(position, int)):
+        elif(core.is_typeof(position, int)):
             return self.__figure.add_subplot(position)
         else:
-            if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([not core.is_iterable(_) for _ in position])):
                 return self.__figure.add_subplot(*position)
-            if(len(position) == 3 and all([refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([core.is_iterable(_) for _ in position])):
                 return mpl.pyplot.subplot2grid(position[0], position[1], rowspan = position[2][0], colspan = position[2][1])
 
     """------------------------------------------------------------------------------------------------
@@ -63,14 +63,14 @@ class Figure(object):
         if(position is None):
             position=(1, 1, 1)
             return self.__figure.add_subplot(*position, projection='3d')
-        elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
+        elif(core.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position, projection='3d')
-        elif(refl.is_typeof(position, int)):
+        elif(core.is_typeof(position, int)):
             return self.__figure.add_subplot(position, projection='3d')
         else:
-            if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([not core.is_iterable(_) for _ in position])):
                 return self.__figure.add_subplot(*position, projection='3d')
-            if(len(position) == 3 and all([refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([core.is_iterable(_) for _ in position])):
                 return mpl.pyplot.subplot2grid(position[0], position[1], rowspan = position[2][0], colspan = position[2][1], projection='3d')
 
     """------------------------------------------------------------------------------------------------
@@ -79,14 +79,14 @@ class Figure(object):
         if(position is None):
             position=(1, 1, 1)
             return self.__figure.add_subplot(*position, projection='polar')
-        elif(refl.is_typeof(position, mpl.gridspec.SubplotSpec)):
+        elif(core.is_typeof(position, mpl.gridspec.SubplotSpec)):
             return self.__figure.add_subplot(position, projection='polar')
-        elif(refl.is_typeof(position, int)):
+        elif(core.is_typeof(position, int)):
             return self.__figure.add_subplot(position)
         else:
-            if(len(position) == 3 and all([not refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([not core.is_iterable(_) for _ in position])):
                 return self.__figure.add_subplot(*position, projection='polar')
-            if(len(position) == 3 and all([refl.is_iterable(_) for _ in position])):
+            if(len(position) == 3 and all([core.is_iterable(_) for _ in position])):
                 return mpl.pyplot.subplot2grid(position[0], position[1], rowspan = position[2][0], colspan = position[2][1], projection='polar')
 
     """------------------------------------------------------------------------------------------------

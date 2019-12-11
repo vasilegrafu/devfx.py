@@ -1,4 +1,4 @@
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.mathematics as math
 
 """------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class distribution_algebra_operation_node(object):
     """ ---------------- binary ----------------
     """
     def __binary_operation(self, operation, other):
-        if (refl.is_typeof(other, distribution_algebra_operation_node)):
+        if (core.is_typeof(other, distribution_algebra_operation_node)):
             return distribution_algebra_operation_node(lambda size: getattr(self.sample(size), operation)(other.sample(size)))
         else:
             return distribution_algebra_operation_node(lambda size: getattr(self.sample(size), operation)(other))

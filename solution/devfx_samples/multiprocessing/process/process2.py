@@ -1,7 +1,7 @@
 import time
 import devfx.multiprocessing as mproc
 import devfx.diagnostics as dgn
-import devfx.reflection as refl
+import devfx.core as core
 
 class TargetArgs(object):
     def __init__(self, p1, p2):

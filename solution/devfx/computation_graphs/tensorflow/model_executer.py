@@ -1,28 +1,25 @@
 import tensorflow as tf
+import devfx.core as core
 import devfx.exceptions as exceps
-import devfx.reflection as refl
 
 class ModelExecuter(object):
-    def __init__(self, path=None):
-        if(path is not None):
-            self.import_from(path=path)
-
-    def close(self):
-        pass
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        self.close()
+    """------------------------------------------------------------------------------------------------
+    """
+    def __init__(self, path):
+        self.__model = tf.saved_model.load(path)
 
     """------------------------------------------------------------------------------------------------
     """
-    def import_from(self, path):
-        pass
+    @classmethod
+    def import_from(cls, path):
+        return ModelExecuter(path=path)
 
     """------------------------------------------------------------------------------------------------
     """
-    def evaluate(self, x):
-        pass
+    def __getattr__(self, attr):
+        if(self.__model is None):
+            raise exceps.ValueError()
+        return core.getattr(self.__model, attr)
+
+
 

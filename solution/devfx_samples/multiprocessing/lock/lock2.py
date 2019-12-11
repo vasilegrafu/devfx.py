@@ -1,7 +1,7 @@
 import time
 import devfx.multiprocessing as mproc
 import devfx.diagnostics as dgn
-import devfx.reflection as refl
+import devfx.core as core
 
 class Targets(object):
     lock = mproc.Lock()

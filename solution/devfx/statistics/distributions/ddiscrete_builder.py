@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.mathematics as math
 from .ddiscrete import ddiscrete
 
@@ -23,7 +23,7 @@ class ddiscrete_builder(ddiscrete):
     """------------------------------------------------------------------------------------------------
     """     
     def _cpmf(self, x):
-        if (refl.is_iterable(x)):
+        if (core.is_iterable(x)):
             return np.asarray([self.__distribution.cdf(x) for x in x])
         else:
             return self.__distribution.cdf(x)
@@ -34,7 +34,7 @@ class ddiscrete_builder(ddiscrete):
     """------------------------------------------------------------------------------------------------
     """ 
     def _pmf(self, x):
-        if (refl.is_iterable(x)):
+        if (core.is_iterable(x)):
             return np.asarray([self.__distribution.pmf(x) for x in x])
         else:
             return self.__distribution.pmf(x)

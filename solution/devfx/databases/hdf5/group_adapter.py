@@ -1,6 +1,6 @@
 import h5py as hdf5
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 from .dataset_adapter import DatasetAdapter
 from .attributes_adapter import AttributesAdapter
 
@@ -16,12 +16,12 @@ class GroupAdapter(object):
     def is_group(self, path):
         if(not self.exists(path)):
             raise exceps.ArgumentError()
-        return refl.is_typeof(self.__group[path], hdf5.Group)
+        return core.is_typeof(self.__group[path], hdf5.Group)
 
     def is_dataset(self, path):
         if(not self.exists(path)):
             raise exceps.ArgumentError()
-        return refl.is_typeof(self.__group[path], hdf5.Dataset)
+        return core.is_typeof(self.__group[path], hdf5.Dataset)
 
     """----------------------------------------------------------------
     """

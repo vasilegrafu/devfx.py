@@ -1,6 +1,6 @@
 import multiprocessing as mproc
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 from .process_result import ProcessResult
 
 class Process(mproc.Process):

@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 import scipy.stats
-import devfx.reflection as refl
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
 def mean(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.mean()
     else:
         data = np.asarray(data)
@@ -16,7 +16,7 @@ def mean(data):
 """------------------------------------------------------------------------------------------------
 """
 def median(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.median()
     else:
         data = np.asarray(data)
@@ -25,7 +25,7 @@ def median(data):
 """------------------------------------------------------------------------------------------------
 """
 def mode(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.mode()
     else:
         data = np.asarray(data)

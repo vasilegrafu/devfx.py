@@ -4,7 +4,7 @@ import matplotlib.dates
 import numpy as np
 import pandas as pd
 import datetime as dt
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.exceptions as exceps
 from .figure import Figure as Figure
 from .chart import Chart
@@ -117,13 +117,13 @@ class Chart2d(Chart):
 
     def plot(self, *args, **kwargs):
         self._do_prior_draw()
-        if (refl.is_iterable(args[0]) and (len(args) >= 2 and refl.is_iterable(args[1]))):
+        if (core.is_iterable(args[0]) and (len(args) >= 2 and core.is_iterable(args[1]))):
             a = np.asarray([args[0], args[1]])
             a = a.T
             a = a[np.argsort(a[:, 0])]
             a = a.T
             result = self.axes.plot(a[0], a[1], *args[2:], **kwargs)
-        elif (refl.is_iterable(args[0])):
+        elif (core.is_iterable(args[0])):
             result = self.axes.plot(args[0], *args[1:], **kwargs)
         else:
             raise exceps.NotSupportedError()
@@ -174,9 +174,9 @@ class Chart2d(Chart):
 
     def scatter(self, *args, **kwargs):
         self._do_prior_draw()
-        if(refl.is_iterable(args[0]) and (len(args) >= 2 and refl.is_iterable(args[1]))):
+        if(core.is_iterable(args[0]) and (len(args) >= 2 and core.is_iterable(args[1]))):
             result = self.axes.scatter(args[0], args[1], *args[2:], marker = kwargs.pop('marker', '.'), **kwargs)
-        elif(refl.is_iterable(args[0])):
+        elif(core.is_iterable(args[0])):
             result = self.axes.scatter(range(1, len(args[0]) + 1), args[0], *args[1:], marker = kwargs.pop('marker', '.'), **kwargs)
         else:
             raise exceps.NotSupportedError()
@@ -216,11 +216,11 @@ class Chart2d(Chart):
         """----------------------------------------------------------------
         """
         def candlesticks(self, data, eliminate_gaps=True, colorup='g', colordown='r', alpha=0.75):
-            if(refl.is_typeof(data, tuple) and len(data) == 5):
+            if(core.is_typeof(data, tuple) and len(data) == 5):
                 (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
-            elif(refl.is_typeof(data, list) and len(data) == 5):
+            elif(core.is_typeof(data, list) and len(data) == 5):
                 (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
-            elif(refl.is_typeof(data, pd.DataFrame)):
+            elif(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, opens, highs, lows, closes) = (data.index.values, data.iloc[:, 0].values, data.iloc[:, 1].values, data.iloc[:, 2].values, data.iloc[:, 3].values)
             else:
                 raise exceps.ArgumentError()
@@ -260,13 +260,13 @@ class Chart2d(Chart):
         """----------------------------------------------------------------
         """
         def plot(self, data, eliminate_gaps=True, *args, **kwargs):
-            if(refl.is_typeof(data, tuple) and len(data) == 2):
+            if(core.is_typeof(data, tuple) and len(data) == 2):
                 (datetimes, values) = (data[0], data[1])
-            elif(refl.is_typeof(data, list) and len(data) == 2):
+            elif(core.is_typeof(data, list) and len(data) == 2):
                 (datetimes, values) = (data[0], data[1])
-            elif(refl.is_typeof(data, pd.DataFrame)):
+            elif(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
-            elif(refl.is_typeof(data, pd.Series)):
+            elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
                 raise exceps.ArgumentError()
@@ -296,13 +296,13 @@ class Chart2d(Chart):
         """----------------------------------------------------------------
         """
         def bar(self, data, eliminate_gaps=True, *args, **kwargs):
-            if(refl.is_typeof(data, tuple) and len(data) == 2):
+            if(core.is_typeof(data, tuple) and len(data) == 2):
                 (datetimes, values) = (data[0], data[1])
-            elif(refl.is_typeof(data, list) and len(data) == 2):
+            elif(core.is_typeof(data, list) and len(data) == 2):
                 (datetimes, values) = (data[0], data[1])
-            elif(refl.is_typeof(data, pd.DataFrame)):
+            elif(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
-            elif(refl.is_typeof(data, pd.Series)):
+            elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
                 raise exceps.ArgumentError()

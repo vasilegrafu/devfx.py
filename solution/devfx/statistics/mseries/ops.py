@@ -1,6 +1,6 @@
 import numpy as np
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 from .. import series
 
 """------------------------------------------------------------------------------------------------
@@ -33,9 +33,9 @@ def shuffle(data):
 """------------------------------------------------------------------------------------------------
 """
 def split(data, delimeter):
-    if(refl.is_typeof(delimeter, int)):
+    if(core.is_typeof(delimeter, int)):
         return [get(data, slice(None, delimeter)), get(data, slice(delimeter, None))]
-    elif(refl.is_typeof(delimeter, float)):
+    elif(core.is_typeof(delimeter, float)):
         return [get(data, slice(None, int(delimeter*rows_count(data)))), get(data, slice(int(delimeter*rows_count(data)), None))]
     else:
         raise exceps.NotSupportedError()

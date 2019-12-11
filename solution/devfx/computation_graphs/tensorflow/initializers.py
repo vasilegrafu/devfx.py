@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from . import types
 from . import tensors
 from . import mathematics
 

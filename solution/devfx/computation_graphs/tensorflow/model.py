@@ -3,7 +3,7 @@ import itertools as it
 import numpy as np
 import tensorflow as tf
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.diagnostics as dgn
 from . import variables
 from . import tensors
@@ -12,14 +12,6 @@ class Model(tf.Module):
     """------------------------------------------------------------------------------------------------
     """
     def __init__(self):
-        pass
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
         pass
 
     """------------------------------------------------------------------------------------------------
@@ -88,9 +80,9 @@ class Model(tf.Module):
                     name_value_list.append("{name}={value:.3f}".format(name=name, value=value))
                 elif(value is None):
                     name_value_list.append("{name}={value}".format(name=name, value=None))
-                elif(refl.is_typeof(value, str)):
+                elif(core.is_typeof(value, str)):
                     name_value_list.append("{name}={value}".format(name=name, value=value))
-                elif (refl.is_typeof(value, int)):
+                elif (core.is_typeof(value, int)):
                     name_value_list.append("{name}={value}".format(name=name, value=value))
                 else:
                     try:
@@ -130,7 +122,7 @@ class Model(tf.Module):
                     return [getattr(_, name) for _ in self.__items]
 
             item_or_items = self.__items[index_or_indices]
-            if(not refl.is_iterable(item_or_items)):
+            if(not core.is_iterable(item_or_items)):
                 return item_or_items
             else:
                 return __TrainingLogItemsProxy(item_or_items)
@@ -145,13 +137,13 @@ class Model(tf.Module):
     """
     def train(self, training_data, batch_size=None, iterations=None, epochs=None, hparams=None, **kwargs):
         # ----------------------------------------------------------------
-        if(not refl.is_iterable(training_data)):
+        if(not core.is_iterable(training_data)):
             raise exceps.ArgumentError()
         if(len(training_data) != 2):
             raise exceps.ArgumentError()
-        if(not refl.is_iterable(training_data[0])):
+        if(not core.is_iterable(training_data[0])):
             raise exceps.ArgumentError()
-        if(not refl.is_iterable(training_data[1])):
+        if(not core.is_iterable(training_data[1])):
             raise exceps.ArgumentError()
         if(len(training_data[0]) != len(training_data[1])):
             raise exceps.ArgumentError()
@@ -180,7 +172,7 @@ class Model(tf.Module):
         append_to_training_log_condition = lambda context: True
 
         apply_cost_optimizer = None
-        def register_apply_cost_optimizer_function(self, cost_fn, cost_optimizer):
+        def register_apply_cost_optimizer_function(self, model, cost_fn, cost_optimizer):
             if(cost_fn is None):
                 raise exceps.ArgumentError()
             if(cost_optimizer is None):
@@ -188,8 +180,8 @@ class Model(tf.Module):
             def __apply_cost_optimizer(*args, **kwargs):
                 with tf.GradientTape() as gradient_tape:
                     cost = cost_fn(*args, **kwargs)
-                gradients = gradient_tape.gradient(cost, variables.get_variables())
-                cost_optimizer.apply_gradients(zip(gradients, variables.get_variables()))
+                gradients = gradient_tape.gradient(cost, variables.get_trainable_variables(model))
+                cost_optimizer.apply_gradients(zip(gradients, variables.get_trainable_variables(model)))
             self.apply_cost_optimizer = __apply_cost_optimizer
         # ----------------------------------------------------------------
 
@@ -261,9 +253,9 @@ class Model(tf.Module):
                     break
 
                 batch = []
-                training_data_batch_column0 = [training_data[0][_] if (not refl.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indices_batch]
+                training_data_batch_column0 = [training_data[0][_] if (not core.is_function(training_data[0][_])) else training_data[0][_]() for _ in training_data_row_indices_batch]
                 batch.append(training_data_batch_column0)
-                training_data_batch_column1 = [training_data[1][_] if (not refl.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indices_batch]
+                training_data_batch_column1 = [training_data[1][_] if (not core.is_function(training_data[1][_])) else training_data[1][_]() for _ in training_data_row_indices_batch]
                 batch.append(training_data_batch_column1)
 
                 iteration += 1
@@ -465,4 +457,7 @@ class Model(tf.Module):
 
     def _on_training_end(self, context):
         pass
+
+    def export_to(self, path):
+        tf.saved_model.save(self, path)
 

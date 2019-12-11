@@ -1,11 +1,11 @@
 import numpy as np
 import datetime as dt
-import devfx.reflection as refl
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
 def as_dtype(arg, dtype):
-    if(refl.is_iterable(arg)):
+    if(core.is_iterable(arg)):
         return np.asarray(arg, dtype=dtype)
     else:
         return np.asarray([arg], dtype=dtype)[0]

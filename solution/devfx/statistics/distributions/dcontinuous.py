@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import devfx.exceptions as exceps
-import devfx.reflection as refl
+import devfx.core as core
 import devfx.mathematics as math
 from .distribution import distribution
 
@@ -34,7 +34,7 @@ class dcontinuous(distribution):
     """------------------------------------------------------------------------------------------------
     """
     def pdf(self, x):
-        if(refl.is_iterable(x)):
+        if(core.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
                 raise exceps.ArgumentOutOfRangeError()
             return self._pdf(x)

@@ -1,6 +1,6 @@
 import pandas as pd
 import sqlalchemy as sa
-import devfx.reflection as refl
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
@@ -20,7 +20,7 @@ def to_dataframe(self, index_columns=None):
     if(index_columns is not None):
         index_columns2 = []
         for index_column in index_columns:
-            if(refl.is_typeof(index_column, sa.orm.attributes.InstrumentedAttribute)):
+            if(core.is_typeof(index_column, sa.orm.attributes.InstrumentedAttribute)):
                 index_columns2.append(index_column.name)
             else:
                 index_columns2.append(index_column)

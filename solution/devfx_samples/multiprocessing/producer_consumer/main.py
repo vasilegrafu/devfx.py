@@ -1,6 +1,6 @@
 import devfx.multiprocessing as mproc
 import devfx.diagnostics as dgn
-import devfx.reflection as refl
+import devfx.core as core
 from devfx_samples.multiprocessing.producer_consumer.producer import Producer
 from devfx_samples.multiprocessing.producer_consumer.consumer import Consumer
 

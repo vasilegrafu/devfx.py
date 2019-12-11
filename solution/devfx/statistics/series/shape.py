@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 import scipy.stats
-import devfx.reflection as refl
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
 def skew(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.skew(axis=None)
     else:
         data = np.asarray(data)
@@ -16,7 +16,7 @@ def skew(data):
 """------------------------------------------------------------------------------------------------
 """
 def kurtosis(data):
-    if(refl.is_typeof(data, pd.Series)):
+    if(core.is_typeof(data, pd.Series)):
         return data.kurtosis(axis=None)
     else:
         data = np.asarray(data)

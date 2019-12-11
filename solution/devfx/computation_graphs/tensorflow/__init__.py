@@ -1,5 +1,3 @@
-from .types import *
-
 from .tensors import *
 
 from .variables import *
@@ -15,6 +13,7 @@ from .optimizers import *
 from .train import *
 
 from .model import *
+from .model_executer import *
 
 from .errors import *
 from .logging import *

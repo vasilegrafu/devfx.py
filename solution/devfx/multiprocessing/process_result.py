@@ -1,4 +1,4 @@
-import devfx.reflection as refl
+import devfx.core as core
 
 class ProcessResult(object):
     def __init__(self, value):
@@ -9,4 +9,4 @@ class ProcessResult(object):
         return self.__value
 
     def is_exception(self):
-        return refl.is_typeof(self.__value, Exception)
+        return core.is_typeof(self.__value, Exception)

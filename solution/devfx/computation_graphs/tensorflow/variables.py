@@ -1,6 +1,6 @@
 import tensorflow as tf
 import devfx.exceptions as exceps
-from . import types
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
@@ -20,60 +20,58 @@ def __create_variable(name=None, shape=None, dtype=None, initializer=None, train
 
 """------------------------------------------------------------------------------------------------
 """
-__variables_storage = {}
-__variables_storage['default'] = {}
-
-def exists_variable(name, partition='default'):
-    if(partition not in __variables_storage):
-        raise exceps.ArgumentError()
-    if(name in __variables_storage[partition]):
-        return True
-    else:
+def exists_variable(model, name):
+    if(not core.hasattr(object=model, name=name)):
         return False
+    value = core.getattr(object=model, name=name)
+    if(not core.is_instance(value, tf.Variable)):
+        return False
+    return True
 
-
-def create_variable(name, partition='default', shape=None, dtype=None, initializer=None, trainable=True):
-    if(partition not in __variables_storage):
-        __variables_storage[partition] = {}
-    if(name in __variables_storage[partition]):
+def set_variable(model, name, variable):
+    if(exists_variable(model=model, name=name)):
         raise exceps.ArgumentError()
-    __variables_storage[partition][name] = __create_variable(name=f'{partition}__{name}', shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
-    variable = __variables_storage[partition][name]
+    if(not core.is_instance(variable, tf.Variable)):
+        raise exceps.ArgumentError()
+    core.setattr(object=model, name=name, value=variable)
+
+def get_variable(model, name):
+    if(not exists_variable(model=model, name=name)):
+        raise exceps.ArgumentError()
+    variable = core.getattr(object=model, name=name)
     return variable
 
-def get_variable(name, partition='default'):
-    if(partition not in __variables_storage):
+def remove_variable(model, name):
+    if(not exists_variable(model=model, name=name)):
         raise exceps.ArgumentError()
-    if(name not in __variables_storage[partition]):
+    core.delattr(object=model, name=name)
+
+
+def create_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
+    if(exists_variable(model=model, name=name)):
         raise exceps.ArgumentError()
-    variable = __variables_storage[partition][name]
+    variable = __create_variable(name=f'{id(model)}__{name}', shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+    set_variable(model=model, name=name, variable=variable)
     return variable
 
-def get_or_create_variable(name, partition='default', shape=None, dtype=None, initializer=None, trainable=True):
-    if(exists_variable(name=name, partition=partition)):
-        variable = get_variable(name=name, partition=partition)
+
+def get_or_create_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
+    if(exists_variable(model=model, name=name)):
+        variable = get_variable(model=model, name=name)
         return variable
     else:
-        variable = create_variable(name=name, partition=partition, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+        variable = create_variable(model=model, name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
         return variable
 
-def remove_variable(name, partition='default'):
-    if(partition not in __variables_storage):
-        raise exceps.ArgumentError()
-    del __variables_storage[partition][name]
+def create_or_get_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
+    return get_or_create_variable(model=model, name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
 
 
-def get_variables(partition='default'):
-    if(partition not in __variables_storage):
-        raise exceps.ArgumentError()
-    return list(__variables_storage[partition].values())
+"""------------------------------------------------------------------------------------------------
+"""
+def get_variables(model):
+    return model.variables
 
-def remove_variables(partition='default'):
-    if(partition not in __variables_storage):
-        raise exceps.ArgumentError()
-    if(partition == 'default'):
-        for name in  __variables_storage[partition]:
-            del __variables_storage[partition][name]
-    else:
-        del __variables_storage[partition]
+def get_trainable_variables(model):
+    return model.trainable_variables
     
