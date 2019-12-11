@@ -13,7 +13,7 @@ class UnivariateLinearRegressionDataGenerator():
         pass
 
     def generate(self):
-        M = 1024*16
+        M = 1024
         a = 1.0
         b = 0.75
         x = np.random.normal(0.0, 0.5, size=M)
@@ -79,6 +79,14 @@ class UnivariateLinearRegressionModel(cg.Model):
 """------------------------------------------------------------------------------------------------
 """
 def main():
+    # test
+    generated_data = UnivariateLinearRegressionDataGenerator().generate()
+
+    model = UnivariateLinearRegressionModel()
+    # tensor = cg.as_tensor(generated_data[0], dtype=cg.float32, shape=(None,))
+    output = model.h(generated_data[0])
+    print(output)
+
     # # generating data
     # generated_data = UnivariateLinearRegressionDataGenerator().generate()
     
@@ -121,13 +129,7 @@ def main():
     # figure.show()
 
 
-    # test
-    generated_data = UnivariateLinearRegressionDataGenerator().generate()
 
-    model = UnivariateLinearRegressionModel()
-    tensor = cg.as_tensor(generated_data[0], dtype=cg.float32, shape=(None,))
-    output = model.h(tensor)
-    print(output)
 
 """------------------------------------------------------------------------------------------------
 """

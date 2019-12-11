@@ -114,7 +114,7 @@ def input_as_tensor(**tkwargs):
             bound_arguments.apply_defaults()
             for tkarg in tkwargs.keys():
                 bound_arguments.arguments[tkarg] = as_tensor(bound_arguments.arguments[tkarg], dtype=tkwargs[tkarg][0], shape=tkwargs[tkarg][1])
-            output = fn(*bound_arguments.args, **bound_arguments.kwargs)
+            output = fn(args[0], as_tensor(args[1], dtype=float32, shape=(None,)))
             return output
         return __
     return _
