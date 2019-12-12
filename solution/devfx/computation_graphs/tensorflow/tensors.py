@@ -101,8 +101,8 @@ def output_as_tensor(targ):
     def _(fn):
         def __(*args, **kwargs):
             output = fn(*args, **kwargs)
-            tensor = as_tensor(output, dtype=targ[0], shape=targ[1])
-            return tensor
+            output = as_tensor(output, dtype=targ[0], shape=targ[1])
+            return output
         return __
     return _
 
@@ -114,7 +114,15 @@ def input_as_tensor(**tkwargs):
             bound_arguments.apply_defaults()
             for tkarg in tkwargs.keys():
                 bound_arguments.arguments[tkarg] = as_tensor(bound_arguments.arguments[tkarg], dtype=tkwargs[tkarg][0], shape=tkwargs[tkarg][1])
-            output = fn(args[0], as_tensor(args[1], dtype=float32, shape=(None,)))
+            output = fn(*bound_arguments.args, **bound_arguments.kwargs)
+            return output
+        return __
+    return _
+
+def Function(input_signature):
+    def _(fn):
+        def __(*args, **kwargs):
+            output = tf.function(input_signature=input_signature)(fn)(*args, **kwargs)
             return output
         return __
     return _

@@ -459,5 +459,5 @@ class Model(tf.Module):
         pass
 
     def export_to(self, path):
-        tf.saved_model.save(self, path)
+        tf.saved_model.save(obj=self, export_dir=path)
 
