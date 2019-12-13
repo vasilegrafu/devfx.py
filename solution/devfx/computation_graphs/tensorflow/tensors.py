@@ -1,5 +1,6 @@
 import tensorflow as tf
 import inspect as insp
+import functools as fnt
 import devfx.core as core
 import devfx.exceptions as exceps
 
@@ -99,6 +100,7 @@ def as_tensor(value, dtype=None, shape=None):
 
 def output_as_tensor(targ):
     def _(fn):
+        @fnt.wraps(fn)
         def __(*args, **kwargs):
             output = fn(*args, **kwargs)
             output = as_tensor(output, dtype=targ[0], shape=targ[1])
@@ -108,8 +110,9 @@ def output_as_tensor(targ):
 
 def input_as_tensor(**tkwargs):
     def _(fn):
+        signature = insp.signature(fn)
+        @fnt.wraps(fn)
         def __(*args, **kwargs):
-            signature = insp.signature(fn)
             bound_arguments = signature.bind(*args, **kwargs)
             bound_arguments.apply_defaults()
             for tkarg in tkwargs.keys():
@@ -119,12 +122,27 @@ def input_as_tensor(**tkwargs):
         return __
     return _
 
-def Function(input_signature):
+"""------------------------------------------------------------------------------------------------
+"""
+def build_graph(**tkwargs):
     def _(fn):
-        def __(*args, **kwargs):
-            output = tf.function(input_signature=input_signature)(fn)(*args, **kwargs)
-            return output
-        return __
+        signature = insp.signature(fn)
+        parameters = signature.parameters
+        if('self' not in signature.parameters):
+            @fnt.wraps(fn)
+            @tf.function(input_signature=[tf.TensorSpec(dtype=tkwargs[parameter][0], shape=tkwargs[parameter][1]) for parameter in parameters.keys()])
+            def __(*args, **kwargs):
+                output = fn(*args, **kwargs)
+                return output
+            return __
+        if('self' in signature.parameters):
+            @fnt.wraps(fn)
+            @tf.function(input_signature=[tf.TensorSpec(dtype=tkwargs[parameter][0], shape=tkwargs[parameter][1]) for parameter in parameters.keys() if parameter != 'self'])
+            def __(self, *args, **kwargs):
+                output = fn(self, *args, **kwargs)
+                return output
+            return __
+        raise exceps.NotSupportedError()
     return _
 
 """------------------------------------------------------------------------------------------------

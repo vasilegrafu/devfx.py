@@ -24,6 +24,7 @@ class UnivariateLinearRegressionDataGenerator():
 """
 class UnivariateLinearRegressionModel(cg.Model):
     # ----------------------------------------------------------------
+    # @cg.build_graph(x=(cg.float32, (None,)))
     @cg.output_as_tensor((cg.float32, (None,)))
     @cg.input_as_tensor(x=(cg.float32, (None,)))
     def h(self, x):
@@ -31,22 +32,14 @@ class UnivariateLinearRegressionModel(cg.Model):
         w1 = cg.get_or_create_variable(model=self, name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
         r = w0 + w1*x
         return r
-
-    @cg.function(input_signature=[tf.TensorSpec(dtype=cg.float32, shape=(None,))])
-    def hX(self, x):
-        return self.h(x)
-
+    
+    # @cg.build_graph(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
     @cg.output_as_tensor((cg.float32, (None,)))
     @cg.input_as_tensor(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
     def J(self, x, y):
         hr = self.h(x)
         r = cg.reduce_mean(cg.square(hr - y))
         return r
-
-    # ----------------------------------------------------------------
-    @cg.function(input_signature=[tf.TensorSpec(dtype=cg.float32, shape=(None,))])
-    def hx(self, x):
-        pass
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
@@ -116,18 +109,18 @@ def main():
     chart.scatter(test_data[0], model.h(test_data[0]), color='red')
     figure.show()
 
-    # export_to
-    model.export_to(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+    # # export_to
+    # model.export_to(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
 
-    # import_from
-    model_executer = cg.ModelExecuter.import_from(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+    # # import_from
+    # model_executer = cg.ModelExecuter.import_from(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
 
-    # visual validation
-    figure = dv.Figure(size=(8, 6))
-    chart = dv.Chart2d(figure=figure)
-    chart.scatter(test_data[0], test_data[1], color='blue')
-    chart.scatter(test_data[0], model_executer.hX(cg.as_tensor(test_data[0], dtype=cg.float32, shape=(None,))), color='yellow')
-    figure.show()
+    # # visual validation
+    # figure = dv.Figure(size=(8, 6))
+    # chart = dv.Chart2d(figure=figure)
+    # chart.scatter(test_data[0], test_data[1], color='blue')
+    # chart.scatter(test_data[0], model_executer.h(cg.as_tensor(test_data[0], dtype=cg.float32, shape=(None,))), color='yellow')
+    # figure.show()
 
 
 
