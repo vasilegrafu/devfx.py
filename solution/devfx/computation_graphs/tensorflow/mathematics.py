@@ -45,6 +45,41 @@ def clip_by_min_poshalfinf(min, x, name=None):
 
 """------------------------------------------------------------------------------------------------
 """
+def equal(x, y, name=None):
+    return tf.math.equal(x, y, name=None)
+
+def not_equal(x, y, name=None):
+    return tf.math.not_equal(x, y, name=None)
+
+def less(x, y, name=None):
+    return tf.math.less(x, y, name=None)
+
+def less_equal(x, y, name=None):
+    return tf.math.less_equal(x, y, name=None)
+
+
+def greater(x, y, name=None):
+    return tf.math.greater(x, y, name=None)
+
+def greater_equal(x, y, name=None):
+    return tf.math.greater_equal(x, y, name=None)
+
+"""------------------------------------------------------------------------------------------------
+"""
+def logical_not(x, y, name=None):
+    return tf.math.logical_not(x, y, name=None)
+
+def logical_and(x, y, name=None):
+    return tf.math.logical_and(x, y, name=None)
+
+def logical_or(x, y, name=None):
+    return tf.math.logical_or(x, y, name=None)
+
+def logical_xor(x, y, name=None):
+    return tf.math.logical_xor(x, y, name=None)
+
+"""------------------------------------------------------------------------------------------------
+"""
 add = tf.math.add
 add_n = tf.math.add_n
 subtract = tf.math.subtract
@@ -63,8 +98,11 @@ argmax = tf.math.argmax
 
 """------------------------------------------------------------------------------------------------
 """
-cumulative_sum = tf.math.cumsum
-cumulative_product = tf.math.cumprod
+def cumulative_sum(x, axis=0, reverse=False, name=None):
+    return tf.math.cumsum(x, axis=axis, reverse=reverse, name=name)
+
+def cumulative_product(x, axis=0, reverse=False, name=None):
+    return tf.math.cumprod(x, axis=axis, reverse=reverse, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
@@ -127,13 +165,6 @@ matrix_determinant = tf.linalg.det
 matrix_transpose = tf.linalg.matrix_transpose
 matrix_inverse = tf.linalg.inv
 matrix_multiply = tf.linalg.matmul
-
-"""------------------------------------------------------------------------------------------------
-"""
-logical_not = tf.math.logical_not
-logical_and = tf.math.logical_and
-logical_or = tf.math.logical_or
-logical_xor = tf.math.logical_xor
 
 """------------------------------------------------------------------------------------------------
 """

@@ -232,24 +232,17 @@ def stack(tensors, axis=0, name=None):
     return tf.stack(tensors, axis=axis, name=name)
 
 def unstack(tensor, axis=0, name=None):
-    return tf.unstack(tensor, num=None, axis=axis, name=name)
+    return tf.unstack(tensor, axis=axis, name=name)
 
-def concatenate(tensors, axis=0, name=None):
-    return tf.concat(values=tensors, axis=axis, name=name)
+def concatenate(tensors, axis, name=None):
+    return tf.concat(tensors, axis, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
 def where(condition, x=None, y=None, name=None):
     return tf.where(condition, x=x, y=y, name=name)
 
-"""------------------------------------------------------------------------------------------------
-"""
-equal = tf.equal
-not_equal = tf.not_equal
-less = tf.less
-less_equal = tf.less_equal
-greater = tf.greater
-greater_equal = tf.greater_equal
+
 
 
 

@@ -87,7 +87,7 @@ class MnistModel(cg.models.DeclarativeModel):
     def _on_append_to_training_log(self, training_log, context):
         # training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data.random_select(1024*4), hparams_values=[False])
         # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.trend_of_training_data_cost = stats.regresion.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=64)[0]*360/(2.0*np.pi)
+        #     training_log.last_item.training_data_cost_trend = stats.regresion.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=64)[0]*360/(2.0*np.pi)
         # training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data.random_select(1024*4), hparams_values=[False])
 
         training_log.last_item.accuracy = self.run_evaluator(name='accuracy', feeds_data=[*context.test_data.random_select(1024*4)], hparams_values=[False])

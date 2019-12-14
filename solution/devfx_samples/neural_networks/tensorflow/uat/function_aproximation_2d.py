@@ -75,8 +75,8 @@ class FunctionAproximationModel(cg.models.DeclarativeModel):
     def _on_append_to_training_log(self, training_log, context):
         training_log[-1].training_data_cost = self.run_cost_evaluator(input_data=context.training_data[0][:1024], output_data=context.training_data[1][:1024])
         if(len(training_log) >= 2):
-            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
+            training_log[-1].training_data_cost_trend = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].training_data_cost_trend) <= 1e-2))
             
         training_log[-1].test_data_cost = self.run_cost_evaluator(input_data=context.test_data[0][:1024], output_data=context.test_data[1][:1024])
 

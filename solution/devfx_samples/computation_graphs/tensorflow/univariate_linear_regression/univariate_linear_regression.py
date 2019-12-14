@@ -28,8 +28,8 @@ class UnivariateLinearRegressionModel(cg.Model):
     @cg.output_as_tensor((cg.float32, (None,)))
     @cg.input_as_tensor(x=(cg.float32, (None,)))
     def h(self, x):
-        w0 = cg.get_or_create_variable(model=self, name='w0', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
-        w1 = cg.get_or_create_variable(model=self, name='w1', shape=(), dtype=cg.float32, initializer=cg.zeros_initializer())
+        w0 = cg.get_or_create_variable(model=self, name='w0', shape=(), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
+        w1 = cg.get_or_create_variable(model=self, name='w1', shape=(), dtype=cg.float32, initializer=cg.random_truncated_normal_initializer())
         r = w0 + w1*x
         return r
     
@@ -53,12 +53,12 @@ class UnivariateLinearRegressionModel(cg.Model):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log[-1].training_data_cost = self.J(*context.training_data)
+        training_log[-1].training_data_cost = self.J(*context.training_data_sample)
         if(len(training_log) >= 2):
-            training_log[-1].trend_of_training_data_cost = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].trend_of_training_data_cost) <= 1e-2))
+            training_log[-1].training_data_cost_trend = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
+            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].training_data_cost_trend) <= 1e-2))
             
-        training_log[-1].test_data_cost = self.J(*context.test_data)
+        training_log[-1].test_data_cost = self.J(*context.test_data_sample)
 
         print(training_log[-1])
 
@@ -100,7 +100,9 @@ def main():
     # learning from data
     model = UnivariateLinearRegressionModel()
     model.train(training_data=training_data, batch_size=64,
-                test_data=test_data)
+                test_data=test_data,
+                training_data_sample=stats.mseries.sample(training_data, 64),
+                test_data_sample=stats.mseries.sample(test_data, 64))
 
     # visual validation
     figure = dv.Figure(size=(8, 6))
