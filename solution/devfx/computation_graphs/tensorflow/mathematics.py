@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from . import tensors
+from . import mathematics
 
 """------------------------------------------------------------------------------------------------
 """
@@ -80,21 +81,44 @@ def logical_xor(x, y, name=None):
 
 """------------------------------------------------------------------------------------------------
 """
-add = tf.math.add
-add_n = tf.math.add_n
-subtract = tf.math.subtract
-multiply = tf.math.multiply
-scalar_multiply = tf.math.scalar_mul
-divide = tf.math.divide
-mod = tf.math.mod
+def add(x, y, name=None):
+    return tf.math.add(x, y, name=None)
+
+def add_n(tensors, name=None):
+    return tf.math.add_n(tensors, name=None)
+
+
+def subtract(x, y, name=None):
+    return tf.math.subtract(x, y, name=None)
+
+
+def multiply(x, y, name=None):
+    return tf.math.multiply(x, y, name=None)
+
+def scalar_multiply(scalar, x, name=None):
+    return tf.math.scalar_mul(scalar, x, name=None)
+
+
+def divide(x, y, name=None):
+    return tf.math.divide(x, y, name=None)
+
+def mod(x, y, name=None):
+    return tf.math.mod(x, y, name=None)
 
 """------------------------------------------------------------------------------------------------
 """
-min = tf.math.minimum
-max = tf.math.maximum
+def min(x, y, name=None):
+    return tf.math.minimum(x, y, name=None)
 
-argmin = tf.math.argmin
-argmax = tf.math.argmax
+def max(x, y, name=None):
+    return tf.math.maximum(x, y, name=None)
+
+
+def argmin(tensor, axis=None, dtype=tensors.int32, name=None):
+    return tf.math.argmin(tensor, axis=axis, output_type=dtype, name=name)
+
+def argmax(tensor, axis=None, dtype=tensors.int32, name=None):
+    return tf.math.argmax(tensor, axis=axis, output_type=dtype, name=name)
 
 """------------------------------------------------------------------------------------------------
 """
@@ -152,8 +176,8 @@ sqrt = tf.math.sqrt
 square = tf.math.square
 pow = tf.math.pow
 sin = tf.math.sin
-cos = tf.math.cos
 arcsin = tf.math.asin
+cos = tf.math.cos
 arccos = tf.math.acos
 tan = tf.math.tan
 arctan = tf.math.atan
@@ -174,25 +198,23 @@ def tensordot(a, b, axes, dtype=None, name=None):
     else:
         return tf.tensordot(a=tf.cast(a, dtype), b=tf.cast(b, dtype), axes=axes, name=name)
 
-einsum = tf.einsum
-
+def einsum(equation, *inputs, **kwargs):
+    return tf.einsum(equation, *inputs, **kwargs)
 
 """------------------------------------------------------------------------------------------------
 """
-def iverson(condition, dtype=None):
-    if (dtype is None):
-        return tensors.where(condition, tensors.ones_like(condition), tensors.zeros_like(condition))
-    else:
-        return tensors.where(condition, tensors.cast(tensors.ones_like(condition), dtype), tensors.cast(tensors.zeros_like(condition), dtype))
+def iverson(condition, dtype=tensors.int32):
+    return tensors.where(condition, tensors.ones_like(condition, dtype=dtype), tensors.zeros_like(condition, dtype=dtype))
+        
 
-def macaulay(x, dtype=None):
+def macaulay(x, dtype=tensors.int32):
     if (dtype is None):
         return tensors.where(tensors.greater_equal(x, 0), x, tensors.zeros_like(x))
     else:
-        return tensors.where(tensors.greater_equal(x, 0), tensors.cast(x, dtype), tensors.cast(tensors.zeros_like(x), dtype))
+        return tensors.where(tensors.greater_equal(x, 0), tensors.cast(x, dtype), tensors.zeros_like(x, dtype=dtype))
 
-def kronecker(x_i, x_j, dtype=None):
-    return iverson(tensors.equal(x_i, x_j), dtype=dtype)
+def kronecker(x_i, x_j, dtype=tensors.int32):
+    return iverson(mathematics.equal(x_i, x_j), dtype=dtype)
 
 
 

@@ -12,7 +12,7 @@ class LogisticRegression1DataGenerator(object):
         pass
 
     def generate(self):
-        M = 1024*4
+        M = 1024*64
         w0 = 3.0
         w1 = 0.75
         a = -16
@@ -20,7 +20,7 @@ class LogisticRegression1DataGenerator(object):
 
         x = stats.distributions.uniform(a=a, b=b).rvs(M)
         p = math.logistic(w0 + w1*x)
-        y = [stats.distributions.bernoulli(p).rvs(1) for p in p]
+        y = np.random.binomial(1, p, M)
 
         return [x, y, p]
 
@@ -37,20 +37,29 @@ class LogisticRegression1Model(cg.Model):
         return r
 
     @cg.output_as_tensor((cg.float32, ()))
-    @cg.input_as_tensor(x=(cg.float32, (None,)), y=(cg.float32, (None,)))
+    @cg.input_as_tensor(x=(cg.float32, (None,)), y=(cg.int32, (None,)))
     def J(self, x, y):
         hr = self.h(x)
-        r = -cg.reduce_mean(y*cg.log(hr)+(1.0-y)*cg.log(1.0-hr))
+        r = -cg.reduce_mean(cg.cast_to_float32(y)*cg.log(hr)+cg.cast_to_float32(1-y)*cg.log(1.0-hr))
         return r
 
-    def weights(self):
-        w0 = cg.get_variable(self, 'w0')
-        w1 = cg.get_variable(self, 'w1')
-        return [w0.numpy(), w1.numpy()]
+    @cg.output_as_tensor((cg.int32, (None,)))
+    @cg.input_as_tensor(x=(cg.float32, (None,)))
+    def y_pred(self, x):
+        hr = self.h(x)
+        r = cg.iverson(cg.greater_equal(hr, 0.5))
+        return r
+
+    @cg.output_as_tensor((cg.float32, ()))
+    @cg.input_as_tensor(x=(cg.float32, (None,)), y=(cg.int32, (None,)))
+    def accuracy(self, x, y):
+        y_predr = self.y_pred(x)
+        r = cg.reduce_mean(cg.kronecker(y_predr, y, dtype=cg.float32))
+        return r
    
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(model=self, cost_fn=self.J, cost_optimizer=cg.AdamOptimizer(learning_rate=1e-3))
+        context.register_apply_cost_optimizer_function(model=self, cost_fn=self.J, cost_optimizer=cg.AdamOptimizer(learning_rate=1e-2))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
@@ -64,10 +73,9 @@ class LogisticRegression1Model(cg.Model):
         if(len(training_log) >= 2):
             training_log[-1].training_data_cost_trend = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=64)[0][1]
             context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].training_data_cost_trend) <= 1e-3))
-
         training_log[-1].test_data_cost = self.J(*context.test_data_sample)
         
-        training_log[-1].w = self.weights()
+        training_log[-1].accuracy = self.accuracy(*context.test_data_sample)
 
         print(training_log[-1])
 

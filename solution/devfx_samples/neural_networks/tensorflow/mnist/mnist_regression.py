@@ -24,8 +24,8 @@ class MnistModel(cg.Model):
         @cg.output_as((cg.float32, ()))
         @cg.input_as(x=(cg.float32, (None, 28, 28)), y=(cg.int64, (None,)))
         def J(x, y):
-            y_one_hot = cg.one_hot(indices=y, depth=10, on_value=1, off_value=0)
             hr = h(x)
+            y_one_hot = cg.one_hot(indices=y, depth=10, on_value=1, off_value=0)
             r = -cg.reduce_mean(cg.reduce_sum(cg.cast_to_float32(y_one_hot)*cg.log(hr+1e-16), axis=1))
             return r
 
@@ -62,6 +62,7 @@ class MnistModel(cg.Model):
     def _on_append_to_training_log(self, training_log, context):
         training_log[-1].training_data_cost = self.run_cost_function(*context.training_data_sample)
         training_log[-1].test_data_cost = self.run_cost_function(*context.test_data_sample)
+        
         training_log[-1].accuracy = self.run_function('accuracy', *context.test_data_sample)
 
         print(training_log[-1])
