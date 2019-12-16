@@ -20,7 +20,7 @@ from .errors import *
 from .logging import *
 from .debugging import *
 
-from .nn import *
+from . import nn
 
 
 

@@ -11,26 +11,26 @@ import devfx.data_vizualization.seaborn as dv
 class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
-    # @ml.build_graph(x=(ml.float32, (None, 28, 28)))
+    @ml.build_graph(x=(ml.float32, (None, 28, 28)))
     @ml.output_as_tensor((ml.float32, (None, 10)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)))
     def h(self, x):
         w = ml.get_or_create_variable(model=self, name='w', shape=(10, 28, 28), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        b = ml.get_or_create_variable(model=self, name='b', shape=(10, ), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        b = ml.get_or_create_variable(model=self, name='b', shape=(10,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z = ml.tensordot(x, w, axes=([1, 2], [1, 2])) + b
  
         r = ml.softmax(z, axis=1)
         return r
 
-    # @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
+    @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     def J(self, x, y):
         hr = self.h(x)
-        r = -ml.reduce_mean(ml.reduce_sum(ml.one_hot(indices=y, depth=10, on_value=1.0, off_value=0.0, axis=1)*ml.log(hr), axis=1))
+        r = -ml.reduce_mean(ml.reduce_sum(ml.one_hot(indices=y, depth=10, on_value=1.0, off_value=0.0, axis=1)*ml.log(hr+1e-16), axis=1))
         return r
 
-    # @ml.build_graph(x=(ml.float32, (None, 28, 28)))
+    @ml.build_graph(x=(ml.float32, (None, 28, 28)))
     @ml.output_as_tensor((ml.int32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)))
     def y_pred(self, x):
@@ -38,7 +38,7 @@ class MnistModel(ml.Model):
         r = ml.argmax(hr, axis=1)
         return r
 
-    # @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
+    @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     def accuracy(self, x, y):
@@ -48,7 +48,8 @@ class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
+        context.register_apply_cost_optimizer_function(model=self, cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-6))
+        context.append_to_training_log_condition = lambda context: context.iteration % 20 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
         pass
@@ -97,8 +98,8 @@ def main():
     model = MnistModel()
     model.train(training_data=training_data, batch_size=32,
                 test_data=test_data,
-                training_data_sample = stats.mseries.sample(training_data, 256),
-                test_data_sample = stats.mseries.sample(test_data, 256))
+                training_data_sample = stats.mseries.sample(training_data, 512),
+                test_data_sample = stats.mseries.sample(test_data, 512))
 
     test_data_file.close()
     training_data_file.close()
