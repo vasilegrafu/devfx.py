@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 import scipy.stats
 import devfx.core as core
-import devfx.mathematics as math
+import devfx.math as math
 from .ddiscrete import ddiscrete
 
 

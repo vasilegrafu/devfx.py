@@ -1,6 +1,6 @@
 import numpy as np
 import devfx.exceptions as exceps
-import devfx.mathematics as math
+import devfx.math as math
 from .. import distributions
 
 """------------------------------------------------------------------------------------------------

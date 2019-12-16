@@ -1,17 +1,18 @@
 import numpy as np
 import tensorflow as tf
-import devfx.machine_learning.tensorflow as ml
+from ... import tensors
+from ... import math
 
 """------------------------------------------------------------------------------------------------
 """
 def identity(x):
-    y = cg.identity(x)
+    y = ml.identity(x)
     return y
 
 """------------------------------------------------------------------------------------------------
 """
 def binary(x):
-    y = cg.where(cg.less(x, 0), 0, +1)
+    y = ml.where(ml.less(x, 0), 0, +1)
     return y
 
 def sigmoid(x, L=1.0, s0=1.0/4.0):
@@ -19,7 +20,7 @@ def sigmoid(x, L=1.0, s0=1.0/4.0):
     return y
 
 def bipolar(x):
-    y = cg.where(cg.less(x, 0), -1, +1)
+    y = ml.where(ml.less(x, 0), -1, +1)
     return y
 
 def tanh(x, L=1.0, s0=1.0/4.0):
@@ -27,7 +28,7 @@ def tanh(x, L=1.0, s0=1.0/4.0):
     return y
 
 def softsign(x, L=1.0, s0=1.0/4.0):
-    y = L*(s0/L)*x/(1.0 + cg.abs((s0/L)*x))
+    y = L*(s0/L)*x/(1.0 + ml.abs((s0/L)*x))
     return y
 
 # ---------------------------------------------------------------
@@ -37,15 +38,15 @@ def softmax(x, axis=-1):
 
 # ---------------------------------------------------------------
 def symlog(x, s0=1.0, b=np.e):
-    d = 1.0/(s0*cg.log(b))
-    f = lambda x, d, b: cg.log(x+d)/cg.log(b) - cg.log(d)/cg.log(b)
-    y = cg.where(cg.less(x, 0), -f(-cg.clip_by_neginf_max(x, 0), d, b), f(cg.clip_by_min_posinf(0, x), d, b))
+    d = 1.0/(s0*ml.log(b))
+    f = lambda x, d, b: ml.log(x+d)/ml.log(b) - ml.log(d)/ml.log(b)
+    y = ml.where(ml.less(x, 0), -f(-ml.clip_by_neginf_max(x, 0), d, b), f(ml.clip_by_min_posinf(0, x), d, b))
     return y
 
 def sympow(x, s0=1.0, n=2.0):
-    d = cg.pow(1.0/(s0*n), n/(n-1))
-    f = lambda x, d, n: cg.pow(x+d, 1.0/n) - cg.pow(d, 1.0/n)
-    y = cg.where(cg.less(x, 0), -f(-cg.clip_by_neginf_max(x, 0), d, n), f(cg.clip_by_min_posinf(0, x), d, n))
+    d = ml.pow(1.0/(s0*n), n/(n-1))
+    f = lambda x, d, n: ml.pow(x+d, 1.0/n) - ml.pow(d, 1.0/n)
+    y = ml.where(ml.less(x, 0), -f(-ml.clip_by_neginf_max(x, 0), d, n), f(ml.clip_by_min_posinf(0, x), d, n))
     return y
 
 # ----------------------------------------------------------------
@@ -54,18 +55,18 @@ def softplus(x):
     return y
 
 def relu(x, s0=1.0, a=1e-2):
-    y = cg.where(cg.less(x, 0), a*x, s0*x)
+    y = ml.where(ml.less(x, 0), a*x, s0*x)
     return y
 
 def loglu(x, s0=1.0, b=np.e):
-    d = 1.0/(s0*cg.log(b))
-    f = lambda x, d, b: cg.log(x+d)/cg.log(b) - cg.log(d)/cg.log(b)
-    y = cg.where(cg.less(x, 0), -f(-cg.clip_by_neginf_max(x, 0), d, b), s0*x)
+    d = 1.0/(s0*ml.log(b))
+    f = lambda x, d, b: ml.log(x+d)/ml.log(b) - ml.log(d)/ml.log(b)
+    y = ml.where(ml.less(x, 0), -f(-ml.clip_by_neginf_max(x, 0), d, b), s0*x)
     return y
 
 def powlu(x, s0=1.0, n=2.0):
-    d = cg.pow(1.0/(s0*n), n/(n-1))
-    f = lambda x, d, n: cg.pow(x+d, 1.0/n) - cg.pow(d, 1.0/n)
-    y = cg.where(cg.less(x, 0), -f(-cg.clip_by_neginf_max(x, 0), d, n), s0*x)
+    d = ml.pow(1.0/(s0*n), n/(n-1))
+    f = lambda x, d, n: ml.pow(x+d, 1.0/n) - ml.pow(d, 1.0/n)
+    y = ml.where(ml.less(x, 0), -f(-ml.clip_by_neginf_max(x, 0), d, n), s0*x)
     return y
 

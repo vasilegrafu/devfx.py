@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from . import types
 from . import tensors
-from . import mathematics
+from . import math
 
 """------------------------------------------------------------------------------------------------
 """
@@ -225,7 +225,7 @@ def macaulay(x, dtype=types.int32):
         return tensors.where(tensors.greater_equal(x, 0), tensors.cast(x, dtype), tensors.zeros_like(x, dtype=dtype))
 
 def kronecker(x_i, x_j, dtype=types.int32):
-    return iverson(mathematics.equal(x_i, x_j), dtype=dtype)
+    return iverson(math.equal(x_i, x_j), dtype=dtype)
 
 
 

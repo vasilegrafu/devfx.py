@@ -1,4 +1,4 @@
-import devfx.mathematics as math
+import devfx.math as math
 from .dcontinuous import dcontinuous
 from .gamma import gamma
 

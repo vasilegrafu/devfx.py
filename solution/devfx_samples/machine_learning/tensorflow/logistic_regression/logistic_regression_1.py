@@ -1,6 +1,6 @@
 import numpy as np
 import devfx.core as core
-import devfx.mathematics as math
+import devfx.math as math
 import devfx.statistics as stats
 import devfx.machine_learning.tensorflow as ml
 import devfx.data_vizualization.seaborn as dv

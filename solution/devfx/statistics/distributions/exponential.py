@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.mathematics as math
+import devfx.math as math
 from .dcontinuous import dcontinuous
 
 """ Exponential is the time we will wait for the first event to occur.

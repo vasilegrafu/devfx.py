@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 import scipy.stats
 import scipy.interpolate
-import devfx.mathematics as math
+import devfx.math as math
 from .distribution import distribution
 
 class empirical(distribution):

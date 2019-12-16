@@ -1,6 +1,6 @@
 import scipy as sp
 import scipy.stats
-import devfx.mathematics as math
+import devfx.math as math
 from .dcontinuous import dcontinuous
 
 """------------------------------------------------------------------------------------------------

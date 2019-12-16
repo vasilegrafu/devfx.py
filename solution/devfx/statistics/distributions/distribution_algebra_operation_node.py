@@ -1,5 +1,5 @@
 import devfx.core as core
-import devfx.mathematics as math
+import devfx.math as math
 
 """------------------------------------------------------------------------------------------------
 """

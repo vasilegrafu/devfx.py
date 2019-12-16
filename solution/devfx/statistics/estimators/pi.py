@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.mathematics as math
+import devfx.math as math
 from .. import distributions
 from .. import series
 

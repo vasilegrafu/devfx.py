@@ -1,5 +1,5 @@
 import devfx.data_vizualization.matplotlib as dv
-import devfx.mathematics as math
+import devfx.math as math
 
 """----------------------------------------------------------------
 """

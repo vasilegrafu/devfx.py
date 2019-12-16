@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.mathematics as math
+import devfx.math as math
 from .dcontinuous import dcontinuous
 
 """ Let X be a gamma random variable with parameters (n, rate).

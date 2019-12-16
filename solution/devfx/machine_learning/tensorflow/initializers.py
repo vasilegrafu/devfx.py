@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from . import tensors
-from . import mathematics
+from . import math
 
 """------------------------------------------------------------------------------------------------
 """

@@ -4,7 +4,7 @@ from .tensors import *
 from .variables import *
 from .initializers import *
 
-from .mathematics import *
+from .math import *
 
 from .devices import *
 
@@ -19,6 +19,8 @@ from .model_executer import *
 from .errors import *
 from .logging import *
 from .debugging import *
+
+from .nn import *
 
 
 

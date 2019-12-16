@@ -1,6 +1,6 @@
 import numpy as np
 import pymc3 as pymc3
-import devfx.mathematics as math
+import devfx.math as math
 import devfx.statistics as stats
 import devfx.data_vizualization.matplotlib as dv
 

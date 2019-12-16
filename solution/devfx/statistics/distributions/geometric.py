@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.mathematics as math
+import devfx.math as math
 from .ddiscrete import ddiscrete
 
 """ It’s the probability that the first occurrence of success requires k number of independent trials, each with success probability p.

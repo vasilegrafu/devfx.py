@@ -6,7 +6,7 @@ import sklearn as skl
 import sklearn.neighbors
 import statsmodels as sm
 import statsmodels.nonparametric.kernel_density
-import devfx.mathematics as math
+import devfx.math as math
 from .dcontinuous import dcontinuous
 
 """ - normal_reference: normal reference rule of thumb (default)

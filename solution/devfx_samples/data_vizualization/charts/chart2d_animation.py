@@ -1,4 +1,4 @@
-import devfx.mathematics as math
+import devfx.math as math
 import devfx.data_vizualization.seaborn as dv
 
 """------------------------------------------------------------------------------------------------
