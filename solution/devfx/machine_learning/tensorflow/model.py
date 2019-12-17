@@ -1,4 +1,5 @@
-import types as types
+import types as tp
+import inspect as insp
 import itertools as it
 import numpy as np
 import tensorflow as tf
@@ -9,6 +10,17 @@ from . import variables
 from . import tensors
 
 class Model(tf.Module):
+    @staticmethod
+    def current_model():
+        stack = insp.stack()
+        for frameinfo in stack:
+            f_locals = frameinfo.frame.f_locals
+            if('self' in f_locals):
+                self = f_locals['self']
+                if(core.is_instance(self, Model)):
+                    return self
+        return None
+
     """------------------------------------------------------------------------------------------------
     """
     def __init__(self):
@@ -172,7 +184,7 @@ class Model(tf.Module):
         append_to_training_log_condition = lambda context: True
 
         apply_cost_optimizer = None
-        def register_apply_cost_optimizer_function(self, model, cost_fn, cost_optimizer):
+        def register_apply_cost_optimizer_function(self, cost_fn, cost_optimizer):
             if(cost_fn is None):
                 raise exceps.ArgumentError()
             if(cost_optimizer is None):
@@ -180,8 +192,8 @@ class Model(tf.Module):
             def __apply_cost_optimizer(*args, **kwargs):
                 with tf.GradientTape() as gradient_tape:
                     cost = cost_fn(*args, **kwargs)
-                gradients = gradient_tape.gradient(cost, variables.get_trainable_variables(model))
-                cost_optimizer.apply_gradients(zip(gradients, variables.get_trainable_variables(model)))
+                gradients = gradient_tape.gradient(cost, variables.get_trainable_variables())
+                cost_optimizer.apply_gradients(zip(gradients, variables.get_trainable_variables()))
             self.apply_cost_optimizer = __apply_cost_optimizer
         # ----------------------------------------------------------------
 
@@ -197,7 +209,7 @@ class Model(tf.Module):
         context.training_log = training_log
         context.cancellation_token = cancellation_token
         context.append_to_training_log_condition = append_to_training_log_condition
-        context.register_apply_cost_optimizer_function = types.MethodType(register_apply_cost_optimizer_function, context)
+        context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
         context.apply_cost_optimizer = apply_cost_optimizer
         self._on_training_begin(context)
         apply_cost_optimizer = context.apply_cost_optimizer

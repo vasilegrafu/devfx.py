@@ -53,24 +53,24 @@ class SoftmaxRegression1Model(ml.Model):
     @ml.output_as_tensor((ml.float32, (None, 4)))
     @ml.input_as_tensor(x=(ml.float32, (None, 2)))
     def h(self, x):
-        w10 = ml.get_or_create_variable(model=self, name='w10', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w11 = ml.get_or_create_variable(model=self, name='w11', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w12 = ml.get_or_create_variable(model=self, name='w12', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w10 = ml.get_or_create_variable(name='w10', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w11 = ml.get_or_create_variable(name='w11', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w12 = ml.get_or_create_variable(name='w12', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z1 = w10 + w11*x[:, 0] + w12*x[:, 1]
 
-        w20 = ml.get_or_create_variable(model=self, name='w20', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w21 = ml.get_or_create_variable(model=self, name='w21', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w22 = ml.get_or_create_variable(model=self, name='w22', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w20 = ml.get_or_create_variable(name='w20', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w21 = ml.get_or_create_variable(name='w21', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w22 = ml.get_or_create_variable(name='w22', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z2 = w20 + w21*x[:, 0] + w22*x[:, 1]
 
-        w30 = ml.get_or_create_variable(model=self, name='w30', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w31 = ml.get_or_create_variable(model=self, name='w31', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w32 = ml.get_or_create_variable(model=self, name='w32', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w30 = ml.get_or_create_variable(name='w30', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w31 = ml.get_or_create_variable(name='w31', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w32 = ml.get_or_create_variable(name='w32', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z3 = w30 + w31*x[:, 0] + w32*x[:, 1]
 
-        w40 = ml.get_or_create_variable(model=self, name='w40', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w41 = ml.get_or_create_variable(model=self, name='w41', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w42 = ml.get_or_create_variable(model=self, name='w42', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w40 = ml.get_or_create_variable(name='w40', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w41 = ml.get_or_create_variable(name='w41', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w42 = ml.get_or_create_variable(name='w42', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z4 = w40 + w41*x[:, 0] + w42*x[:, 1]
 
         r = ml.stack([
@@ -108,7 +108,7 @@ class SoftmaxRegression1Model(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(model=self, cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):

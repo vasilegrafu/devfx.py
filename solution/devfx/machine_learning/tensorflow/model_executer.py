@@ -1,6 +1,6 @@
 import tensorflow as tf
-import devfx.core as core
 import devfx.exceptions as exceps
+import devfx.core as core
 
 class ModelExecuter(object):
     """------------------------------------------------------------------------------------------------

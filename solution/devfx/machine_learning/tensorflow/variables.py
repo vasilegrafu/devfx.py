@@ -1,6 +1,8 @@
 import tensorflow as tf
+import inspect as insp
 import devfx.exceptions as exceps
 import devfx.core as core
+from .model import Model
 
 """------------------------------------------------------------------------------------------------
 """
@@ -20,7 +22,7 @@ def __create_variable(name=None, shape=None, dtype=None, initializer=None, train
 
 """------------------------------------------------------------------------------------------------
 """
-def exists_variable(model, name):
+def __exists_variable(model, name):
     if(not core.hasattr(object=model, name=name)):
         return False
     value = core.getattr(object=model, name=name)
@@ -28,50 +30,92 @@ def exists_variable(model, name):
         return False
     return True
 
-def set_variable(model, name, variable):
-    if(exists_variable(model=model, name=name)):
-        raise exceps.ArgumentError()
+def __set_variable(model, name, variable):
     if(not core.is_instance(variable, tf.Variable)):
         raise exceps.ArgumentError()
     core.setattr(object=model, name=name, value=variable)
 
-def get_variable(model, name):
-    if(not exists_variable(model=model, name=name)):
+def __get_variable(model, name):
+    if(not __exists_variable(model=model, name=name)):
         raise exceps.ArgumentError()
     variable = core.getattr(object=model, name=name)
+    if(not core.is_instance(variable, tf.Variable)):
+        raise exceps.ArgumentError()
     return variable
 
-def remove_variable(model, name):
-    if(not exists_variable(model=model, name=name)):
+def __remove_variable(model, name):
+    if(not __exists_variable(model=model, name=name)):
         raise exceps.ArgumentError()
     core.delattr(object=model, name=name)
 
-
-def create_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
-    if(exists_variable(model=model, name=name)):
-        raise exceps.ArgumentError()
-    variable = __create_variable(name=f'{id(model)}__{name}', shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
-    set_variable(model=model, name=name, variable=variable)
+"""------------------------------------------------------------------------------------------------
+"""
+def create_variable(name, shape=None, dtype=None, initializer=None, trainable=True, model=None):
+    if(model is None):
+        model = Model.current_model()
+    variable = __create_variable(name=f'{name}', shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+    if(model is not None):
+        __set_variable(model=model, name=name, variable=variable)
     return variable
 
+def get_variable(name, model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
+    return __get_variable(model=model, name=name)
 
-def get_or_create_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
-    if(exists_variable(model=model, name=name)):
-        variable = get_variable(model=model, name=name)
+def get_or_create_variable(name, shape=None, dtype=None, initializer=None, trainable=True, model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
+    if(__exists_variable(model=model, name=name)):
+        variable = __get_variable(model=model, name=name)
         return variable
     else:
-        variable = create_variable(model=model, name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+        variable = __create_variable(name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+        __set_variable(model=model, name=name, variable=variable)
         return variable
 
-def create_or_get_variable(model, name, shape=None, dtype=None, initializer=None, trainable=True):
-    return get_or_create_variable(model=model, name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+def create_or_get_variable(name, shape=None, dtype=None, initializer=None, trainable=True, model=None):
+    return get_or_create_variable(name=name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable, model=model)
+
+def set_variable(name, variable, model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
+    return __set_variable(model=model, name=name, variable=variable)
+
+def exists_variable(name, model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
+    return __exists_variable(model=model, name=name)
+
+def remove_variable(name, model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
+    return __remove_variable(model=model, name=name)
 
 
 """------------------------------------------------------------------------------------------------
 """
-def get_variables(model):
+def get_all_variables(model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
     return model.variables
 
-def get_trainable_variables(model):
+def get_trainable_variables(model=None):
+    if(model is None):
+        model = Model.current_model()
+    if(model is None):
+        raise exceps.ApplicationError()
     return model.trainable_variables
     

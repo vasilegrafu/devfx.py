@@ -60,8 +60,8 @@ class SoftmaxRegression2Model(ml.Model):
               ...                                 ...                     
             |xm1 xm2|                          |(xm1*w11 + xm2*w12 + b1) (xm1*w21 + xm2*w22 + b2) (xm1*w31 + xm2*w32 + b3) (xm1*w41 + xm2*w42 + b4)|  
         """
-        w = ml.get_or_create_variable(model=self, name='w', shape=(4, 2), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        b = ml.get_or_create_variable(model=self, name='b', shape=(4,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w = ml.get_or_create_variable(name='w', shape=(4, 2), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        b = ml.get_or_create_variable(name='b', shape=(4,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z = ml.tensordot(x, w, ([1], [1])) + b
 
         r = ml.softmax(z, axis=1)
@@ -93,7 +93,7 @@ class SoftmaxRegression2Model(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(model=self, cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-2))
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-2))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
