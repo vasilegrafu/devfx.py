@@ -28,8 +28,8 @@ class UnivariateLinearRegressionModel(ml.Model):
     @ml.output_as_tensor((ml.float32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None,)))
     def h(self, x):
-        w0 = ml.get_or_create_variable(name='w0', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        w1 = ml.get_or_create_variable(name='w1', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w0 = ml.create_or_get_variable(name='w0', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w1 = ml.create_or_get_variable(name='w1', shape=(), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         r = w0 + w1*x
         return r
     

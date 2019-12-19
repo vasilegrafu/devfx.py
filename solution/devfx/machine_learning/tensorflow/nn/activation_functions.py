@@ -70,3 +70,9 @@ def powlu(x, s0=1.0, n=2.0):
     y = tensors.where(math.less(x, 0), -f(-math.clip_by_neginf_max(x, 0), d, n), s0*x)
     return y
 
+def softlu(x, s0=1.0, a=1e-2):
+    y = tensors.where(math.less(x, 0), a*x, s0*x)
+    return y
+
+ELU
+To do

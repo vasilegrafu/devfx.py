@@ -15,8 +15,8 @@ class MnistModel(ml.Model):
     @ml.output_as_tensor((ml.float32, (None, 10)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)))
     def h(self, x):
-        w = ml.get_or_create_variable(name='w', shape=(10, 28, 28), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        b = ml.get_or_create_variable(name='b', shape=(10,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w = ml.create_or_get_variable(name='w', shape=(10, 28, 28), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        b = ml.create_or_get_variable(name='b', shape=(10,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z = ml.tensordot(x, w, axes=([1, 2], [1, 2])) + b
  
         r = ml.softmax(z, axis=1)

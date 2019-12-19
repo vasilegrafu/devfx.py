@@ -60,8 +60,8 @@ class SoftmaxRegression2Model(ml.Model):
               ...                                 ...                     
             |xm1 xm2|                          |(xm1*w11 + xm2*w12 + b1) (xm1*w21 + xm2*w22 + b2) (xm1*w31 + xm2*w32 + b3) (xm1*w41 + xm2*w42 + b4)|  
         """
-        w = ml.get_or_create_variable(name='w', shape=(4, 2), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
-        b = ml.get_or_create_variable(name='b', shape=(4,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        w = ml.create_or_get_variable(name='w', shape=(4, 2), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
+        b = ml.create_or_get_variable(name='b', shape=(4,), dtype=ml.float32, initializer=ml.random_truncated_normal_initializer())
         z = ml.tensordot(x, w, ([1], [1])) + b
 
         r = ml.softmax(z, axis=1)
