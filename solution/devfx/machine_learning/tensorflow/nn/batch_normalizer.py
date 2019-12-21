@@ -1,32 +1,28 @@
-import devfx.machine_learning.tensorflow as ml
+from .. import types
+from .. import variables
+from .. import initializers
+from .. import math
 
 class BatchNormalizer(object):
-    def __init__(self, is_training):
+    def __init__(self, name, is_training):
+        self.name = name
         self.is_training = is_training
 
     def __call__(self, z):
-        is_training = self.is_training
+        mean = math.reduce_mean(z, axis=0)
+        var = math.reduce_var(z, axis=0)
+        zn = (z - mean)/math.sqrt(var + 1e-8)
 
-        batch_mean = cg.reduce_mean(z, axis=0)
-        batch_var = cg.reduce_var(z, axis=0)
+        gamma = variables.create_or_get_variable(name=f'{self.name}_gamma', shape=(), dtype=types.float32, initializer=initializers.ones_initializer())
+        beta = variables.create_or_get_variable(name=f'{self.name}_beta', shape=(), dtype=types.float32, initializer=initializers.zeros_initializer())
 
-        ema = cg.train.ema(decay=0.99)
-
-        def update_mean_var(ema, batch_mean, batch_var):
-            ema_apply_op = ema.apply([batch_mean, batch_var])
-            with cg.control_dependencies([ema_apply_op]):
-                return (cg.identity(batch_mean), cg.identity(batch_var))
-
-        def get_mean_var(ema, batch_mean, batch_var):
-            return (ema.average(batch_mean), ema.average(batch_var))
-
-        mean, var = cg.condition(cg.equal(is_training, True), lambda: update_mean_var(ema, batch_mean, batch_var), lambda: get_mean_var(ema, batch_mean, batch_var))
-
-        z = (z - mean)/cg.sqrt(var + 1e-8)
-        gamma = cg.Variable(dtype=cg.float32, initial_value=1.0)
-        beta = cg.Variable(dtype=cg.float32, initial_value=0.0)
-        z = gamma*z + beta
-
-        return z
+        z_shape = tuple([_.value for _ in z.shape])
+        z_M = z_shape[0]
+        z_ema_shape = z_shape[1:]
+        z_ema = variables.create_or_get_variable(name=f'{self.name}_ema', shape=z_ema_shape, dtype=types.float32, initializer=initializers.zeros_initializer(), trainable=false)
+        z_ema.assign(z_ema*)
+         
+        zr = gamma*zn + beta
+        return zr
 
 batch_normalizer = BatchNormalizer

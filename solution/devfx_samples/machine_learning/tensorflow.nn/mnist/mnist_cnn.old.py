@@ -1,5 +1,6 @@
-import numpy as np
+# import os as os2
 import devfx.os as os
+import tensorflow as tf
 import devfx.databases.hdf5 as hdf5
 import devfx.data_containers as dc
 import devfx.statistics as stats
@@ -11,6 +12,18 @@ from devfx_samples.neural_networks.tensorflow.mnist.data.mnist_dataset import Mn
 """------------------------------------------------------------------------------------------------
 """
 class MnistModel(cg.models.DeclarativeModel):
+    # def __init__(self):
+    #     # os2.environ["OMP_NUM_THREADS"] = "16"
+    #     # os2.environ["KMP_BLOCKTIME"] = "30"
+    #     # os2.environ["KMP_SETTINGS"] = "1"
+    #     # os2.environ["KMP_AFFINITY"]= "granularity=fine,verbose,compact,1,0"
+
+    #     config = tf.ConfigProto(intra_op_parallelism_threads=16,
+    #                             inter_op_parallelism_threads=16,  
+    #                             allow_soft_placement=True, 
+    #                             device_count={"CPU": 8})
+    #     super().__init__(config=config)
+
     # ----------------------------------------------------------------
     def _build_model(self):
         # hparams
@@ -19,28 +32,39 @@ class MnistModel(cg.models.DeclarativeModel):
         # hypothesis
         x = cg.placeholder(shape=[None, 28, 28, 1], name='x')
 
-        fc1 = nn.layers.fully_connected(name='fc1',
-                                        input=x,
-                                        n=256,
-                                        normalizer=nn.normalization.batch_normalizer(is_training=is_training),
-                                        activation_fn=lambda z: nn.activation.relu(z))
-        fc2 = nn.layers.fully_connected(name='fc2',
-                                        input=fc1,
-                                        n=192,
-                                        normalizer=nn.normalization.batch_normalizer(is_training=is_training),
-                                        activation_fn=lambda z: nn.activation.relu(z))
-        fc3 = nn.layers.fully_connected(name='fc3',
-                                        input=fc2,
-                                        n=128,
-                                        normalizer=nn.normalization.batch_normalizer(is_training=is_training),
-                                        activation_fn=lambda z: nn.activation.relu(z))
-        fc4 = nn.layers.fully_connected(name='fc4',
-                                        input=fc3,
+        conv1 = nn.layers.conv2d(name='conv1',
+                                 input=x,
+                                 filters=64,
+                                 kernel_size=(4, 4),
+                                 activation_fn=lambda z: nn.activation.relu(z))
+        print(conv1.shape)
+        pool1 = nn.layers.max_pooling2d(name='pool1',
+                                        input=conv1)
+        print(pool1.shape)
+
+        conv2 = nn.layers.conv2d(name='conv2',
+                                 input=pool1,
+                                 filters=128,
+                                 kernel_size=(4, 4),
+                                 activation_fn=lambda z: nn.activation.relu(z))
+        pool2 = nn.layers.max_pooling2d(name='pool2',
+                                        input=conv2)
+        linear = nn.layers.linearize(pool2)
+
+        fc1 = nn.layers.dense(name='fc1',
+                                        input=linear,
                                         n=64,
                                         normalizer=nn.normalization.batch_normalizer(is_training=is_training),
                                         activation_fn=lambda z: nn.activation.relu(z))
-        fco = nn.layers.fully_connected(name='fco',
-                                        input=fc4,
+
+        fc2 = nn.layers.dense(name='fc2',
+                                        input=fc1,
+                                        n=32,
+                                        normalizer=nn.normalization.batch_normalizer(is_training=is_training),
+                                        activation_fn=lambda z: nn.activation.relu(z))
+
+        fco = nn.layers.dense(name='fco',
+                                        input=fc2,
                                         n=10,
                                         activation_fn=lambda z: nn.activation.softmax(z, axis=1))
 
@@ -77,35 +101,26 @@ class MnistModel(cg.models.DeclarativeModel):
         # cost minimizer
         self.register_cost_optimizer_applier_evaluator(cost=J, input=x, output=y, hparams=[is_training], optimizer=cg.train.AdamOptimizer(learning_rate=learning_rate))
 
+
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.append_to_training_log_condition = lambda context: context.iteration % 20 == 0
+        context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        # training_log.last_item.training_data_cost = self.run_cost_evaluator(*context.training_data.random_select(1024*4), hparams_values=[False])
-        # if(len(training_log.nr_list) >= 2):
-        #     training_log.last_item.training_data_cost_trend = stats.regresion.normalized_trend(x=training_log.nr_list, y=training_log.training_data_cost_list, n_max=64)[0]*360/(2.0*np.pi)
-        # training_log.last_item.test_data_cost = self.run_cost_evaluator(*context.test_data.random_select(1024*4), hparams_values=[False])
-
-        training_log.last_item.accuracy = self.run_evaluator(name='accuracy', feeds_data=[*context.test_data.random_select(1024*4)], hparams_values=[False])
+        training_log.last_item.accuracy = self.run_evaluator(name='accuracy', feeds_data=[*context.test_data.random_select(1024)], hparams_values=[False])
         training_log.last_item.initial_learning_rate = self.run_evaluator(name='initial_learning_rate')
         training_log.last_item.learning_rate = self.run_evaluator(name='learning_rate')
         if(training_log.last_item.accuracy < 0.95):
             self.run_evaluator(name='update_learning_rate', feeds_data=[training_log.last_item.initial_learning_rate])
-        elif(training_log.last_item.accuracy < 0.98):
+        elif(training_log.last_item.accuracy < 0.99):
             self.run_evaluator(name='update_learning_rate', feeds_data=[training_log.last_item.initial_learning_rate*(1.0/2.0)**((training_log.last_item.accuracy-0.95)*100)])
         else:
             context.cancellation_token.request_cancellation()
 
         print(training_log.last_item)
-
-        # figure, chart = dv.PersistentFigure(id='status', size=(8, 6), chart_fns=[lambda _: dv.Chart2d(figure=_)])
-        # chart.plot(training_log.training_data_cost_list, color='red')
-        # chart.plot(training_log.test_data_cost_list, color='green')
-        # figure.refresh()
 
     def _on_training_epoch_end(self, epoch, context):
         pass
@@ -123,8 +138,7 @@ def main():
                                     hparams=[training_data_file])
 
     test_data_file = hdf5.File(os.path.join(data_path, 'mnist_test.hdf5'))
-    test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))],
-                                hparams=[test_data_file])
+    test_dataset = MnistDataset(data=[list(range(test_data_file['/images'].shape[0]))], hparams=[test_data_file])
 
     results = []
     i = 1

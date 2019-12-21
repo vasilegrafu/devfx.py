@@ -215,8 +215,6 @@ class Model(tf.Module):
         apply_cost_optimizer = context.apply_cost_optimizer
         append_to_training_log_condition = context.append_to_training_log_condition
         batch_size = context.batch_size
-        iterations = context.iterations
-        epochs = context.epochs
         hparams = context.hparams
         # ----------------------------------------------------------------
 
@@ -244,12 +242,13 @@ class Model(tf.Module):
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = training_log
             context.cancellation_token = cancellation_token
+            context.append_to_training_log_condition = append_to_training_log_condition
+            context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+            context.apply_cost_optimizer = apply_cost_optimizer
             self._on_training_epoch_begin(epoch, context)
+            apply_cost_optimizer = context.apply_cost_optimizer
+            append_to_training_log_condition = context.append_to_training_log_condition
             batch_size = context.batch_size
-            iterations = context.iterations
-            iteration = context.iteration
-            epochs = context.epochs
-            epoch = context.epoch
             hparams = context.hparams
             # ----------------------------------------------------------------
 
@@ -289,12 +288,13 @@ class Model(tf.Module):
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = training_log
                 context.cancellation_token = cancellation_token
+                context.append_to_training_log_condition = append_to_training_log_condition
+                context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+                context.apply_cost_optimizer = apply_cost_optimizer
                 self._on_training_iteration_begin(iteration, context)
+                apply_cost_optimizer = context.apply_cost_optimizer
+                append_to_training_log_condition = context.append_to_training_log_condition
                 batch_size = context.batch_size
-                iterations = context.iterations
-                iteration = context.iteration
-                epochs = context.epochs
-                epoch = context.epoch
                 hparams = context.hparams
                 # ----------------------------------------------------------------
 
@@ -318,12 +318,13 @@ class Model(tf.Module):
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = training_log
                     context.cancellation_token = cancellation_token
+                    context.append_to_training_log_condition = append_to_training_log_condition
+                    context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+                    context.apply_cost_optimizer = apply_cost_optimizer
                     self._on_training_apply_cost_optimizer(context)
+                    apply_cost_optimizer = context.apply_cost_optimizer
+                    append_to_training_log_condition = context.append_to_training_log_condition
                     batch_size = context.batch_size
-                    iterations = context.iterations
-                    iteration = context.iteration
-                    epochs = context.epochs
-                    epoch = context.epoch
                     hparams = context.hparams
                 # ----------------------------------------------------------------
 
@@ -355,12 +356,13 @@ class Model(tf.Module):
                     for key in kwargs: setattr(context, key, kwargs[key])
                     context.training_log = training_log
                     context.cancellation_token = cancellation_token
+                    context.append_to_training_log_condition = append_to_training_log_condition
+                    context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+                    context.apply_cost_optimizer = apply_cost_optimizer
                     self._on_append_to_training_log(training_log, context)
+                    apply_cost_optimizer = context.apply_cost_optimizer
+                    append_to_training_log_condition = context.append_to_training_log_condition
                     batch_size = context.batch_size
-                    iterations = context.iterations
-                    iteration = context.iteration
-                    epochs = context.epochs
-                    epoch = context.epoch
                     hparams = context.hparams
                 # ----------------------------------------------------------------
 
@@ -378,12 +380,13 @@ class Model(tf.Module):
                 for key in kwargs: setattr(context, key, kwargs[key])
                 context.training_log = training_log
                 context.cancellation_token = cancellation_token
+                context.append_to_training_log_condition = append_to_training_log_condition
+                context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+                context.apply_cost_optimizer = apply_cost_optimizer
                 self._on_training_iteration_end(iteration, context)
+                apply_cost_optimizer = context.apply_cost_optimizer
+                append_to_training_log_condition = context.append_to_training_log_condition
                 batch_size = context.batch_size
-                iterations = context.iterations
-                iteration = context.iteration
-                epochs = context.epochs
-                epoch = context.epoch
                 hparams = context.hparams
                 # ----------------------------------------------------------------
             # ----------------------------------------------------------------
@@ -401,12 +404,13 @@ class Model(tf.Module):
             for key in kwargs: setattr(context, key, kwargs[key])
             context.training_log = training_log
             context.cancellation_token = cancellation_token
+            context.append_to_training_log_condition = append_to_training_log_condition
+            context.register_apply_cost_optimizer_function = tp.MethodType(register_apply_cost_optimizer_function, context)
+            context.apply_cost_optimizer = apply_cost_optimizer
             self._on_training_epoch_end(epoch, context)
+            apply_cost_optimizer = context.apply_cost_optimizer
+            append_to_training_log_condition = context.append_to_training_log_condition
             batch_size = context.batch_size
-            iterations = context.iterations
-            iteration = context.iteration
-            epochs = context.epochs
-            epoch = context.epoch
             hparams = context.hparams
             # ----------------------------------------------------------------
 

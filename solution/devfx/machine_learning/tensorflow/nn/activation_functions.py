@@ -55,7 +55,11 @@ def softplus(x):
     return y
 
 def relu(x, s0=1.0, a=1e-2):
-    y = tensors.where(math.less(x, 0), a*x, s0*x)
+    y = tensors.where(math.less(x, 0), a*math.clip_by_neginf_max(x, 0), s0*math.clip_by_min_posinf(0, x))
+    return y
+
+def elu(x):
+    y = tensors.where(math.less(x, 0), math.exp(math.clip_by_neginf_max(x, 0)) - 1.0, math.clip_by_min_posinf(0, x))
     return y
 
 def loglu(x, s0=1.0, b=np.e):
@@ -70,9 +74,3 @@ def powlu(x, s0=1.0, n=2.0):
     y = tensors.where(math.less(x, 0), -f(-math.clip_by_neginf_max(x, 0), d, n), s0*x)
     return y
 
-def softlu(x, s0=1.0, a=1e-2):
-    y = tensors.where(math.less(x, 0), a*x, s0*x)
-    return y
-
-ELU
-To do

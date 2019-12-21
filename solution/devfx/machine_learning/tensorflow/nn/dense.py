@@ -2,13 +2,13 @@ from .. import variables
 from .. import initializers
 from .. import math
 
-def fully_connected(name,
-                    input,
-                    n,
-                    dtype=None,
-                    initializer=None,
-                    normalizer=None,
-                    activation_fn=None):
+def dense(name,
+          input,
+          n,
+          dtype=None,
+          initializer=None,
+          normalizer=None,
+          activation_fn=None):
 
     # parameters
     if(initializer is None):
@@ -21,8 +21,8 @@ def fully_connected(name,
         activation_fn = lambda x : x
 
     # algorithm
-    input_shape = tuple([_ for _ in input.shape])
-    input_M = input_shape[0]
+    input_shape = tuple(input.shape)
+    input_m = input_shape[0]
     input_item_shape = input_shape[1:]
 
     w_shape = [n, *input_item_shape]
