@@ -28,8 +28,8 @@ def dense(name,
     w_shape = [n, *input_item_shape]
     b_shape = [n]
 
-    w = variables.create_or_get_variable(name=f'{name}_w', shape=w_shape, dtype=dtype, initializer=initializer)
-    b = variables.create_or_get_variable(name=f'{name}_b', shape=b_shape, dtype=dtype, initializer=initializer)
+    w = variables.create_or_get_variable(name=f'{name}__w', shape=w_shape, dtype=dtype, initializer=initializer)
+    b = variables.create_or_get_variable(name=f'{name}__b', shape=b_shape, dtype=dtype, initializer=initializer)
 
     # z: mj,ij->mi + b
     axes_1 = list(range(len(input_shape))[1:])

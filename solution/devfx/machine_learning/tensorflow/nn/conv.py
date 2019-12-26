@@ -3,17 +3,17 @@ from .. import types
 from .. import initializers
 from .. import variables
 
-def conv2d(name,
-           input,
-           filters_n,
-           kernel_size,
-           strides=(1, 1, 1, 1),
-           padding='VALID',
-           data_format='NHWC',  
-           dtype=types.float32,
-           kernel_initializer=None,
-           bias_initializer=None,
-           activation_fn=None):
+def conv(name,
+         input,
+         filters_n,
+         kernel_size,
+         strides=None,
+         padding='VALID',
+         data_format=None,  
+         dtype=types.float32,
+         kernel_initializer=None,
+         bias_initializer=None,
+         activation_fn=None):
 
     if(kernel_initializer is None):
         kernel_initializer = initializers.random_glorot_normal_initializer()
@@ -33,11 +33,11 @@ def conv2d(name,
     w_shape = (w_height, w_width, in_channels, out_channels)
     w = variables.create_or_get_variable(name=f'{name}__w', shape=w_shape, dtype=dtype, initializer=kernel_initializer)
     
-    conv = tf.nn.conv2d(input=input,  # [batch, in_height, in_width, in_channels]
-                        filters=w, # [filter_height, filter_width, in_channels, out_channels]
+    conv = tf.nn.conv2d(input=input, 
+                        filters=w, 
                         strides=strides, 
                         padding=padding,
-                        data_format=data_format) # [batch, out_height, out_width, out_channels]
+                        data_format=data_format) 
 
     conv_shape = tuple(conv.shape)
 
