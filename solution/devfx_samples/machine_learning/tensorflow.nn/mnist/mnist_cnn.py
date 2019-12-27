@@ -1,4 +1,5 @@
 import numpy as np
+import datetime as dt
 import devfx.os as os
 import devfx.core as core
 import devfx.statistics as stats
@@ -25,10 +26,10 @@ class MnistModel(ml.Model):
                                  input=conv1)
 
         conv2 = ml.nn.conv2d(name='conv2',
-                        input=pool1,
-                        filters_n=128,
-                        kernel_size=(3, 3),
-                        activation_fn=lambda z: ml.nn.relu(z))
+                             input=pool1,
+                             filters_n=128,
+                             kernel_size=(3, 3),
+                             activation_fn=lambda z: ml.nn.relu(z))
 
         pool2 = ml.nn.max_pool2d(name='pool2',
                                  input=conv2)
@@ -36,22 +37,19 @@ class MnistModel(ml.Model):
         linear = ml.nn.linearize(pool2)
 
         fc1 = ml.nn.dense(name="fc1",
-                            input=linear,
-                            n=64,
-                            dtype=ml.float32,
-                            activation_fn=lambda z: ml.nn.relu(z))
+                          input=linear,
+                          n=64,
+                          activation_fn=lambda z: ml.nn.relu(z))
 
         fc2 = ml.nn.dense(name="fc2",
-                            input=fc1,
-                            n=32,
-                            dtype=ml.float32,
-                            activation_fn=lambda z: ml.nn.relu(z))
+                          input=fc1,
+                          n=32,
+                          activation_fn=lambda z: ml.nn.relu(z))
 
         fco = ml.nn.dense(name="fco",
-                            input=fc2,
-                            n=10,
-                            dtype=ml.float32,
-                            activation_fn=lambda z: ml.nn.softmax(z, axis=1))
+                          input=fc2,
+                          n=10,
+                          activation_fn=lambda z: ml.nn.softmax(z, axis=1))
 
         r = fco
         return r
@@ -97,6 +95,9 @@ class MnistModel(ml.Model):
             context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-4))
             context.batch_size = 64
 
+        if(len(training_log[:].time_delta) >= 2):
+            training_log[-1].time_delta_average = sum(training_log[:].time_delta, dt.timedelta(0))/(len(training_log[:].time_delta)-1)
+
         print(training_log[-1])
 
     def _on_training_iteration_end(self, iteration, context):
@@ -122,10 +123,10 @@ def main():
     test_data = [np.reshape(test_data[0], (*test_data[0].shape, 1)), test_data[1]]
 
     model = MnistModel()
-    model.train(training_data=training_data, batch_size=16,
+    model.train(training_data=training_data, batch_size=32,
                 test_data=test_data,
-                training_data_sample = stats.mseries.sample(training_data, 256),
-                test_data_sample = stats.mseries.sample(test_data, 256))
+                training_data_sample = stats.mseries.sample(training_data, 512),
+                test_data_sample = stats.mseries.sample(test_data, 512))
 
     test_data_file.close()
     training_data_file.close()

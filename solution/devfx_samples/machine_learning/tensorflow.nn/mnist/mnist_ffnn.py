@@ -18,35 +18,30 @@ class MnistModel(ml.Model):
         fc1 = ml.nn.dense(name="fc1",
                             input=x,
                             n=256,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.elu(z))
 
         fc2 = ml.nn.dense(name="fc2",
                             input=fc1,
                             n=192,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.elu(z))
 
         fc3 = ml.nn.dense(name="fc3",
                             input=fc2,
                             n=128,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.elu(z))
 
         fc4 = ml.nn.dense(name="fc4",
                             input=fc3,
                             n=64,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.elu(z))
 
         fco = ml.nn.dense(name="fco",
                             input=fc4,
                             n=10,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.softmax(z, axis=1))
 

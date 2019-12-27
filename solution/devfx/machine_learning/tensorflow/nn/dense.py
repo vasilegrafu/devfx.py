@@ -5,7 +5,6 @@ from .. import math
 def dense(name,
           input,
           n,
-          dtype=None,
           initializer=None,
           normalizer=None,
           activation_fn=None):
@@ -21,18 +20,16 @@ def dense(name,
         activation_fn = lambda x : x
 
     # algorithm
-    input_shape = tuple(input.shape)
-    input_m = input_shape[0]
-    input_item_shape = input_shape[1:]
+    input_item_shape = input.shape[1:]
 
-    w_shape = [n, *input_item_shape]
+    w_shape = [n, *input.shape[1:]]
     b_shape = [n]
 
-    w = variables.create_or_get_variable(name=f'{name}__w', shape=w_shape, dtype=dtype, initializer=initializer)
-    b = variables.create_or_get_variable(name=f'{name}__b', shape=b_shape, dtype=dtype, initializer=initializer)
+    w = variables.create_or_get_variable(name=f'{name}__w', shape=w_shape, dtype=input.dtype, initializer=initializer)
+    b = variables.create_or_get_variable(name=f'{name}__b', shape=b_shape, dtype=input.dtype, initializer=initializer)
 
     # z: mj,ij->mi + b
-    axes_1 = list(range(len(input_shape))[1:])
+    axes_1 = list(range(len(input.shape))[1:])
     axes_2 = list(range(len(w_shape))[1:])
     z = math.tensordot(input, w, axes=(axes_1, axes_2)) + b
 

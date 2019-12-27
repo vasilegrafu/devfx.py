@@ -1,6 +1,7 @@
 import types as tp
 import inspect as insp
 import itertools as it
+import datetime as dt
 import numpy as np
 import tensorflow as tf
 import devfx.exceptions as exceps
@@ -83,9 +84,9 @@ class Model(tf.Module):
                 value = attr[1]
 
                 if(name == 'time_elapsed'):
-                    name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
+                    name_value_list.append("{name}={value}".format(name=name, value=value))
                 elif(name == 'time_delta'):
-                    name_value_list.append("{name}={value}".format(name=name, value=value)[:-3])
+                    name_value_list.append("{name}={value}".format(name=name, value=value))
                 elif (name == 'iteration'):
                     name_value_list.append("{name}={value}".format(name=name, value=value))
                 elif (name == 'epoch'):
@@ -338,7 +339,7 @@ class Model(tf.Module):
                     time_elapsed = stopwatch.elapsed
                     training_log_item = Model.TrainingLogItem(nr=(len(training_log) + 1),
                                                               time_elapsed=time_elapsed,
-                                                              time_delta=((time_elapsed - training_log[-1].time_elapsed) if (len(training_log) >= 1) else 0),
+                                                              time_delta=((time_elapsed - training_log[-1].time_elapsed) if (len(training_log) >= 1) else dt.timedelta(0)),
                                                               iteration=iteration,
                                                               epoch=(epoch + training_data_epoch_position / training_data_row_count))
                     training_log.append(training_log_item)
