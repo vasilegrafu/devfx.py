@@ -6,10 +6,16 @@ import devfx.databases.hdf5 as db
 import devfx.machine_learning.tensorflow as ml
 import devfx.data_vizualization.seaborn as dv
 
+def reluX(name, x):
+    # return ml.nn.relu(x)
+    s_neg = ml.create_or_get_variable(name=f'{name}__s_neg', shape=(), dtype=ml.float32, initializer=ml.constant_initializer(1e-2))
+    s_pos = ml.create_or_get_variable(name=f'{name}__s_pos', shape=(), dtype=ml.float32, initializer=ml.constant_initializer(1.0))
+    y = ml.where(ml.less(x, 0), s_neg*ml.clip_by_neginf_max(x, 0), s_pos*ml.clip_by_min_posinf(0, x))
+    return y
+
 """------------------------------------------------------------------------------------------------
 """
 class MnistModel(ml.Model):
-
     # ----------------------------------------------------------------
     @ml.build_graph(x=(ml.float32, (None, 28, 28)))
     @ml.output_as_tensor((ml.float32, (None, 10)))
@@ -19,25 +25,25 @@ class MnistModel(ml.Model):
                           input=x,
                           n=256,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: reluX(name="fc1", x=z))
 
         fc2 = ml.nn.dense(name="fc2",
                           input=fc1,
                           n=192,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: reluX(name="fc2", x=z))
 
         fc3 = ml.nn.dense(name="fc3",
                           input=fc2,
                           n=128,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: reluX(name="fc3", x=z))
 
         fc4 = ml.nn.dense(name="fc4",
                           input=fc3,
                           n=64,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: reluX(name="fc4", x=z))
 
         fco = ml.nn.dense(name="fco",
                           input=fc4,
@@ -74,7 +80,7 @@ class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-4))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
@@ -85,27 +91,20 @@ class MnistModel(ml.Model):
 
     def _on_append_to_training_log(self, training_log, context):
         training_log[-1].training_data_cost = self.J(*context.training_data_sample)
-        if(len(training_log) >= 2):
-            training_log[-1].training_data_cost_trend = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].training_data_cost_trend) <= 1e-2))
         training_log[-1].test_data_cost = self.J(*context.test_data_sample)
         
         training_log[-1].accuracy = self.accuracy(*context.test_data_sample)
-        if(training_log[-1].accuracy > 0.90):
-            context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-4))
-            context.batch_size = 128
-        if(training_log[-1].accuracy > 0.95):
-            context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-5))
-            context.batch_size = 256
 
         print(training_log[-1])
 
-        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(8, 6)))
-        chart = core.persistent_variable('chart', lambda: dv.Chart2d(figure=figure))
-        figure.clear_charts()
-        chart.plot(training_log[:].training_data_cost, color='green')
-        chart.plot(training_log[:].test_data_cost, color='red')
-        figure.show(block=False)
+        context.cancellation_token.request_cancellation(condition=(training_log[-1].accuracy > 0.95))
+
+        # figure = core.persistent_variable('figure', lambda: dv.Figure(size=(8, 6)))
+        # chart = core.persistent_variable('chart', lambda: dv.Chart2d(figure=figure))
+        # figure.clear_charts()
+        # chart.plot(training_log[:].training_data_cost, color='green')
+        # chart.plot(training_log[:].test_data_cost, color='red')
+        # figure.show(block=False)
 
     def _on_training_iteration_end(self, iteration, context):
         pass

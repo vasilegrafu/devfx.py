@@ -63,7 +63,7 @@ def conv(name,
     if (activation_fn is None):
         activation_fn = lambda x : x
     
-    weights = variables.create_or_get_variable(name=f'{name}__weights', 
+    weights = variables.create_or_get_variable(name=f'{name}__convolution_weights', 
                                                shape=(*kernel_size, input.shape[1 if data_format.startswith("NC") else len(input.shape) - 1], filters_n), 
                                                dtype=input.dtype, 
                                                initializer=kernel_initializer)
@@ -75,7 +75,7 @@ def conv(name,
                                     data_format=data_format,
                                     name=f'{name}__convolution') 
 
-    bias = variables.create_or_get_variable(name=f'{name}__bias', 
+    bias = variables.create_or_get_variable(name=f'{name}__convolution_bias', 
                                          shape=(filters_n,), 
                                          dtype=input.dtype, 
                                          initializer=bias_initializer)

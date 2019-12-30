@@ -16,7 +16,7 @@ class BatchNormalizer(object):
         gamma = variables.create_or_get_variable(name=f'{self.name}_gamma', shape=(), dtype=types.float32, initializer=initializers.ones_initializer())
         beta = variables.create_or_get_variable(name=f'{self.name}_beta', shape=(), dtype=types.float32, initializer=initializers.zeros_initializer())
 
-        z_shape = tuple([_.value for _ in z.shape])
+        z_shape = tuple(input.shape)
         z_M = z_shape[0]
         z_ema_shape = z_shape[1:]
         z_ema = variables.create_or_get_variable(name=f'{self.name}_ema', shape=z_ema_shape, dtype=types.float32, initializer=initializers.zeros_initializer(), trainable=false)

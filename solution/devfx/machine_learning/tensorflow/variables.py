@@ -2,11 +2,15 @@ import tensorflow as tf
 import inspect as insp
 import devfx.exceptions as exceps
 import devfx.core as core
+from . import initializers
 from .model import Model
 
 """------------------------------------------------------------------------------------------------
 """
 def __create_variable(name=None, shape=None, dtype=None, initializer=None, trainable=True):
+    if(initializer is None):
+        initializer = initializers.zeros_initializer()
+
     if((shape is None) and (dtype is None)):
         initial_value = initializer()
     elif((shape is None) and (dtype is not None)):
@@ -17,6 +21,7 @@ def __create_variable(name=None, shape=None, dtype=None, initializer=None, train
         initial_value = initializer(shape=shape, dtype=dtype)
     else:
         raise exceps.NotSupportedError()
+    
     variable = tf.Variable(name=name, initial_value=initial_value, trainable=trainable)
     return variable
 

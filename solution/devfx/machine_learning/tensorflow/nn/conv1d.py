@@ -1,27 +1,39 @@
-from . import conv
+from . import convNd
 
-def conv2d(name,
-           input, # [batch, in_width, in_channels] or [batch, in_channels, in_width]
-           filters_n, # number
-           kernel_size, # (dw, )
+def conv1d(name,
+           input, 
+           filters_n, 
+           kernel_size, 
            strides=(1,),
-           padding='VALID', # 'VALID' or 'SAME'
-           data_format='NWC', # 'NWC' or 'NCW'
+           padding='VALID', 
+           data_format='NWC', 
            kernel_initializer=None,
            bias_initializer=None,
-           activation_fn=None): # [batch, out_width, out_channels] or [batch, out_channels, out_width]
+           activation_fn=None): 
+    """
+    :param name: string
+    :param filters_n: number
+    :param input: (batch, in_width, in_channels) or (batch, in_channels, in_width)
+    :param kernel_size: (dw,)
+    :param strides: (dw,)
+    :param kernel_initializer: initializer
+    :param bias_initializer: initializer
+    :param padding: 'VALID' or 'SAME'
+    :param data_format: 'NWC' or 'NCW'
+    :return: (batch, out_width, out_channels) or (batch, out_channels, out_width)
+    """
 
-    convolution = conv.conv(name=name,
-                            input=input,
-                            filters_n=filters_n,
-                            kernel_size=kernel_size,
-                            strides=strides,
-                            padding=padding,
-                            data_format=data_format,  
-                            kernel_initializer=kernel_initializer,
-                            bias_initializer=bias_initializer,
-                            activation_fn=activation_fn)
+    conv = convNd.conv(name=name,
+                       input=input,
+                       filters_n=filters_n,
+                       kernel_size=kernel_size,
+                       strides=strides,
+                       padding=padding,
+                       data_format=data_format,  
+                       kernel_initializer=kernel_initializer,
+                       bias_initializer=bias_initializer,
+                       activation_fn=activation_fn)
 
-    output = convolution
+    output = conv
 
     return output 
