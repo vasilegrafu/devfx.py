@@ -22,6 +22,14 @@ class Model(tf.Module):
                     return self
         return None
 
+    @staticmethod
+    def is_called_by_apply_cost_optimizer():
+        stack = insp.stack()
+        for frameinfo in stack:
+            if(frameinfo.function == '__apply_cost_optimizer'):
+                return True
+        return False
+
     """------------------------------------------------------------------------------------------------
     """
     def __init__(self):

@@ -11,7 +11,7 @@ import devfx.data_vizualization.seaborn as dv
 class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
-    @ml.build_graph(x=(ml.float32, (None, 28, 28)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28)))
     @ml.output_as_tensor((ml.float32, (None, 10)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)))
     def h(self, x):
@@ -48,7 +48,7 @@ class MnistModel(ml.Model):
         r = fco
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     def J(self, x, y):
@@ -56,7 +56,7 @@ class MnistModel(ml.Model):
         r = -ml.reduce_mean(ml.reduce_sum(ml.one_hot(indices=y, depth=10, on_value=1.0, off_value=0.0, axis=1)*ml.log(hr+1e-16), axis=1))
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28)))
     @ml.output_as_tensor((ml.int32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)))
     def y_pred(self, x):
@@ -64,7 +64,7 @@ class MnistModel(ml.Model):
         r = ml.argmax(hr, axis=1)
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28)), y=(ml.int32, (None,)))
     def accuracy(self, x, y):

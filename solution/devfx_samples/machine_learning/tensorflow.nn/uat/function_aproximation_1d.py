@@ -28,25 +28,25 @@ class FunctionAproximationModel(ml.Model):
     @ml.output_as_tensor((ml.float32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None,)))
     def h(self, x):
+        bn1 = ml.nn.batch_norm(name='bn1',
+                               input=x)
         fc1 = ml.nn.dense(name="fc1",
-                          input=x,
+                          input=bn1,
                           n=64,
-                          dtype=ml.float32,
                           initializer=ml.random_glorot_normal_initializer(),
                           activation_fn=lambda z: ml.nn.relu(z))
 
+        bn2 = ml.nn.batch_norm(name='bn2',
+                               input=fc1)
         fc2 = ml.nn.dense(name="fc2",
-                          input=fc1,
+                          input=bn2,
                           n=32,
-                          dtype=ml.float32,
                           initializer=ml.random_glorot_normal_initializer(),
                           activation_fn=lambda z: ml.nn.relu(z))
-
 
         fco = ml.nn.dense(name="fco",
                           input=fc2,
                           n=1,
-                          dtype=ml.float32,
                           initializer=ml.random_glorot_normal_initializer())
 
         r = fco
@@ -62,7 +62,7 @@ class FunctionAproximationModel(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-2))
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):

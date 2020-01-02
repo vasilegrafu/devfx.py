@@ -35,14 +35,12 @@ class FunctionAproximationModel(ml.Model):
         fc1 = ml.nn.dense(name="fc1",
                             input=x,
                             n=128,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.relu(z))
 
         fc2 = ml.nn.dense(name="fc2",
                             input=fc1,
                             n=64,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer(),
                             activation_fn=lambda z: ml.nn.relu(z))
 
@@ -50,7 +48,6 @@ class FunctionAproximationModel(ml.Model):
         fco = ml.nn.dense(name="fco",
                             input=fc2,
                             n=1,
-                            dtype=ml.float32,
                             initializer=ml.random_glorot_normal_initializer())
 
         r = fco

@@ -24,7 +24,7 @@ class UnivariateLinearRegressionDataGenerator():
 """
 class UnivariateLinearRegressionModel(ml.Model):
     # ----------------------------------------------------------------
-    # @ml.build_graph(x=(ml.float32, (None,)))
+    @ml.build_graph(x=(ml.float32, (None,)))
     @ml.output_as_tensor((ml.float32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None,)))
     def h(self, x):
@@ -33,7 +33,7 @@ class UnivariateLinearRegressionModel(ml.Model):
         r = w0 + w1*x
         return r
     
-    # @ml.build_graph(x=(ml.float32, (None,)), y=(ml.float32, (None,)))
+    @ml.build_graph(x=(ml.float32, (None,)), y=(ml.float32, (None,)))
     @ml.output_as_tensor((ml.float32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None,)), y=(ml.float32, (None,)))
     def J(self, x, y):
@@ -111,18 +111,18 @@ def main():
     chart.scatter(test_data[0], model.h(test_data[0]), color='red')
     figure.show()
 
-    # # export_to
-    # model.export_to(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+    # export_to
+    model.export_to(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
 
-    # # import_from
-    # model_executer = ml.ModelExecuter.import_from(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+    # import_from
+    model_executer = ml.ModelExecuter.import_from(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
 
-    # # visual validation
-    # figure = dv.Figure(size=(8, 6))
-    # chart = dv.Chart2d(figure=figure)
-    # chart.scatter(test_data[0], test_data[1], color='blue')
-    # chart.scatter(test_data[0], model_executer.h(ml.as_tensor(test_data[0], dtype=ml.float32, shape=(None,))), color='yellow')
-    # figure.show()
+    # visual validation
+    figure = dv.Figure(size=(8, 6))
+    chart = dv.Chart2d(figure=figure)
+    chart.scatter(test_data[0], test_data[1], color='blue')
+    chart.scatter(test_data[0], model_executer.h(ml.as_tensor(test_data[0], dtype=ml.float32, shape=(None,))), color='yellow')
+    figure.show()
 
 
 
