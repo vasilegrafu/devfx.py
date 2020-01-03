@@ -9,7 +9,10 @@ def conv1d(name,
            data_format='NWC', 
            kernel_initializer=None,
            bias_initializer=None,
-           activation_fn=None): 
+           activation_fn=None,
+           normalize_input=False,
+           normalize_z=False,
+           normalize_output=False): 
     """
     :param name: string
     :param filters_n: number
@@ -32,7 +35,10 @@ def conv1d(name,
                        data_format=data_format,  
                        kernel_initializer=kernel_initializer,
                        bias_initializer=bias_initializer,
-                       activation_fn=activation_fn)
+                       activation_fn=activation_fn,
+                       normalize_input=normalize_input,
+                       normalize_z=normalize_z,
+                       normalize_output=normalize_output)
 
     output = conv
 

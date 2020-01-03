@@ -19,25 +19,29 @@ class MnistModel(ml.Model):
                           input=x,
                           n=256,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
         fc2 = ml.nn.dense(name="fc2",
                           input=fc1,
                           n=192,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
         fc3 = ml.nn.dense(name="fc3",
                           input=fc2,
                           n=128,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
         fc4 = ml.nn.dense(name="fc4",
                           input=fc3,
                           n=64,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
         fco = ml.nn.dense(name="fco",
                           input=fc4,

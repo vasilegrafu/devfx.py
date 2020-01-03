@@ -8,7 +8,8 @@ from .max_poolNd import *
 from .max_pool1d import *
 from .max_pool2d import *
 from .max_pool3d import *
-from .linearize import *
-from .batch_norm import *
+from .normalization import *
+from .linearization import *
+
 
 

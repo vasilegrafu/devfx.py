@@ -12,7 +12,7 @@ import devfx.data_vizualization.seaborn as dv
 class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
-    @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)))
     @ml.output_as_tensor((ml.float32, (None, 10)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28, 1)))
     def h(self, x):
@@ -20,7 +20,8 @@ class MnistModel(ml.Model):
                              input=x,
                              filters_n=64,
                              kernel_size=(5, 5),
-                             activation_fn=lambda z: ml.nn.relu(z))
+                             activation_fn=lambda z: ml.nn.relu(z),
+                             normalize_z=True)
 
         pool1 = ml.nn.max_pool2d(name='pool1',
                                  input=conv1)
@@ -54,7 +55,7 @@ class MnistModel(ml.Model):
         r = fco
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
     def J(self, x, y):
@@ -62,7 +63,7 @@ class MnistModel(ml.Model):
         r = -ml.reduce_mean(ml.reduce_sum(ml.one_hot(indices=y, depth=10, on_value=1.0, off_value=0.0, axis=1)*ml.log(hr+1e-16), axis=1))
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)))
     @ml.output_as_tensor((ml.int32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28, 1)))
     def y_pred(self, x):
@@ -70,7 +71,7 @@ class MnistModel(ml.Model):
         r = ml.argmax(hr, axis=1)
         return r
 
-    @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
+    # @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
     @ml.output_as_tensor((ml.float32, ()))
     @ml.input_as_tensor(x=(ml.float32, (None, 28, 28, 1)), y=(ml.int32, (None,)))
     def accuracy(self, x, y):
@@ -80,7 +81,7 @@ class MnistModel(ml.Model):
 
     # ----------------------------------------------------------------
     def _on_training_begin(self, context):
-        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
+        context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-4))
         context.append_to_training_log_condition = lambda context: context.iteration % 10 == 0
 
     def _on_training_epoch_begin(self, epoch, context):
@@ -92,7 +93,7 @@ class MnistModel(ml.Model):
     def _on_append_to_training_log(self, training_log, context):
         training_log[-1].accuracy = self.accuracy(*context.test_data_sample)
         if(training_log[-1].accuracy > 0.90):
-            context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-4))
+            context.register_apply_cost_optimizer_function(cost_fn=self.J, cost_optimizer=ml.AdamOptimizer(learning_rate=1e-3))
             context.batch_size = 64
 
         if(len(training_log[:].time_delta) >= 2):

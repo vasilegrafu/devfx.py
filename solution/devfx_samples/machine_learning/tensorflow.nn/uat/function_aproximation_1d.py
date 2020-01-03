@@ -14,7 +14,7 @@ class FunctionAproximationDataGenerator():
         pass
 
     def generate(self):
-        M = 1024*8
+        M = 1024*4
 
         x = stats.distributions.uniform(a=-4*3.14, b=+4.0*3.14).rvs(M)
         y = np.cos(x)*x + np.random.normal(0.0, 1.0, size=M)
@@ -28,21 +28,19 @@ class FunctionAproximationModel(ml.Model):
     @ml.output_as_tensor((ml.float32, (None,)))
     @ml.input_as_tensor(x=(ml.float32, (None,)))
     def h(self, x):
-        bn1 = ml.nn.batch_norm(name='bn1',
-                               input=x)
         fc1 = ml.nn.dense(name="fc1",
-                          input=bn1,
-                          n=64,
+                          input=x,
+                          n=128,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
-        bn2 = ml.nn.batch_norm(name='bn2',
-                               input=fc1)
         fc2 = ml.nn.dense(name="fc2",
-                          input=bn2,
-                          n=32,
+                          input=fc1,
+                          n=128,
                           initializer=ml.random_glorot_normal_initializer(),
-                          activation_fn=lambda z: ml.nn.relu(z))
+                          activation_fn=lambda z: ml.nn.relu(z),
+                          normalize_z=True)
 
         fco = ml.nn.dense(name="fco",
                           input=fc2,
@@ -72,11 +70,7 @@ class FunctionAproximationModel(ml.Model):
         pass
 
     def _on_append_to_training_log(self, training_log, context):
-        training_log[-1].training_data_cost = self.J(*context.training_data_sample)
-        if(len(training_log) >= 2):
-            training_log[-1].training_data_cost_trend = stats.regression.normalized_trend(x=training_log[:].nr, y=training_log[:].training_data_cost, n_max=32)[0][1]
-            context.cancellation_token.request_cancellation(condition=(abs(training_log[-1].training_data_cost_trend) <= 1e-2))
-            
+        training_log[-1].training_data_cost = self.J(*context.training_data_sample)          
         training_log[-1].test_data_cost = self.J(*context.test_data_sample)
 
         print(training_log[-1])

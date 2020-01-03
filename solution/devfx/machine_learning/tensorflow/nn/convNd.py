@@ -3,6 +3,7 @@ import devfx.exceptions as exceps
 import devfx.core as core
 from .. import initializers
 from .. import variables
+from . import normalization
 
 def conv(name,
          input,
@@ -13,7 +14,10 @@ def conv(name,
          data_format=None,  
          kernel_initializer=None,
          bias_initializer=None,
-         activation_fn=None):
+         activation_fn=None,
+         normalize_input=False,
+         normalize_z=False,
+         normalize_output=False):
 
     if (not 3 <= len(input.shape) <= 5):
         raise exceps.ArgumentError()
@@ -62,27 +66,36 @@ def conv(name,
 
     if (activation_fn is None):
         activation_fn = lambda x : x
-    
-    weights = variables.create_or_get_variable(name=f'{name}__convolution_weights', 
-                                               shape=(*kernel_size, input.shape[1 if data_format.startswith("NC") else len(input.shape) - 1], filters_n), 
-                                               dtype=input.dtype, 
-                                               initializer=kernel_initializer)
-    
-    convolution = tf.nn.convolution(input=input, 
-                                    filters=weights, 
-                                    strides=strides, 
-                                    padding=padding,
-                                    data_format=data_format,
-                                    name=f'{name}__convolution') 
 
-    bias = variables.create_or_get_variable(name=f'{name}__convolution_bias', 
+    if(normalize_input):
+        input = normalization.normalize(name=f'{name}__convNd__normalize_input', input=input)
+    
+    w = variables.create_or_get_variable(name=f'{name}__convNd__w', 
+                                         shape=(*kernel_size, input.shape[1 if data_format.startswith("NC") else len(input.shape) - 1], filters_n), 
+                                         dtype=input.dtype, 
+                                         initializer=kernel_initializer)
+    
+    conv = tf.nn.convolution(input=input, 
+                             filters=w, 
+                             strides=strides, 
+                             padding=padding,
+                             data_format=data_format,
+                             name=f'{name}__convNd') 
+
+    b = variables.create_or_get_variable(name=f'{name}__convNd__b', 
                                          shape=(filters_n,), 
                                          dtype=input.dtype, 
                                          initializer=bias_initializer)
 
-    z = convolution + bias
+    z = conv + b
+
+    if(normalize_z):
+        z = normalization.normalize(name=f'{name}__convNd__normalize_z', input=z)
 
     output = activation_fn(z)
+
+    if(normalize_output):
+        output = normalization.normalize(name=f'{name}__convNd__normalize_output', input=output)
 
     return output 
 
