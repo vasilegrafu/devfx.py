@@ -11,7 +11,6 @@ import devfx.data_vizualization.seaborn as dv
 """------------------------------------------------------------------------------------------------
 """
 class MnistModel(ml.Model):
-
     # ----------------------------------------------------------------
     @ml.build_graph(x=(ml.float32, (None, 28, 28, 1)))
     @ml.output_as_tensor((ml.float32, (None, 10)))

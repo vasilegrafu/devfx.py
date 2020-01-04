@@ -72,7 +72,7 @@ def convNd(name,
         activation_fn = lambda x : x
 
     if(input_normalizer is not None):
-        input = input_normalizer.normalize(name=f'{name}__normalize_input', input=input)
+        input = input_normalizer(name=f'{name}__normalize_input', input=input)
     
     w = variables.create_or_get_variable(name=f'{name}__w', 
                                          shape=(*kernel_size, input.shape[1 if data_format.startswith("NC") else len(input.shape) - 1], filters_n), 
@@ -94,12 +94,12 @@ def convNd(name,
     z = conv + b
 
     if(z_normalizer is not None):
-        z = z_normalizer.normalize(name=f'{name}__normalize_z', input=z)
+        z = z_normalizer(name=f'{name}__normalize_z', input=z)
 
     output = activation_fn(z)
 
     if(output_normalizer is not None):
-        output = output_normalizer.normalize(name=f'{name}__normalize_output', input=output)
+        output = output_normalizer(name=f'{name}__normalize_output', input=output)
 
     return output 
 
