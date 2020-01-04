@@ -104,6 +104,8 @@ class MnistModel(ml.Model):
 
         print(training_log[-1])
 
+        # context.cancellation_token.request_cancellation(condition=(training_log[-1].accuracy > 0.90))
+
     def _on_training_iteration_end(self, iteration, context):
         pass
 
@@ -134,6 +136,15 @@ def main():
 
     test_data_file.close()
     training_data_file.close()
+
+    # # export-import
+    # model.export_to(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+
+    # model_executer = ml.ModelExecuter.import_from(path=f'{os.file_info.parent_directorypath(__file__)}/exports')
+
+    # accuracy = model_executer.accuracy(ml.as_tensor(test_data[0], dtype=ml.float32, shape=((None, 28, 28, 1))),
+    #                                    ml.as_tensor(test_data[1], dtype=ml.int32, shape=((None,))))
+    # print(accuracy)
 
 """------------------------------------------------------------------------------------------------
 """

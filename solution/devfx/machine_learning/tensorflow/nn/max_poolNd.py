@@ -10,6 +10,7 @@ def max_poolNd(name,
                strides=None,
                padding=None,
                data_format=None):
+    name = name + '__max_poolNd'
 
     if (not 3 <= len(input.shape) <= 5):
         raise exceps.ArgumentError()
@@ -53,7 +54,7 @@ def max_poolNd(name,
                           strides=strides,
                           padding=padding,
                           data_format=data_format,
-                          name=f'{name}__max_pool')
+                          name=f'{name}')
 
     output = pool
 
