@@ -2,7 +2,7 @@ from .types import *
 from .tensors import *
 
 from .variables import *
-from .initializers import *
+from .initialization import *
 
 from .math import *
 

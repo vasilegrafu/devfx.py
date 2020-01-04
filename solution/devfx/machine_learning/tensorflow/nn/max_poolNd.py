@@ -2,12 +2,14 @@ import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.core as core
 
-def max_pool(name,
-             input,
-             kernel_size,
-             strides=None,
-             padding=None,
-             data_format=None):
+"""------------------------------------------------------------------------------------------------
+"""
+def max_poolNd(name,
+               input,
+               kernel_size,
+               strides=None,
+               padding=None,
+               data_format=None):
 
     if (not 3 <= len(input.shape) <= 5):
         raise exceps.ArgumentError()

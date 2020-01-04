@@ -1,5 +1,7 @@
-from . import convNd
+from .convNd import convNd
 
+"""------------------------------------------------------------------------------------------------
+"""
 def conv2d(name,
            input, 
            filters_n, 
@@ -10,9 +12,9 @@ def conv2d(name,
            kernel_initializer=None,
            bias_initializer=None,
            activation_fn=None,
-           normalize_input=False,
-           normalize_z=False,
-           normalize_output=False): 
+           input_normalizer=None,
+           z_normalizer=None,
+           output_normalizer=None): 
     """
     :param name: string
     :param filters_n: number
@@ -26,19 +28,19 @@ def conv2d(name,
     :return: (batch, out_height, out_width, out_channels) or (batch, out_channels, out_height, out_width)
     """
 
-    conv = convNd.conv(name=name,
-                       input=input,
-                       filters_n=filters_n,
-                       kernel_size=kernel_size,
-                       strides=strides,
-                       padding=padding,
-                       data_format=data_format,  
-                       kernel_initializer=kernel_initializer,
-                       bias_initializer=bias_initializer,
-                       activation_fn=activation_fn,
-                       normalize_input=normalize_input,
-                       normalize_z=normalize_z,
-                       normalize_output=normalize_output)
+    conv = convNd(name=name,
+                  input=input,
+                  filters_n=filters_n,
+                  kernel_size=kernel_size,
+                  strides=strides,
+                  padding=padding,
+                  data_format=data_format,  
+                  kernel_initializer=kernel_initializer,
+                  bias_initializer=bias_initializer,
+                  activation_fn=activation_fn,
+                  input_normalizer=input_normalizer,
+                  z_normalizer=z_normalizer,
+                  output_normalizer=output_normalizer)
 
     output = conv
 

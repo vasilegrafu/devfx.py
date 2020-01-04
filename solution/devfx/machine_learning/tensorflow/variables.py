@@ -2,14 +2,14 @@ import tensorflow as tf
 import inspect as insp
 import devfx.exceptions as exceps
 import devfx.core as core
-from . import initializers
+from . import initialization
 from .model import Model
 
 """------------------------------------------------------------------------------------------------
 """
 def __create_variable(name=None, shape=None, dtype=None, initializer=None, trainable=True):
     if(initializer is None):
-        initializer = initializers.zeros_initializer()
+        initializer = initialization.zeros_initializer()
 
     if((shape is None) and (dtype is None)):
         initial_value = initializer()

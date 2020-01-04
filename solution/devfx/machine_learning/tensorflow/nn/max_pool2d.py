@@ -1,6 +1,8 @@
 import tensorflow as tf
-from . import max_poolNd
+from .max_poolNd import max_poolNd
 
+"""------------------------------------------------------------------------------------------------
+"""
 def max_pool2d(name,
                input,
                kernel_size=(2, 2),
@@ -17,12 +19,12 @@ def max_pool2d(name,
     :return: (batch, out_height, out_width, out_channels) or (batch, out_channels, out_height, out_width)
     """
 
-    pool = max_poolNd.max_pool(name=name,
-                               input=input,
-                               kernel_size=kernel_size,
-                               strides=strides,
-                               padding=padding,
-                               data_format=data_format)
+    pool = max_poolNd(name=name,
+                      input=input,
+                      kernel_size=kernel_size,
+                      strides=strides,
+                      padding=padding,
+                      data_format=data_format)
 
     output = pool
 

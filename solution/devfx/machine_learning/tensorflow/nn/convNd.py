@@ -1,23 +1,27 @@
 import tensorflow as tf
 import devfx.exceptions as exceps
 import devfx.core as core
-from .. import initializers
+from .. import initialization
 from .. import variables
 from . import normalization
 
-def conv(name,
-         input,
-         filters_n, 
-         kernel_size,
-         strides=None,
-         padding=None,
-         data_format=None,  
-         kernel_initializer=None,
-         bias_initializer=None,
-         activation_fn=None,
-         normalize_input=False,
-         normalize_z=False,
-         normalize_output=False):
+"""------------------------------------------------------------------------------------------------
+"""
+def convNd(name,
+           input,
+           filters_n, 
+           kernel_size,
+           strides=None,
+           padding=None,
+           data_format=None,  
+           kernel_initializer=None,
+           bias_initializer=None,
+           activation_fn=None,
+           input_normalizer=None,
+           z_normalizer=None,
+           output_normalizer=None):
+
+    name = name + '__convNd'
 
     if (not 3 <= len(input.shape) <= 5):
         raise exceps.ArgumentError()
@@ -59,18 +63,18 @@ def conv(name,
         raise exceps.ArgumentError()
     
     if(kernel_initializer is None):
-        kernel_initializer = initializers.random_glorot_normal_initializer()
+        kernel_initializer = initialization.random_glorot_normal_initializer()
 
     if(bias_initializer is None):
-        bias_initializer = initializers.random_glorot_normal_initializer()
+        bias_initializer = initialization.random_glorot_normal_initializer()
 
     if (activation_fn is None):
         activation_fn = lambda x : x
 
-    if(normalize_input):
-        input = normalization.normalize(name=f'{name}__convNd__normalize_input', input=input)
+    if(input_normalizer is not None):
+        input = input_normalizer.normalize(name=f'{name}__normalize_input', input=input)
     
-    w = variables.create_or_get_variable(name=f'{name}__convNd__w', 
+    w = variables.create_or_get_variable(name=f'{name}__w', 
                                          shape=(*kernel_size, input.shape[1 if data_format.startswith("NC") else len(input.shape) - 1], filters_n), 
                                          dtype=input.dtype, 
                                          initializer=kernel_initializer)
@@ -80,22 +84,22 @@ def conv(name,
                              strides=strides, 
                              padding=padding,
                              data_format=data_format,
-                             name=f'{name}__convNd') 
+                             name=f'{name}') 
 
-    b = variables.create_or_get_variable(name=f'{name}__convNd__b', 
+    b = variables.create_or_get_variable(name=f'{name}__b', 
                                          shape=(filters_n,), 
                                          dtype=input.dtype, 
                                          initializer=bias_initializer)
 
     z = conv + b
 
-    if(normalize_z):
-        z = normalization.normalize(name=f'{name}__convNd__normalize_z', input=z)
+    if(z_normalizer is not None):
+        z = z_normalizer.normalize(name=f'{name}__normalize_z', input=z)
 
     output = activation_fn(z)
 
-    if(normalize_output):
-        output = normalization.normalize(name=f'{name}__convNd__normalize_output', input=output)
+    if(output_normalizer is not None):
+        output = output_normalizer.normalize(name=f'{name}__normalize_output', input=output)
 
     return output 
 
