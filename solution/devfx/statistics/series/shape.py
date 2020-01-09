@@ -24,3 +24,4 @@ def kurtosis(data):
     else:
         data = np.asarray(data)
         return sp.stats.kurtosis(data, axis=None)
+        
