@@ -144,6 +144,14 @@ class distribution(distribution_algebra_operation_node):
         return self.icdf(self.cdf_a+(self.cdf_b-self.cdf_a)*np.random.rand(size))
 
     """------------------------------------------------------------------------------------------------
+    """   
+    def rv(self):
+        return self._rv()
+      
+    def _rv(self):
+        return self._rvs(1)[0]
+
+    """------------------------------------------------------------------------------------------------
     """     
     def sf(self, x):
         return self._sf(x)

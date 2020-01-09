@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 import devfx.core as core
-from .dispersion import stddev
+from . import validation
+from . import dispersion
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data1', 'data2')
 def cov(data1, data2):
     if(core.is_typeof(data1, pd.Series) and core.is_typeof(data2, pd.Series)):
         return data1.cov(data2)
@@ -16,5 +18,6 @@ def cov(data1, data2):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data1', 'data2')
 def corr(data1, data2):
-    return cov(data1, data2)/(stddev(data1)*stddev(data2))
+    return cov(data1, data2)/(dispersion.stddev(data1)*dispersion.stddev(data2))

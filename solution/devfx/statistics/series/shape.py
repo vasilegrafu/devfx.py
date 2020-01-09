@@ -3,9 +3,11 @@ import pandas as pd
 import scipy as sp
 import scipy.stats
 import devfx.core as core
+from . import validation
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def skew(data):
     if(core.is_typeof(data, pd.Series)):
         return data.skew(axis=None)
@@ -15,6 +17,7 @@ def skew(data):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def kurtosis(data):
     if(core.is_typeof(data, pd.Series)):
         return data.kurtosis(axis=None)

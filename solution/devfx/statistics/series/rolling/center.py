@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
 import devfx.core as core
+from .. import validation
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_mean(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).mean()
@@ -11,6 +13,7 @@ def rolling_mean(data, n):
         data = np.asarray(data)
         return rolling_mean(data=pd.Series(data), n=n).values
 
+@validation.validate_args_is_series('data')
 def rolling_ewmean(data, n, alpha=0.05):
     if(core.is_typeof(data, pd.Series)):
         return data.ewm(alpha=alpha).mean()
@@ -20,6 +23,7 @@ def rolling_ewmean(data, n, alpha=0.05):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_median(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).median()

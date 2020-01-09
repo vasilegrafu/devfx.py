@@ -1,3 +1,6 @@
+from .validation import is_series
+from .validation import validate_is_series
+
 from .rolling import *
 from .expanding import *
 
@@ -47,6 +50,8 @@ from .shape import kurtosis
 
 from .ops import count
 from .ops import get
-from .ops import sample
 from .ops import shuffle
 from .ops import split
+
+from .random import sample
+from .random import choose_one

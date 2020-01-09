@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
 import devfx.core as core
+from .. import validation
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_skew(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).skew()
@@ -13,6 +15,7 @@ def rolling_skew(data, n):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_kurtosis(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).kurt()

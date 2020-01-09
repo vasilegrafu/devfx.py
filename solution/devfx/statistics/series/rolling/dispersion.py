@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
 import devfx.core as core
+from .. import validation
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_min(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).min()
@@ -11,6 +13,7 @@ def rolling_min(data, n):
         data = np.asarray(data)
         return rolling_min(data=pd.Series(data), n=n).values
 
+@validation.validate_args_is_series('data')
 def rolling_max(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).max()
@@ -20,6 +23,7 @@ def rolling_max(data, n):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def rolling_var(data, n, ddof=0):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).var(ddof=1)
@@ -27,6 +31,7 @@ def rolling_var(data, n, ddof=0):
         data = np.asarray(data)
         return rolling_var(data=pd.Series(data), n=n).values
 
+@validation.validate_args_is_series('data')
 def rolling_ewvar(data, n, alpha=0.05):
     if(core.is_typeof(data, pd.Series)):
         return data.ewm(alpha=alpha).var()
@@ -34,7 +39,7 @@ def rolling_ewvar(data, n, alpha=0.05):
         data = np.asarray(data)
         return rolling_ewvar(data=pd.Series(data), n=n).values
 
-
+@validation.validate_args_is_series('data')
 def rolling_stddev(data, n, ddof=0):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).std(ddof=1)
@@ -42,6 +47,7 @@ def rolling_stddev(data, n, ddof=0):
         data = np.asarray(data)
         return rolling_stddev(data=pd.Series(data), n=n).values
 
+@validation.validate_args_is_series('data')
 def rolling_ewstddev(data, n, alpha=0.05):
     if(core.is_typeof(data, pd.Series)):
         return data.ewm(alpha=alpha).std()

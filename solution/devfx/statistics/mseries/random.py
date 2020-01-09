@@ -1,14 +1,20 @@
+import numpy as np
+import devfx.exceptions as exceps
+import devfx.core as core
 from .. import series
+from . import ops
 from . import validation
 
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_mseries('data')
-def skew(data):
-    return [series.skew(column_data) for column_data in data]
+def sample(data, size=None):
+    return ops.get(data, np.random.choice(ops.rows_count(data), size=size))
 
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_mseries('data')
-def kurtosis(data):
-    return [series.kurtosis(column_data) for column_data in data]
+def choose_one(data):
+    if(ops.rows_count(data) == 0):
+        raise exceps.ArgumentError()
+    return [_[0] for _ in sample(data, size=1)]

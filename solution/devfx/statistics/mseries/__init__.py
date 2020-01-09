@@ -1,3 +1,6 @@
+from .validation import is_mseries
+from .validation import validate_is_mseries
+
 from .aggregation import sum
 
 from .center import mean
@@ -47,6 +50,8 @@ from .ops import columns_count
 from .ops import rows
 from .ops import rows_count
 from .ops import get
-from .ops import sample
 from .ops import shuffle
 from .ops import split
+
+from .random import sample
+from .random import choose_one

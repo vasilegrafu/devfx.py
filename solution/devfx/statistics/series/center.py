@@ -3,9 +3,11 @@ import pandas as pd
 import scipy as sp
 import scipy.stats
 import devfx.core as core
+from . import validation
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def mean(data):
     if(core.is_typeof(data, pd.Series)):
         return data.mean()
@@ -15,6 +17,7 @@ def mean(data):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def median(data):
     if(core.is_typeof(data, pd.Series)):
         return data.median()
@@ -24,6 +27,7 @@ def median(data):
 
 """------------------------------------------------------------------------------------------------
 """
+@validation.validate_args_is_series('data')
 def mode(data):
     if(core.is_typeof(data, pd.Series)):
         return data.mode()
