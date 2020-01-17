@@ -21,6 +21,9 @@ from .logging import *
 from .debugging import *
 
 from . import nn
+from . import rl
+
+from . import nlp
 
 
 

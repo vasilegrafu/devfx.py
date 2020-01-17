@@ -3,9 +3,11 @@ import devfx.exceptions as exceps
 import devfx.math as math
 from .. import distributions
 
-"""------------------------------------------------------------------------------------------------
+"""========================================================================================================
 """
 class cdhistogram(object):
+    """------------------------------------------------------------------------------------------------
+    """
     def __init__(self, a, b, cfreq):
         self.cfreq = np.array(cfreq)
         self.size = self.cfreq.size
