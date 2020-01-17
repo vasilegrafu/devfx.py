@@ -3,7 +3,7 @@ from .environment import Environment
 class Agent(object):
     def __init__(self, environment, state=None):
         self.__set_environment(environment=environment)
-        self.__set_state(state=state)
+        self.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -16,7 +16,7 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __set_state(self, state):
+    def set_state(self, state):
         self.__state = state
 
     def get_state(self):
@@ -29,7 +29,7 @@ class Agent(object):
         if(self.get_environment().is_terminal_state(state=state)):
             return
         (next_state, reward) = self.get_environment().get_next_state_and_reward(state=state, action=action)
-        self.__set_state(state=next_state)
+        self.set_state(state=next_state)
 
     def do_random_action(self):
         state = self.get_state()
@@ -37,5 +37,5 @@ class Agent(object):
             return
         action = self.get_environment().get_random_action(state=state)
         (next_state, reward) = self.get_environment().get_next_state_and_reward(state=state, action=action)
-        self.__set_state(state=next_state)
+        self.set_state(state=next_state)
         

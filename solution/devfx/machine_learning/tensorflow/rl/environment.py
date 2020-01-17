@@ -70,6 +70,42 @@ class Environment(object):
     def _get_states(self):
         raise exceps.NotImplementedError()  
 
+    def get_random_state(self):
+        states = self.get_states()
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def is_non_terminal_state(self, state):
+        self.validate_state(state=state)
+        exists_actions = self.exists_actions(state)
+        is_non_terminal_state = exists_actions
+        return is_non_terminal_state
+
+    def is_terminal_state(self, state):
+        self.validate_state(state=state)
+        is_terminal_state = not self.is_non_terminal_state(state)
+        return is_terminal_state
+
+    def get_non_terminal_states(self): 
+        states = [state for state in self.get_states() if self.is_non_terminal_state(state)]
+        return states
+
+    def get_terminal_states(self): 
+        states = [state for state in self.get_states() if self.is_terminal_state(state)]
+        return states
+
+    def get_random_non_terminal_state(self):
+        states = self.get_non_terminal_states()
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
+    def get_random_terminal_state(self):
+        states = self.get_terminal_states()
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
     """------------------------------------------------------------------------------------------------
     """   
     def get_reward(self, state):
@@ -106,28 +142,7 @@ class Environment(object):
         actions = self.get_actions(state=state)
         action = actions[np.random.choice(len(actions), size=1)[0]]
         return action
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def is_terminal_state(self, state):
-        self.validate_state(state=state)
-        exists_actions = self.exists_actions(state)
-        is_terminal_state = not exists_actions
-        return is_terminal_state
-
-    def is_non_terminal_state(self, state):
-        self.validate_state(state=state)
-        is_non_terminal_state = not self.is_terminal_state(state)
-        return is_non_terminal_state
-        
-    def get_terminal_states(self): 
-        states = [state for state in self.get_states() if self.is_terminal_state(state)]
-        return states
-
-    def get_non_terminal_states(self): 
-        states = [state for state in self.get_states() if self.is_non_terminal_state(state)]
-        return states
-        
+       
     """------------------------------------------------------------------------------------------------
     """ 
     def get_next_state(self, state, action):

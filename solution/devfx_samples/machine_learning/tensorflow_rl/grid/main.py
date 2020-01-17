@@ -1,3 +1,4 @@
+import time as t
 import devfx.statistics as stats
 import devfx.machine_learning.tensorflow as ml
 import devfx.data_vizualization.seaborn as dv
@@ -8,16 +9,19 @@ from devfx_samples.machine_learning.tensorflow_rl.grid.agent import GridAgent
 """
 def main():
     environment = GridEnvironment()
-    agent = GridAgent(environment=environment, state=(1, 1))
+    agent = GridAgent(environment=environment)
 
-    is_non_terminal_state = environment.is_non_terminal_state(state=(2,4))
-
-    i = 0
-    while((i <= 1000) and environment.is_non_terminal_state(agent.get_state())):
-        agent.do_random_action()
-        print(i, agent.get_state())
-        i += 1
-
+    while(True):
+        agent.set_state(state=environment.get_random_non_terminal_state())
+        print('start state:', agent.get_state())
+        i = 0
+        while(environment.is_non_terminal_state(agent.get_state())):
+            i += 1
+            agent.do_random_action()
+            print(i, agent.get_state())
+            if(i >= 100):
+                break
+        t.sleep(2.5)
 
 """------------------------------------------------------------------------------------------------
 """

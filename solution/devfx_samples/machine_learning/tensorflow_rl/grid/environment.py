@@ -32,7 +32,7 @@ class GridCell(object):
 class Grid(object):
     def __init__(self):
         self.__grid = np.asarray([
-            [GridCell(), GridCell(),                          GridCell(), GridCell(reward=+1.0)],
+            [GridCell(), GridCell(),                          GridCell(), GridCell(kind=GridCellKind.Free.Terminal, reward=+1.0)],
             [GridCell(), GridCell(kind=GridCellKind.Blocked), GridCell(), GridCell(kind=GridCellKind.Free.Terminal, reward=-1.0)],
             [GridCell(), GridCell(),                          GridCell(), GridCell()]
         ])
