@@ -44,21 +44,6 @@ class Environment(object):
         if(not self.is_valid_action(action=action)):
             raise exceps.ApplicationError()
 
-
-    def is_valid_state_action(self, state, action):
-        if(not self.is_valid_state(state=state)):
-            return False
-        if(not self.is_valid_action(action=action)):
-            return False
-        actions = self.get_actions(state)
-        if(action not in actions):
-            return False
-        return True
-
-    def validate_state_action(self, state, action):
-        if(not self.is_valid_state_action(state=state, action=action)):
-            raise exceps.ApplicationError()
-
     """------------------------------------------------------------------------------------------------
     """ 
     def get_states(self):
@@ -70,6 +55,7 @@ class Environment(object):
     def _get_states(self):
         raise exceps.NotImplementedError()  
 
+
     def get_random_state(self):
         states = self.get_states()
         state = states[np.random.choice(len(states), size=1)[0]]
@@ -79,22 +65,25 @@ class Environment(object):
     """ 
     def is_non_terminal_state(self, state):
         self.validate_state(state=state)
-        exists_actions = self.exists_actions(state)
+        exists_actions = self.exists_actions(state=state)
         is_non_terminal_state = exists_actions
         return is_non_terminal_state
 
     def is_terminal_state(self, state):
         self.validate_state(state=state)
-        is_terminal_state = not self.is_non_terminal_state(state)
+        exists_actions = self.exists_actions(state=state)
+        is_terminal_state = not exists_actions
         return is_terminal_state
 
-    def get_non_terminal_states(self): 
-        states = [state for state in self.get_states() if self.is_non_terminal_state(state)]
+
+    def get_non_terminal_states(self):
+        states = [state for state in self.get_states() if self.is_non_terminal_state(state=state)]
         return states
 
-    def get_terminal_states(self): 
-        states = [state for state in self.get_states() if self.is_terminal_state(state)]
+    def get_terminal_states(self):
+        states = [state for state in self.get_states() if self.is_terminal_state(state=state)]
         return states
+
 
     def get_random_non_terminal_state(self):
         states = self.get_non_terminal_states()
@@ -128,14 +117,24 @@ class Environment(object):
     def _get_actions(self, state):
         raise exceps.NotImplementedError()
 
+
     def exists_actions(self, state):
         self.validate_state(state=state)
-        actions = self.get_actions(state)
-        if(actions is None):
-            return False
+        actions = self.get_actions(state=state)
         if(len(actions) == 0):
             return False
         return True
+
+    def exists_action_in_state(self, action, state):
+        self.validate_action(action=action)
+        self.validate_state(state=state)
+        actions = self.get_actions(state=state)
+        if(len(actions) == 0):
+            return False
+        if(action not in actions):
+            return False
+        return True
+    
 
     def get_random_action(self, state):
         self.validate_state(state=state)
@@ -146,8 +145,13 @@ class Environment(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def get_next_state(self, state, action):
-        self.validate_state_action(state, action)
+        self.validate_state(state=state)
+        self.validate_action(action=action)
+        if(not self.exists_action_in_state(action=action, state=state)):
+            raise exceps.ApplicationError()
         next_state = self._get_next_state(state=state, action=action)
+        if(not self.is_valid_state(state=next_state)):
+            raise exceps.ApplicationError()
         return next_state
         
     def _get_next_state(self, state, action):

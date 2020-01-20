@@ -37,12 +37,18 @@ class Grid(object):
             [GridCell(), GridCell(),                          GridCell(), GridCell()]
         ])
 
-    def __getitem__(self, key):
-        return self.__grid[key]
-
     @property
     def shape(self):
-        return (self.__grid.shape[0], self.__grid.shape[1])
+        shape = (self.__grid.shape[0], self.__grid.shape[1])
+        return shape
+
+    def __iter__(self):
+        for (key, grid_cell) in np.ndenumerate(self.__grid):
+            yield ((key[0]+1, key[1]+1), grid_cell)
+
+    def __getitem__(self, key):
+        grid_cell = self.__grid[(key[0]-1, key[1]-1)]
+        return grid_cell
 
 """========================================================================================================
 """
@@ -64,12 +70,11 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _is_valid_state(self, state):
-        if(not (0 <= (state[0]-1) <= (self.__grid.shape[0]-1))):
+        if(not 1 <= state[0] <= self.__grid.shape[0]):
             return False
-        if(not (0 <= (state[1]-1) <= (self.__grid.shape[1]-1))):
+        if(not 0 <= state[1] <= self.__grid.shape[1]):
             return False
-        grid_cell = self.__grid[(state[0]-1), (state[1]-1)]
-        if(grid_cell.kind == GridCellKind.Blocked):
+        if(self.__grid[state].kind == GridCellKind.Blocked):
             return False
         return True
 
@@ -87,55 +92,42 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_states(self):
-        states = []
-        for (i, grid_cells) in enumerate(self.__grid):
-            for (j, grid_cell) in enumerate(grid_cells): 
-                if(grid_cell.kind != GridCellKind.Blocked):
-                    state = (i+1, j+1)
-                    states.append(state)
+        states = [state for (state, grid_cell) in self.__grid if(grid_cell.kind != GridCellKind.Blocked)]
         return states
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_reward(self, state):
-        grid_cell = self.__grid[(state[0]-1), (state[1]-1)]
-        reward = grid_cell.reward
+        reward = self.__grid[state].reward
         return reward
     
     """------------------------------------------------------------------------------------------------
     """
     def _get_actions(self, state):
-        grid_cell = self.__grid[(state[0]-1), (state[1]-1)]
-        if(grid_cell.kind == GridCellKind.Free.Terminal):
+        if(self.__grid[state].kind == GridCellKind.Free.Terminal):
             return []
 
         actions = []
 
-        if(state[1] > 1):
-            grid_cell = self.__grid[(state[0]-1), (state[1]-1)-1]
-            if(grid_cell.kind != GridCellKind.Blocked):
-                actions.append(GridAction.Left)
+        if((state[0] > 1) and (self.__grid[state[0]-1, state[1]].kind != GridCellKind.Blocked)):
+            actions.append(GridAction.Up)
 
-        if(state[1] < self.__grid.shape[1]):
-            grid_cell = self.__grid[(state[0]-1), (state[1]-1)+1]
-            if(grid_cell.kind != GridCellKind.Blocked):
-                actions.append(GridAction.Right)
+        if((state[0] < self.__grid.shape[0]) and (self.__grid[state[0]+1, state[1]].kind != GridCellKind.Blocked)):
+            actions.append(GridAction.Down)  
 
-        if(state[0] > 1):
-            grid_cell = self.__grid[(state[0]-1)-1, (state[1]-1)]
-            if(grid_cell.kind != GridCellKind.Blocked):
-                actions.append(GridAction.Up)
+        if((state[1] > 1) and (self.__grid[state[0], state[1]-1].kind != GridCellKind.Blocked)):
+            actions.append(GridAction.Left)
 
-        if(state[0] < self.__grid.shape[0]):
-            grid_cell = self.__grid[(state[0]-1)+1, (state[1]-1)]
-            if(grid_cell.kind != GridCellKind.Blocked):
-                actions.append(GridAction.Down)         
+        if((state[1] < self.__grid.shape[1]) and (self.__grid[state[0], state[1]+1].kind != GridCellKind.Blocked)):
+            actions.append(GridAction.Right)     
 
         return actions
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_next_state(self, state, action):
+        next_state = None
+
         if(action == GridAction.Left):
             next_state = (state[0], state[1]-1)
 
@@ -147,9 +139,6 @@ class GridEnvironment(ml.rl.Environment):
 
         if(action == GridAction.Down):
             next_state = (state[0]+1, state[1]) 
-
-        if(not super().is_valid_state(state=next_state)):
-            raise exceps.ApplicationError()
 
         return next_state
 
