@@ -1,4 +1,4 @@
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 from .environment import Environment
 
 class Agent(object):
@@ -26,17 +26,19 @@ class Agent(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self, action):
+        environment = self.get_environment()
         state = self.get_state()
-        if(self.get_environment().is_terminal_state(state=state)):
+        if(environment.is_terminal_state(state=state)):
             return
-        (next_state, reward) = self.get_environment().get_next_state_and_reward(state=state, action=action)
+        next_state = environment.get_next_state(state=state, action=action)
         self.set_state(state=next_state)
 
     def do_random_action(self):
+        environment = self.get_environment()
         state = self.get_state()
-        if(self.get_environment().is_terminal_state(state=state)):
+        if(environment.is_terminal_state(state=state)):
             return
-        action = self.get_environment().get_random_action(state=state)
-        (next_state, reward) = self.get_environment().get_next_state_and_reward(state=state, action=action)
+        action = environment.get_random_action(state=state)
+        next_state = environment.get_next_state(state=state, action=action)
         self.set_state(state=next_state)
         

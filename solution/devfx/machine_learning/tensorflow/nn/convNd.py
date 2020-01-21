@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 import devfx.core as core
 from .. import initialization
 from .. import variables
@@ -24,28 +24,28 @@ def convNd(name,
     name = name + '__convNd'
 
     if (not 3 <= len(input.shape) <= 5):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     N = len(input.shape) - 2
 
     if(not core.is_typeof(filters_n, int)):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
 
     if(not core.is_iterable(kernel_size)):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     if(not len(kernel_size) == N):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
 
     if(strides is None):
         strides = tuple([1]*N)
     if(not core.is_iterable(strides)):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     if(not len(strides) == N):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
         
     if(padding is None):
         padding = 'VALID'
     if(padding != 'VALID' and padding != 'SAME'):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
 
     if (data_format is None and len(input.shape) == 3):
         data_format = 'NWC'
@@ -54,13 +54,13 @@ def convNd(name,
     if (data_format is None and len(input.shape) == 5):
         data_format = 'NDHWC'
     if(len(data_format) != len(input.shape)):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     if(len(input.shape) == 3 and (data_format != 'NWC' and data_format != 'NCW')):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     if(len(input.shape) == 4 and (data_format != 'NHWC' and data_format != 'NCHW')):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     if(len(input.shape) == 5 and (data_format != 'NDHWC' and data_format != 'NCDHW')):
-        raise exceps.ArgumentError()
+        raise exps.ArgumentError()
     
     if(kernel_initializer is None):
         kernel_initializer = initialization.random_glorot_normal_initializer()

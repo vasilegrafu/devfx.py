@@ -1,5 +1,3 @@
-from .environment import Environment
-
 class ActionPolicy(object):
     def __init__(self, agent):
         self.__set_agent(agent=agent)

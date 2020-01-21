@@ -1,4 +1,4 @@
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 import devfx.core as core
 
 

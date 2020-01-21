@@ -1,5 +1,5 @@
 import datetime as dt
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 
 class stopwatch(object):
     def __init__(self):
@@ -14,7 +14,7 @@ class stopwatch(object):
         
     def start(self):
         if(self.__running == True):
-            raise exceps.OperationError()
+            raise exps.OperationError()
 
         self.__running = True
         self.__start = dt.datetime.utcnow()
@@ -22,7 +22,7 @@ class stopwatch(object):
 
     def stop(self):
         if(self.__running == False):
-            raise exceps.OperationError()
+            raise exps.OperationError()
 
         self.__running = False
         self.__elapsed = self.__elapsed + (dt.datetime.utcnow() - self.__start)

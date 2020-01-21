@@ -1,62 +1,32 @@
-from enum import Enum
 import numpy as np
-import devfx.exceptions as exceps
-import devfx.statistics as stats
+import devfx.exceptions as exps
 import devfx.machine_learning.tensorflow as ml
 
 """========================================================================================================
 """
-class GridCellKind(object):
-    class Free(object):
-        NonTerminal = 'Free-NonTerminal'
-        Terminal = 'Free-Terminal'
-    Blocked = 'Blocked'
+class GridCellKind(ml.rl.StateKind):
+    BLOCKED = 'BLOCKED'
 
 """========================================================================================================
 """
-class GridCell(object):
-    def __init__(self, kind=GridCellKind.Free.NonTerminal, reward=0.0):
-        self.__kind = kind
-        self.__reward = reward
+class GridCell(ml.rl.State):
+    def __init__(self, value, state_kind=GridCellKind.NON_TERMINAL, reward=0.0):
+        super().__init__(value=value, state_kind=state_kind, reward=reward)
 
-    @property
-    def kind(self):
-        return self.__kind
-    
-    @property
-    def reward(self):
-        return self.__reward
+    def __str__(self):
+        return str(super().value)
 
 """========================================================================================================
 """
-class Grid(object):
-    def __init__(self):
-        self.__grid = np.asarray([
-            [GridCell(), GridCell(),                          GridCell(), GridCell(kind=GridCellKind.Free.Terminal, reward=+1.0)],
-            [GridCell(), GridCell(kind=GridCellKind.Blocked), GridCell(), GridCell(kind=GridCellKind.Free.Terminal, reward=-1.0)],
-            [GridCell(), GridCell(),                          GridCell(), GridCell()]
-        ])
+class GridAction(ml.rl.Action):
+    def __init__(self, value):
+        super().__init__(value=value)
 
-    @property
-    def shape(self):
-        shape = (self.__grid.shape[0], self.__grid.shape[1])
-        return shape
-
-    def __iter__(self):
-        for (key, grid_cell) in np.ndenumerate(self.__grid):
-            yield ((key[0]+1, key[1]+1), grid_cell)
-
-    def __getitem__(self, key):
-        grid_cell = self.__grid[(key[0]-1, key[1]-1)]
-        return grid_cell
-
-"""========================================================================================================
-"""
-class GridAction(object):
-    Left = 'Left'
-    Right = 'Right'
-    Up = 'Up'
-    Down = 'Down'
+class GridActions(object):
+    Left = GridAction('Left')
+    Right = GridAction('Right')
+    Up = GridAction('Up')
+    Down = GridAction('Down')
 
 """========================================================================================================
 """
@@ -64,84 +34,68 @@ class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
-        self.__grid = Grid()
-
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _is_valid_state(self, state):
-        if(not 1 <= state[0] <= self.__grid.shape[0]):
-            return False
-        if(not 0 <= state[1] <= self.__grid.shape[1]):
-            return False
-        if(self.__grid[state].kind == GridCellKind.Blocked):
-            return False
-        return True
-
-    def _is_valid_action(self, action):
-        if(action == GridAction.Left):
-            return True
-        if(action == GridAction.Right):
-            return True
-        if(action == GridAction.Up):
-            return True
-        if(action == GridAction.Down):
-            return True
-        return False
+        self.__grid = np.asarray([
+            [GridCell((1,1)), GridCell((1,2)),                       GridCell((1,3)), GridCell((1,4), GridCellKind.TERMINAL, +1.0)],
+            [GridCell((2,1)), GridCell((2,2), GridCellKind.BLOCKED), GridCell((2,3)), GridCell((2,4), GridCellKind.TERMINAL, -1.0)],
+            [GridCell((3,1)), GridCell((3,2)),                       GridCell((3,3)), GridCell((3,4))]
+        ])
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_states(self):
-        states = [state for (state, grid_cell) in self.__grid if(grid_cell.kind != GridCellKind.Blocked)]
-        return states
+    def __enumerate_states(self):
+        return [state for state in self.__grid.flat if(state.kind != GridCellKind.BLOCKED)]
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_reward(self, state):
-        reward = self.__grid[state].reward
-        return reward
-    
+    def _get_random_state(self):
+        states = self.__enumerate_states()
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
+    def _get_random_non_terminal_state(self):
+        states = [state for state in self.__enumerate_states() if(state.kind == GridCellKind.NON_TERMINAL)]
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
+    def _get_random_terminal_state(self):
+        states = [state for state in self.__enumerate_states() if(state.kind == GridCellKind.TERMINAL)]
+        state = states[np.random.choice(len(states), size=1)[0]]
+        return state
+
     """------------------------------------------------------------------------------------------------
     """
-    def _get_actions(self, state):
-        if(self.__grid[state].kind == GridCellKind.Free.Terminal):
+    def __enumerate_possible_actions(self, state):
+        if(state.kind == GridCellKind.TERMINAL):
             return []
-
         actions = []
-
-        if((state[0] > 1) and (self.__grid[state[0]-1, state[1]].kind != GridCellKind.Blocked)):
-            actions.append(GridAction.Up)
-
-        if((state[0] < self.__grid.shape[0]) and (self.__grid[state[0]+1, state[1]].kind != GridCellKind.Blocked)):
-            actions.append(GridAction.Down)  
-
-        if((state[1] > 1) and (self.__grid[state[0], state[1]-1].kind != GridCellKind.Blocked)):
-            actions.append(GridAction.Left)
-
-        if((state[1] < self.__grid.shape[1]) and (self.__grid[state[0], state[1]+1].kind != GridCellKind.Blocked)):
-            actions.append(GridAction.Right)     
-
+        ix = (state.value[0]-1, state.value[1]-1)
+        if((ix[0] > 0) and (self.__grid[ix[0]-1, ix[1]].kind != GridCellKind.BLOCKED)):
+            actions.append(GridActions.Up)
+        if((ix[0] < (self.__grid.shape[0]-1)) and (self.__grid[ix[0]+1, ix[1]].kind != GridCellKind.BLOCKED)):
+            actions.append(GridActions.Down)  
+        if((ix[1] > 1) and (self.__grid[ix[0], ix[1]-1].kind != GridCellKind.BLOCKED)):
+            actions.append(GridActions.Left)
+        if((ix[1] < (self.__grid.shape[1]-1)) and (self.__grid[ix[0], ix[1]+1].kind != GridCellKind.BLOCKED)):
+            actions.append(GridActions.Right)     
         return actions
 
     """------------------------------------------------------------------------------------------------
     """
+    def _get_random_action(self, state):
+        actions = self.__enumerate_possible_actions(state)
+        action = actions[np.random.choice(len(actions), size=1)[0]]
+        return action
+
+    """------------------------------------------------------------------------------------------------
+    """ 
     def _get_next_state(self, state, action):
-        next_state = None
-
-        if(action == GridAction.Left):
-            next_state = (state[0], state[1]-1)
-
-        if(action == GridAction.Right):
-            next_state = (state[0], state[1]+1)
-
-        if(action == GridAction.Up):
-            next_state = (state[0]-1, state[1])
-
-        if(action == GridAction.Down):
-            next_state = (state[0]+1, state[1]) 
-
+        ix = (state.value[0]-1, state.value[1]-1)
+        if(action == GridActions.Left):
+            next_state = self.__grid[ix[0], ix[1]-1]
+        if(action == GridActions.Right):
+            next_state = self.__grid[ix[0], ix[1]+1]
+        if(action == GridActions.Up):
+            next_state = self.__grid[ix[0]-1, ix[1]]
+        if(action == GridActions.Down):
+            next_state = self.__grid[ix[0]+1, ix[1]]
         return next_state
-
-
-
-

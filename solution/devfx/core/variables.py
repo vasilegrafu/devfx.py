@@ -1,4 +1,4 @@
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 
 class persistent_variable(object):
     __storage = {}
@@ -6,9 +6,9 @@ class persistent_variable(object):
     @staticmethod
     def __new__(cls, name, constructor_fn=None):
         if(name is None):
-            raise exceps.ArgumentError()
+            raise exps.ArgumentError()
         if(len(name.strip()) == 0):
-            raise exceps.ArgumentError()
+            raise exps.ArgumentError()
         
         if(constructor_fn is not None):
             if(name not in persistent_variable.__storage):

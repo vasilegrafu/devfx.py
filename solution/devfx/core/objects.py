@@ -1,5 +1,5 @@
 import builtins as builtins
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 
 def setattr(object, name, value):
     builtins.setattr(object, name, value)

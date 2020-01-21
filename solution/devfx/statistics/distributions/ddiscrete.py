@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-import devfx.exceptions as exceps
+import devfx.exceptions as exps
 import devfx.core as core
 import devfx.math as math
 from ..series import center
@@ -24,42 +24,42 @@ class ddiscrete(distribution):
         return self._cpmf(x)
         
     def _cpmf(self, x):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
         
     def icpmf(self, p):
         return self._icpmf(p)
         
     def _icpmf(self, p):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
        
     """------------------------------------------------------------------------------------------------
     """
     def pmf(self, x):
         if(core.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
-                raise exceps.ArgumentOutOfRangeError()
+                raise exps.ArgumentOutOfRangeError()
             return self._pmf(x)
         else:
             if((x < self.a) or (x > self.b)):
-                raise exceps.ArgumentOutOfRangeError()
+                raise exps.ArgumentOutOfRangeError()
             return self._pmf(x)
 
     def _pmf(self, x):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
                          
     """------------------------------------------------------------------------------------------------
     """         
     def _mean(self):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
        
     def _var(self):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
        
     def _skew(self):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
         
     def _kurtosis(self):
-        raise exceps.NotImplementedError()
+        raise exps.NotImplementedError()
 
 
     """------------------------------------------------------------------------------------------------
