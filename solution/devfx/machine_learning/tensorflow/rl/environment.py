@@ -1,7 +1,5 @@
-import numpy as np
-import scipy as sp
 import devfx.exceptions as exps
-import devfx.core as core
+from .random_action_policy import RandomActionPolicy
 
 class Environment(object):
     def __init__(self):
@@ -44,30 +42,6 @@ class Environment(object):
         raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
-    """
-    def get_random_action(self, state):
-        return self._get_random_action(state=state)
-
-    def _get_random_action(self, state):
-        raise exps.NotImplementedError()
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def get_state_kind(self, state):
-        return state.kind
-
-    def is_non_terminal_state(self, state):
-        return state.is_non_terminal()
-
-    def is_terminal_state(self, state):
-        return state.is_terminal()
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def get_state_reward(self, state):
-        return state.reward
-
-    """------------------------------------------------------------------------------------------------
     """ 
     def get_next_state(self, state, action):
         next_state = self._get_next_state(state=state, action=action)
@@ -76,10 +50,29 @@ class Environment(object):
     def _get_next_state(self, state, action):
         raise exps.NotImplementedError()
 
+    """------------------------------------------------------------------------------------------------
+    """
+    def get_random_action(self, state):
+        return self._get_random_action(state=state)
 
-        
+    def _get_random_action(self, state):
+        raise exps.NotImplementedError()
 
+    """------------------------------------------------------------------------------------------------
+    """
+    def create_random_action_policy(self):
+        return self._create_random_action_policy() 
 
+    def _create_random_action_policy(self):
+        return RandomActionPolicy(environment=self)
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def create_learning_action_policy(self):
+        return self._create_learning_action_policy() 
+
+    def _create_learning_action_policy(self):
+        raise exps.NotImplementedError()
 
 
 
