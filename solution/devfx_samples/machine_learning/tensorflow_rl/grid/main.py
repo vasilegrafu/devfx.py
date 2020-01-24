@@ -6,10 +6,10 @@ from devfx_samples.machine_learning.tensorflow_rl.grid.agent import GridAgent
 """
 def main():
     environment = GridEnvironment()
-    agent = GridAgent(environment=environment)
-
-    learning_action_policy = environment.create_learning_action_policy()
-    agent.set_action_policy(action_policy=learning_action_policy)
+    agent = GridAgent()
+    agent.set_action_policy(action_policy=Ran(end))
+    agent.set_state(state=environment.get_random_non_terminal_state())
+    environment.add_agent(agent)
 
     while(True):
         agent.set_state(state=environment.get_random_non_terminal_state())

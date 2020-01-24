@@ -1,10 +1,9 @@
-import numpy as np
 import devfx.exceptions as exps
-import devfx.machine_learning.tensorflow as ml
+from .action_policy import ActionPolicy
 
-class GridLearningActionPolicy(ml.rl.LearningActionPolicy):
-    def __init__(self, environment):
-        super().__init__(environment=environment)
+class QLearningActionPolicy(ActionPolicy):
+    def __init__(self):
+        super().__init__()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -13,5 +12,9 @@ class GridLearningActionPolicy(ml.rl.LearningActionPolicy):
 
     """------------------------------------------------------------------------------------------------
     """ 
+    def update(self, state, action, reward):
+        return self._update(state=state, action=action, reward=reward)
+
     def _update(self, state, action, reward):
         raise exps.NotImplementedError()
+

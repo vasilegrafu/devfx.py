@@ -1,12 +1,13 @@
 import devfx.exceptions as exps
 from .environment import Environment
+from .random_action_policy import RandomActionPolicy
 
 class Agent(object):
     def __init__(self, environment, action_policy=None, state=None):
-        self.__set_environment(environment=environment)
+        self.set_environment(environment=environment)
 
         if(action_policy is None):
-            action_policy = environment.create_random_action_policy()
+            action_policy = RandomActionPolicy(environment=environment)
         self.set_action_policy(action_policy=action_policy)
         
         if(state is None):
@@ -15,7 +16,7 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def __set_environment(self, environment):
+    def set_environment(self, environment):
         self.__environment = environment
         self.__environment.add_agent(self)
 
@@ -40,6 +41,15 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
+    def get_random_next_state(self):
+        environment = self.get_environment()
+        state = self.get_state()
+        if(state.is_terminal()):
+            raise exps.ApplicationError()
+        action = environment.get_random_action(state=state)
+        next_state = environment.get_next_state(state=state, action=action)
+        return next_state
+
     def get_next_state(self):
         environment = self.get_environment()
         state = self.get_state()
@@ -49,23 +59,15 @@ class Agent(object):
         next_state = environment.get_next_state(state=state, action=action)
         return next_state
 
-    def get_action_policy_next_state(self, action_policy):
-        environment = self.get_environment()
-        state = self.get_state()
-        if(state.is_terminal()):
-            raise exps.ApplicationError()
-        action = action_policy.get_action(state=state)
-        next_state = environment.get_next_state(state=state, action=action)
-        return next_state
-
     """------------------------------------------------------------------------------------------------
     """ 
+    def do_random_action(self):
+        next_state = self.get_random_next_state()
+        self.set_state(state=next_state)
+
     def do_action(self):
         next_state = self.get_next_state()
         self.set_state(state=next_state)
 
-    def do_action_policy_action(self, action_policy):
-        next_state = self.get_action_policy_next_state(action_policy=action_policy)
-        self.set_state(state=next_state)
 
         

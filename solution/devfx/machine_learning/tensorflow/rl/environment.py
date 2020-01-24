@@ -3,11 +3,11 @@ from .random_action_policy import RandomActionPolicy
 
 class Environment(object):
     def __init__(self):
-        self.__set_agents(agents=[])
+        self.set_agents(agents=[])
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def __set_agents(self, agents):
+    def set_agents(self, agents):
         self.__agents = agents
 
     def get_agents(self):
@@ -58,21 +58,8 @@ class Environment(object):
     def _get_random_action(self, state):
         raise exps.NotImplementedError()
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def create_random_action_policy(self):
-        return self._create_random_action_policy() 
 
-    def _create_random_action_policy(self):
-        return RandomActionPolicy(environment=self)
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def create_learning_action_policy(self):
-        return self._create_learning_action_policy() 
-
-    def _create_learning_action_policy(self):
-        raise exps.NotImplementedError()
 
 
 

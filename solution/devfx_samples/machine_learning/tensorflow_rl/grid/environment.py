@@ -3,7 +3,6 @@ import devfx.exceptions as exps
 import devfx.machine_learning.tensorflow as ml
 from .state import GridCellKind, GridCell
 from .action import GridAction, GridPossibleActions
-from .learning_action_policy import GridLearningActionPolicy
 
 """========================================================================================================
 """
@@ -70,8 +69,3 @@ class GridEnvironment(ml.rl.Environment):
         actions = self.__enumerate_possible_actions(state)
         action = actions[np.random.choice(len(actions), size=1)[0]]
         return action
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _create_learning_action_policy(self):
-        return GridLearningActionPolicy(environment=self)
