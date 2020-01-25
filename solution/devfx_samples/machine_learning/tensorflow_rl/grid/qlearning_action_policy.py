@@ -13,5 +13,5 @@ class GridQLearningActionPolicy(ml.rl.QLearningActionPolicy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _update(self, state, action, reward):
+    def _update(self, state, action, next_state, next_state_reward):
         raise exps.NotImplementedError()

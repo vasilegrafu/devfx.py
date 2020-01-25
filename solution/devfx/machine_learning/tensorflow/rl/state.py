@@ -48,6 +48,3 @@ class State(object):
     def reward(self):
         return self.__reward
     
-
-
-

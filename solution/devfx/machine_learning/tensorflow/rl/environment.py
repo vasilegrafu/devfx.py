@@ -1,5 +1,5 @@
 import devfx.exceptions as exps
-from .random_action_policy import RandomActionPolicy
+from .agent import Agent
 
 class Environment(object):
     def __init__(self):
@@ -12,12 +12,6 @@ class Environment(object):
 
     def get_agents(self):
         return self.__agents
-
-    def add_agent(self, agent):
-        self.get_agents().append(agent)
-
-    def remove_agent(self, agent):
-        self.get_agents().remove(agent)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -58,11 +52,17 @@ class Environment(object):
     def _get_random_action(self, state):
         raise exps.NotImplementedError()
 
+    """------------------------------------------------------------------------------------------------
+    """
+    def create_agent(self, name, state, action_policy=None):
+        agent = Agent(name=name, environment=self, state=state, action_policy=action_policy)
+        self.get_agents().append(agent)
+        return agent
 
-
-
-
-
+    def destroy_agent(self, agent):
+        self.get_agents().remove(agent)
+        agent.set_environment(environment=None)
+        
 
 
 
