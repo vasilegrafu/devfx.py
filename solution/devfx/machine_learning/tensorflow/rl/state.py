@@ -24,6 +24,9 @@ class State(object):
             raise exps.ArgumentError()
         return state.value == self.value
 
+    def __hash__(self):
+        return hash(self.value)
+
     """------------------------------------------------------------------------------------------------
     """ 
     def __set_state_kind(self, state_kind):

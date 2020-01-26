@@ -1,5 +1,4 @@
 import devfx.exceptions as exps
-# from .environment import Environment
 
 class Agent(object):
     def __init__(self, name, environment, state, action_policy=None):
