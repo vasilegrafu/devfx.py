@@ -10,8 +10,8 @@ class GridAgent(ml.rl.Agent):
         action_policy=ml.rl.QPolicy()
         super().__init__(name=name, environment=environment, state=state, action_policy=action_policy)
 
-        self.training_message_signal_handlers = core.SignalHandlers()
-        self.training_progress_signal_handlers = core.SignalHandlers()
+        self.training_info_update = core.SignalHandlers()
+        self.training_progress = core.SignalHandlers()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -20,12 +20,12 @@ class GridAgent(ml.rl.Agent):
         action_policy = self.get_action_policy()
 
         episode = 0
-        while(episode <= episodes):
+        while(episode < episodes):
             episode += 1
             self.set_state(state=environment.get_random_non_terminal_state())
 
-            self.training_message_events(source=self, event_args=core.EventArgs(message=f'[episode: {episode}]'))
-            self.training_message_events(source=self, event_args=core.EventArgs(message=f'- initial state: {self.get_state()}'))
+            self.training_info_update(source=self, event_args=core.SignalArgs(message=f'[episode: {episode}]'))
+            self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- initial state: {self.get_state()}'))
 
             i = 0
             while(self.get_state().is_non_terminal()):
@@ -35,13 +35,15 @@ class GridAgent(ml.rl.Agent):
                     (state, action, next_state) = self.do_random_action()
                 else:
                     rv = np.random.uniform(size=1)
-                    if(rv <= 0.1):
+                    if(rv <= 1.0):
                         (state, action, next_state) = self.do_random_action()
                     else:
                         (state, action, next_state) = self.do_action()
                 action_policy.update(state=state, action=action, next_state=next_state, discount_factor=discount_factor, learning_rate=learning_rate)
 
                 if(self.get_state().is_non_terminal()):
-                    self.training_message_events(source=self, event_args=core.EventArgs(message=f'- move {i} to non-terminal state: {self.get_state()}'))
+                    self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- move {i} to non-terminal state: {self.get_state()}'))
                 else:
-                    self.training_message_events(source=self, event_args=core.EventArgs(message=f'- move {i} to terminal state: {self.get_state()}')
+                    self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- move {i} to terminal state: {self.get_state()}'))
+
+                self.training_progress(source=self, event_args=core.SignalArgs(state=self.get_state()))
