@@ -1,7 +1,7 @@
 import devfx.exceptions as exps
-from .action_policy import ActionPolicy
+from .policy import Policy
 
-class PLearningActionPolicy(ActionPolicy):
+class PGPolicy(Policy):
     def __init__(self):
         super().__init__()
 

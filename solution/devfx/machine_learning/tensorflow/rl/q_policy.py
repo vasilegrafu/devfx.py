@@ -1,7 +1,7 @@
 import devfx.exceptions as exps
-from .action_policy import ActionPolicy
+from .policy import Policy
 
-class QLearningActionPolicy(ActionPolicy):
+class QPolicy(Policy):
     def __init__(self):
         super().__init__()
 
@@ -14,12 +14,13 @@ class QLearningActionPolicy(ActionPolicy):
              return None
         if(len(self.Q[state]) == 0):
             return None
-        action = max(self.Q[state], key=lambda k: self.Q[state][k])
+            
+        action = max(self.Q[state], key=lambda action: self.Q[state][action])
         return action
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def update(self, state, action, next_state, alpha, gamma):
+    def update(self, state, action, next_state, discount_factor, learning_rate):
         if(state not in self.Q):
             self.Q[state] = {}
         if(action not in self.Q[state]):
@@ -28,9 +29,10 @@ class QLearningActionPolicy(ActionPolicy):
         if(next_state not in self.Q):
             self.Q[next_state] = {}
         
-        if(self.get_action(state=next_state) is None):
-            next_state_action = None
+        if(len(self.Q[next_state]) == 0):
+            error = next_state.reward - self.Q[state][action]
         else:
-            next_state_action = max(self.Q[next_state], key=lambda k: self.Q[next_state][k])
-        error = next_state.reward + gamma*(self.Q[next_state][next_state_action] if(next_state_action is not None) else 0.0) - self.Q[state][action]
-        self.Q[state][action] += self.Q[state][action] + alpha*error
+            next_action = max(self.Q[next_state], key=lambda action: self.Q[next_state][action])
+            error = next_state.reward + discount_factor*self.Q[next_state][next_action] - self.Q[state][action]
+
+        self.Q[state][action] = self.Q[state][action] + learning_rate*error

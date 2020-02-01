@@ -16,6 +16,11 @@ class Action(object):
 
     """------------------------------------------------------------------------------------------------
     """
+    def __str__(self):
+        return str(self.value)
+
+    """------------------------------------------------------------------------------------------------
+    """
     def __eq__(self, state):
         if(not core.is_instance(state, Action)):
             raise exps.ArgumentError()

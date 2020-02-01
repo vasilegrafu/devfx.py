@@ -1,6 +1,6 @@
 import devfx.exceptions as exps
 
-class ActionPolicy(object):
+class Policy(object):
     def __init__(self):
         pass
 

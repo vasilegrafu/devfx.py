@@ -54,8 +54,11 @@ class Agent(object):
             raise exps.ApplicationError()
 
         action = environment.get_random_action(state=state)
-        next_state = environment.get_next_state(state=state, action=action)
-        return (state, action, next_state)
+        if(action is None):
+            return (state, None, None)
+        else:
+            next_state = environment.get_next_state(state=state, action=action)
+            return (state, action, next_state)
 
     def get_next_state(self):
         environment = self.get_environment()
@@ -73,8 +76,11 @@ class Agent(object):
             raise exps.ApplicationError()
         
         action = action_policy.get_action(state=state)
-        next_state = environment.get_next_state(state=state, action=action)
-        return (state, action, next_state)
+        if(action is None):
+            return (state, None, None)
+        else:
+            next_state = environment.get_next_state(state=state, action=action)
+            return (state, action, next_state)
 
     """------------------------------------------------------------------------------------------------
     """ 

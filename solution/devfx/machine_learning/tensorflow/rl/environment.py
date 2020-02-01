@@ -54,8 +54,8 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def create_agent(self, name, state, action_policy=None):
-        agent = Agent(name=name, environment=self, state=state, action_policy=action_policy)
+    def create_agent(self, agent_type, *args, **kwargs):
+        agent = agent_type(environment=self, *args, **kwargs)
         self.get_agents().append(agent)
         return agent
 
