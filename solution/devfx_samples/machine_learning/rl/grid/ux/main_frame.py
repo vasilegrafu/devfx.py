@@ -3,10 +3,9 @@ import time as t
 import random as rnd
 import devfx.exceptions as exps
 import devfx.core as core
-from .. logic.grid_cell_state_kind import GridCellStateKind
-from .. logic.grid_possible_actions import GridPossibleActions
-from .. logic.grid_environment import GridEnvironment
-from .. logic.grid_agent import GridAgent
+import devfx.machine_learning as ml
+from .. logic.environment import Environment
+from .. logic.possible_actions import PossibleActions
 
 class MainFrame(wx.Frame):
     """------------------------------------------------------------------------------------------------
@@ -22,8 +21,10 @@ class MainFrame(wx.Frame):
 
         self.__apply_styles()
 
-        self.environment = GridEnvironment()
-        agent1 = self.environment.create_agent(agent_type=GridAgent, name='agent1')
+        self.environment = Environment()
+        agent1 = self.environment.create_agent(name='agent1',
+                                               state=self.environment.get_random_non_terminal_state(),
+                                               policy=ml.rl.QPolicy(discount_factor=0.9, learning_rate=0.25))
         agent1.training_info_update += core.SignalHandler(self.training_info_update)
         agent1.training_progress += core.SignalHandler(self.training_progress)
 
@@ -86,11 +87,11 @@ class MainFrame(wx.Frame):
         (r_w0, r_h0) = (dc_w*((sv_ci-1)/env_cc), dc_h*((sv_ri-1)/env_rc))
         (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
 
-        if(state.kind == GridCellStateKind.BLOCKED):
+        if(state.kind == ml.rl.StateKind.BLOCKED):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
-        elif(state.kind == GridCellStateKind.TERMINAL):
+        elif(state.kind == ml.rl.StateKind.TERMINAL):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
-        elif(state.kind == GridCellStateKind.NON_TERMINAL):
+        elif(state.kind == ml.rl.StateKind.NON_TERMINAL):
             dc.SetBrush(wx.Brush(wx.Colour(0, 255, 0)))
         else:
             raise exps.NotImplementedError()
@@ -121,13 +122,13 @@ class MainFrame(wx.Frame):
         if(state in policy.qtable):
             actions = policy.qtable[state]
             for action in actions:
-                if(action == GridPossibleActions.Left):
+                if(action == PossibleActions.Left):
                     (cw, ch) = (r_w0+2, r_h0+r_dh/2)
-                elif(action == GridPossibleActions.Right):
+                elif(action == PossibleActions.Right):
                     (cw, ch) = (r_w0+r_dw-40, r_h0+r_dh/2) 
-                elif(action == GridPossibleActions.Up):
+                elif(action == PossibleActions.Up):
                     (cw, ch) = (r_w0+r_dw/2, r_h0+2) 
-                elif(action == GridPossibleActions.Down):
+                elif(action == PossibleActions.Down):
                     (cw, ch) = (r_w0+r_dw/2, r_h0+r_dh-16) 
                 else:
                     raise exps.NotImplementedError()

@@ -3,11 +3,10 @@ import devfx.exceptions as exps
 import devfx.core as core
 
 class Agent(object):
-    def __init__(self, name, environment, state, policy=None):
+    def __init__(self, name, environment, state=None, policy=None):
         self.set_name(name=name)
         self.set_environment(environment=environment)
         self.set_state(state=state)
-        
         self.set_policy(policy=policy)
 
         self.training_info_update = core.SignalHandlers()

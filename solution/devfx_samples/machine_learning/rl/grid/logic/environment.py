@@ -1,21 +1,18 @@
 import numpy as np
 import devfx.exceptions as exps
 import devfx.machine_learning as ml
-from .grid_cell_state_kind import GridCellStateKind
-from .grid_cell_state import GridCellState
-from .grid_action import GridAction
-from .grid_possible_actions import GridPossibleActions
+from .possible_actions import PossibleActions
 
 """========================================================================================================
 """
-class GridEnvironment(ml.rl.Environment):
+class Environment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
         self.__grid = np.asarray([
-            [GridCellState((1,1)), GridCellState((1,2)),                            GridCellState((1,3)), GridCellState((1,4), GridCellStateKind.TERMINAL, +1.0)],
-            [GridCellState((2,1)), GridCellState((2,2), GridCellStateKind.BLOCKED), GridCellState((2,3)), GridCellState((2,4), GridCellStateKind.TERMINAL, -1.0)],
-            [GridCellState((3,1)), GridCellState((3,2)),                            GridCellState((3,3)), GridCellState((3,4))]
+            [ml.rl.State((1,1)), ml.rl.State((1,2)),                            ml.rl.State((1,3)), ml.rl.State((1,4), ml.rl.StateKind.TERMINAL, +1.0)],
+            [ml.rl.State((2,1)), ml.rl.State((2,2), ml.rl.StateKind.BLOCKED),   ml.rl.State((2,3)), ml.rl.State((2,4), ml.rl.StateKind.TERMINAL, -1.0)],
+            [ml.rl.State((3,1)), ml.rl.State((3,2)),                            ml.rl.State((3,3)), ml.rl.State((3,4))]
         ])
 
     """------------------------------------------------------------------------------------------------
@@ -24,10 +21,10 @@ class GridEnvironment(ml.rl.Environment):
         return (state for state in self.__grid.flat)
     
     def __get_non_blocked_states_generator(self):
-        return (state for state in self.__get_states_generator() if(state.kind != GridCellStateKind.BLOCKED))
+        return (state for state in self.__get_states_generator() if(state.kind != ml.rl.StateKind.BLOCKED))
 
     def __get_enumerable_blocked_states(self):
-        return (state for state in self.__get_states_generator() if(state.kind == GridCellStateKind.BLOCKED))
+        return (state for state in self.__get_states_generator() if(state.kind == ml.rl.StateKind.BLOCKED))
 
     def _get_random_state(self):
         states = [state for state in self.__get_non_blocked_states_generator()]
@@ -35,41 +32,41 @@ class GridEnvironment(ml.rl.Environment):
         return state
 
     def _get_random_non_terminal_state(self):
-        states = [state for state in self.__get_non_blocked_states_generator() if(state.kind == GridCellStateKind.NON_TERMINAL)]
+        states = [state for state in self.__get_non_blocked_states_generator() if(state.kind == ml.rl.StateKind.NON_TERMINAL)]
         state = states[np.random.choice(len(states), size=1)[0]]
         return state
 
     def _get_random_terminal_state(self):
-        states = [state for state in self.__get_non_blocked_states_generator() if(state.kind == GridCellStateKind.TERMINAL)]
+        states = [state for state in self.__get_non_blocked_states_generator() if(state.kind == ml.rl.StateKind.TERMINAL)]
         state = states[np.random.choice(len(states), size=1)[0]]
         return state
 
     def _get_next_state(self, state, action):
         ix = (state.value[0]-1, state.value[1]-1)
-        if(action == GridPossibleActions.Left):
+        if(action == PossibleActions.Left):
             next_state = self.__grid[ix[0], ix[1]-1]
-        if(action == GridPossibleActions.Right):
+        if(action == PossibleActions.Right):
             next_state = self.__grid[ix[0], ix[1]+1]
-        if(action == GridPossibleActions.Up):
+        if(action == PossibleActions.Up):
             next_state = self.__grid[ix[0]-1, ix[1]]
-        if(action == GridPossibleActions.Down):
+        if(action == PossibleActions.Down):
             next_state = self.__grid[ix[0]+1, ix[1]]
         return next_state
 
     """------------------------------------------------------------------------------------------------
     """
     def __get_possible_actions_generator(self, state):
-        if(state.kind == GridCellStateKind.TERMINAL):
+        if(state.kind == ml.rl.StateKind.TERMINAL):
             return
         ix = (state.value[0]-1, state.value[1]-1)
-        if((ix[0] > 0) and (self.__grid[ix[0]-1, ix[1]].kind != GridCellStateKind.BLOCKED)):
-            yield GridPossibleActions.Up
-        if((ix[0] < (self.__grid.shape[0]-1)) and (self.__grid[ix[0]+1, ix[1]].kind != GridCellStateKind.BLOCKED)):
-            yield GridPossibleActions.Down
-        if((ix[1] > 0) and (self.__grid[ix[0], ix[1]-1].kind != GridCellStateKind.BLOCKED)):
-            yield GridPossibleActions.Left
-        if((ix[1] < (self.__grid.shape[1]-1)) and (self.__grid[ix[0], ix[1]+1].kind != GridCellStateKind.BLOCKED)):
-            yield GridPossibleActions.Right     
+        if((ix[0] > 0) and (self.__grid[ix[0]-1, ix[1]].kind != ml.rl.StateKind.BLOCKED)):
+            yield PossibleActions.Up
+        if((ix[0] < (self.__grid.shape[0]-1)) and (self.__grid[ix[0]+1, ix[1]].kind != ml.rl.StateKind.BLOCKED)):
+            yield PossibleActions.Down
+        if((ix[1] > 0) and (self.__grid[ix[0], ix[1]-1].kind != ml.rl.StateKind.BLOCKED)):
+            yield PossibleActions.Left
+        if((ix[1] < (self.__grid.shape[1]-1)) and (self.__grid[ix[0], ix[1]+1].kind != ml.rl.StateKind.BLOCKED)):
+            yield PossibleActions.Right     
 
 
     def _get_random_action(self, state):

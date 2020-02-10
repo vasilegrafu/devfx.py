@@ -3,7 +3,7 @@ import devfx.core as core
 from .state_kind import StateKind
 
 class State(object):
-    def __init__(self, value, state_kind, reward):
+    def __init__(self, value, state_kind=StateKind.NON_TERMINAL, reward=0.0):
         self.__set_value(value=value)
         self.__set_state_kind(state_kind=state_kind)
         self.__set_reward(reward=reward)

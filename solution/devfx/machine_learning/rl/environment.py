@@ -10,8 +10,27 @@ class Environment(object):
     def set_agents(self, agents):
         self.__agents = agents
 
-    def get_agents(self):
-        return self.__agents
+    def get_agents(self, filter=None):
+        if(filter is None):
+            return self.__agents
+        else:
+            return [agent for agent in self.__agents if(filter(agent))] 
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def create_agent(self, name, state, policy=None):
+        agent = Agent(name=name, environment=self, state=state, policy=policy)
+        self.get_agents().append(agent)
+        return agent
+
+    def create_agent_of_type(self, agent_type, name, state=None, policy=None):
+        agent = agent_type(name=name, environment=self, state=state, policy=policy)
+        self.get_agents().append(agent)
+        return agent 
+
+    def destroy_agent(self, agent):
+        self.get_agents().remove(agent)
+        agent.set_environment(environment=None)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -52,16 +71,7 @@ class Environment(object):
     def _get_random_action(self, state):
         raise exps.NotImplementedError()
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def create_agent(self, agent_type, *args, **kwargs):
-        agent = agent_type(environment=self, *args, **kwargs)
-        self.get_agents().append(agent)
-        return agent
 
-    def destroy_agent(self, agent):
-        self.get_agents().remove(agent)
-        agent.set_environment(environment=None)
         
 
 
