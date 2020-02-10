@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import devfx.data_containers as dc
 import devfx.statistics as stats
-import devfx.data_vizualization.matplotlib as dv
+import devfx.data_vizualization as dv
 
 """------------------------------------------------------------------------------------------------
 """  

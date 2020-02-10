@@ -1,6 +1,6 @@
 import pymc3 as pymc3
 import devfx.statistics as stats
-import devfx.data_vizualization.matplotlib as dv
+import devfx.data_vizualization as dv
 
 with pymc3.Model() as pm:
     exponential_1 = pymc3.Exponential("exponential_1", 1)

@@ -1,4 +1,4 @@
-import devfx.data_vizualization.matplotlib as dv
+import devfx.data_vizualization as dv
 import devfx.math as math
 
 """----------------------------------------------------------------

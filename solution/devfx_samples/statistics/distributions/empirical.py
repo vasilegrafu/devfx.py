@@ -1,5 +1,5 @@
 import devfx.statistics as stats
-import devfx.data_vizualization.matplotlib as dv
+import devfx.data_vizualization as dv
 
 """------------------------------------------------------------------------------------------------
 """ 
@@ -14,7 +14,7 @@ def test_empirical():
     dhistogram.on_chart(chart).bar()
     dhistogram.on_chart(chart).plot('r')
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure[1,0])
     cdhistogram = stats.estimators.cdhistogram.from_distribution(empirical)
     cdhistogram.on_chart(chart).bar()
     cdhistogram.on_chart(chart).plot('r')

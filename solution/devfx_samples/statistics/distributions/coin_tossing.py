@@ -1,6 +1,6 @@
 import numpy as np
 import devfx.math as math
-import devfx.data_vizualization.matplotlib as dv
+import devfx.data_vizualization as dv
 
 """------------------------------------------------------------------------------------------------
 """

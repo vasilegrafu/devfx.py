@@ -11,12 +11,12 @@ def is_mseries(data):
         if(len(data) == 0):
             return False
 
-        for data in data:
-            if(not series.is_series(data)):
+        for column_data in data:
+            if(not series.is_series(column_data)):
                 return False
 
-        for data in data:
-            if(len(data[0]) != len(data)):
+        for column_data in data:
+            if(len(data[0]) != len(column_data)):
                 return False
 
         return True

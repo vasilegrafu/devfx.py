@@ -1,5 +1,5 @@
 import devfx.math as math
-import devfx.data_vizualization.seaborn as dv
+import devfx.data_vizualization as dv
 
 """------------------------------------------------------------------------------------------------
 """
