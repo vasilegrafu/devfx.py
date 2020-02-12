@@ -3,14 +3,14 @@ import devfx.exceptions as exps
 import devfx.core as core
 
 class Agent(object):
-    def __init__(self, name, environment, state=None, policy=None):
+    def __init__(self, name, environment, state, policy=None):
         self.set_name(name=name)
         self.set_environment(environment=environment)
         self.set_state(state=state)
         self.set_policy(policy=policy)
 
         self.training_info_update = core.SignalHandlers()
-        self.training_progress = core.SignalHandlers()
+        self.training_status = core.SignalHandlers()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -119,39 +119,81 @@ class Agent(object):
         self.__training_progress = signal_handlers
 
 
+    class TrainingParameters(object):
+        def __init__(self):
+            self.episodes = None
+            self.episode = None
+            self.episode_step = None
+            self.epsilon = None
+
+        @property
+        def episodes(self):
+            return self.__episodes
+
+        @episodes.setter
+        def episodes(self, episodes):
+            self.__episodes = episodes
+
+
+        @property
+        def episode(self):
+            return self.__episode
+
+        @episode.setter
+        def episode(self, episode):
+            self.__episode = episode
+
+
+        @property
+        def episode_step(self):
+            return self.__episode_step
+
+        @episode_step.setter
+        def episode_step(self, episode_step):
+            self.__episode_step = episode_step
+
+
+        @property
+        def epsilon(self):
+            return self.__epsilon
+
+        @epsilon.setter
+        def epsilon(self, epsilon):
+            self.__epsilon = epsilon
+
+
     def train(self, episodes, epsilon):
         environment = self.get_environment()
         policy = self.get_policy()
 
-        episode = 0
-        while(episode < episodes):
-            episode += 1
+        training_parameters = Agent.TrainingParameters()
+        training_parameters.episodes = episodes
+        training_parameters.episode = 0
+        training_parameters.episode_step = 0
+        training_parameters.epsilon = epsilon
+
+        while(training_parameters.episode < training_parameters.episodes):
+            training_parameters.episode += 1
+            training_parameters.episode_step = 0
+
             self.set_state(state=environment.get_random_non_terminal_state())
 
-            self.training_info_update(source=self, event_args=core.SignalArgs(message=f'[episode: {episode}]'))
-            self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- initial state: {self.get_state()}'))
+            self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters, state=self.get_state()))
 
-            i = 0
             while(self.get_state().is_non_terminal()):
-                i += 1
                 action = policy.get_action(state=self.get_state())
                 if(action is None):
                     (state, action, next_state) = self.do_random_action()
                 else:
                     rv = np.random.uniform(size=1)
-                    if(rv <= epsilon):
+                    if(rv <= training_parameters.epsilon):
                         (state, action, next_state) = self.do_random_action()
                     else:
                         (state, action, next_state) = self.do_action()
                 policy.update(state=state, action=action, next_state=next_state)
 
-                if(self.get_state().is_non_terminal()):
-                    self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- move {i} to non-terminal state: {self.get_state()}'))
-                else:
-                    self.training_info_update(source=self, event_args=core.SignalArgs(message=f'- move {i} to terminal state: {self.get_state()}'))
+                training_parameters.episode_step += 1
 
-                self.training_progress(source=self, event_args=core.SignalArgs(state=self.get_state()))
-
-
+                self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters, state=self.get_state()))
 
         

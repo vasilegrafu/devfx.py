@@ -23,7 +23,7 @@ class Environment(object):
         self.get_agents().append(agent)
         return agent
 
-    def create_agent_of_type(self, agent_type, name, state=None, policy=None):
+    def create_agent_of_type(self, agent_type, name, state, policy=None):
         agent = agent_type(name=name, environment=self, state=state, policy=policy)
         self.get_agents().append(agent)
         return agent 

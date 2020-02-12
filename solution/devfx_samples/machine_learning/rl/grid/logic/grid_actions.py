@@ -2,7 +2,7 @@ import devfx.machine_learning as ml
 
 """========================================================================================================
 """
-class PossibleActions(object):
+class GridActions(object):
     Left = ml.rl.Action('Left')
     Right = ml.rl.Action('Right')
     Up = ml.rl.Action('Up')

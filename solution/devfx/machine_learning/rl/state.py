@@ -25,6 +25,8 @@ class State(object):
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, state):
+        if(state is None):
+            return False
         if(not core.is_instance(state, State)):
             raise exps.ArgumentError()
         return state.value == self.value

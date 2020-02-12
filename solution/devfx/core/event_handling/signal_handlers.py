@@ -25,8 +25,8 @@ class SignalHandlers(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __call__(self, source, event_args):
+    def __call__(self, source, signal_args):
         for event_handler in self.__event_handler_list:
-            event_handler(source=source, event_args=event_args)
+            event_handler(source=source, signal_args=signal_args)
 
 
