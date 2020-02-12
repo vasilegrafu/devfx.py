@@ -9,10 +9,10 @@ class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
-        rn = 3
-        cn = 4
+        rn = 8
+        cn = 10
         cells_with_terminal_states = [((1, cn), +1.0), ((2, cn), -1.0)]
-        cells_blocked = [(2, 2)]
+        cells_blocked = [(2, 2), (3, 3), (6, 5), (7, 9)]
         rclist = []
         for ri in range(1, rn+1):
             clist = []
