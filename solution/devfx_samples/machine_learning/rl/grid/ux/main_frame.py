@@ -29,10 +29,11 @@ class MainFrame(wx.Frame):
         self.__apply_styles()
 
         self.environment = GridEnvironment()
+        self.environment.training_status += core.SignalHandler(self.__environment_training_agent_status)
         agent1 = self.environment.create_agent(name='agent1',
                                                state=self.environment.get_random_non_terminal_state(),
                                                policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        agent1.training_status += core.SignalHandler(self.__agent_training_status)
+        
 
     def __apply_styles(self):
         self.SetTitle("RL")
@@ -67,12 +68,11 @@ class MainFrame(wx.Frame):
     """
     def __train_grid_agents(self):
         self.train_button.Enabled = False
-        for agent in self.environment.get_agents():
-            agent.train(episodes=100, epsilon=self.randomness_variator.GetValue())
+        self.environment.train(episode_count=100, epsilon=self.randomness_variator.GetValue())
         self.train_button.Enabled = True
         self.__draw_grid_environment()
 
-    def __agent_training_status(self, source, signal_args):
+    def __environment_training_agent_status(self, source, signal_args):
         self.__draw_grid_environment()
         t.sleep(self.speed_variator.GetValue())
         

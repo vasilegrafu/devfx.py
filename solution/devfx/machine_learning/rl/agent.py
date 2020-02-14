@@ -9,7 +9,6 @@ class Agent(object):
         self.set_state(state=state)
         self.set_policy(policy=policy)
 
-        self.training_info_update = core.SignalHandlers()
         self.training_status = core.SignalHandlers()
 
     """------------------------------------------------------------------------------------------------
@@ -91,66 +90,59 @@ class Agent(object):
     def do_random_action(self):
         (state, action, next_state) = self.get_random_next_state()
         self.set_state(state=next_state)
+        self.get_policy().update(state=state, action=action, next_state=next_state)
         return (state, action, next_state)
   
     def do_action(self):
         (state, action, next_state) = self.get_next_state()
         self.set_state(state=next_state)
+        self.get_policy().update(state=state, action=action, next_state=next_state)
         return (state, action, next_state)
 
 
     """------------------------------------------------------------------------------------------------
     """
     @property
-    def training_info_update(self):
-        return self.__training_info_update
+    def training_status(self):
+        return self.__training_status
 
-    @training_info_update.setter
-    def training_info_update(self, signal_handlers):
-        self.__training_info_update = signal_handlers
-
-
-    @property
-    def training_progress(self):
-        return self.__training_progress
-
-    @training_progress.setter
-    def training_progress(self, signal_handlers):
-        self.__training_progress = signal_handlers
+    @training_status.setter
+    def training_status(self, signal_handlers):
+        self.__training_status = signal_handlers
 
 
     class TrainingParameters(object):
         def __init__(self):
-            self.episodes = None
-            self.episode = None
-            self.episode_step = None
+            self.episode_count = None
+            self.episode_number = None
+            self.episode_action_number = None
             self.epsilon = None
 
         @property
-        def episodes(self):
-            return self.__episodes
+        def episode_count(self):
+            return self.__episode_count
 
-        @episodes.setter
-        def episodes(self, episodes):
-            self.__episodes = episodes
-
-
-        @property
-        def episode(self):
-            return self.__episode
-
-        @episode.setter
-        def episode(self, episode):
-            self.__episode = episode
+        @episode_count.setter
+        def episode_count(self, value):
+            self.__episode_count = value
 
 
         @property
-        def episode_step(self):
-            return self.__episode_step
+        def episode_number(self):
+            return self.__episode_number
 
-        @episode_step.setter
-        def episode_step(self, episode_step):
-            self.__episode_step = episode_step
+        @episode_number.setter
+        def episode_number(self, value):
+            self.__episode_number = value
+
+
+        @property
+        def episode_action_number(self):
+            return self.__episode_action_number
+
+        @episode_action_number.setter
+        def episode_action_number(self, value):
+            self.__episode_action_number = value
 
 
         @property
@@ -158,42 +150,36 @@ class Agent(object):
             return self.__epsilon
 
         @epsilon.setter
-        def epsilon(self, epsilon):
-            self.__epsilon = epsilon
+        def epsilon(self, value):
+            self.__epsilon = value
 
 
-    def train(self, episodes, epsilon):
+    def train(self, episode_count, epsilon):
         environment = self.get_environment()
-        policy = self.get_policy()
 
         training_parameters = Agent.TrainingParameters()
-        training_parameters.episodes = episodes
-        training_parameters.episode = 0
-        training_parameters.episode_step = 0
+        training_parameters.episode_count = episode_count
+        training_parameters.episode_number = 0
+        training_parameters.episode_action_number = 0
         training_parameters.epsilon = epsilon
 
-        while(training_parameters.episode < training_parameters.episodes):
-            training_parameters.episode += 1
-            training_parameters.episode_step = 0
+        while(training_parameters.episode_number < training_parameters.episode_count):
+            training_parameters.episode_number += 1
+            training_parameters.episode_action_number = 0
 
             self.set_state(state=environment.get_random_non_terminal_state())
-
-            self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters, state=self.get_state()))
+            
+            self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters))
 
             while(self.get_state().is_non_terminal()):
-                action = policy.get_action(state=self.get_state())
-                if(action is None):
-                    (state, action, next_state) = self.do_random_action()
+                rv = np.random.uniform(size=1)
+                if(rv <= training_parameters.epsilon):
+                    self.do_random_action()
                 else:
-                    rv = np.random.uniform(size=1)
-                    if(rv <= training_parameters.epsilon):
-                        (state, action, next_state) = self.do_random_action()
-                    else:
-                        (state, action, next_state) = self.do_action()
-                policy.update(state=state, action=action, next_state=next_state)
+                    self.do_action()
 
-                training_parameters.episode_step += 1
+                training_parameters.episode_action_number += 1
 
-                self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters, state=self.get_state()))
+                self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters))
 
         
