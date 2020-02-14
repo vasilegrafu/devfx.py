@@ -48,17 +48,12 @@ class Model(tf.Module):
         def __init__(self):
             self.__is_cancellation_requested = False
 
-        def request_cancellation(self, condition=None, condition_fn=None):
-            if (condition is None and condition_fn is None):
+        def request_cancellation(self, condition=None):
+            if (condition is None):
                 self.__is_cancellation_requested = True
-            elif (condition is not None and condition_fn is None):
+            elif (condition is not None):
                 if(condition):
                     self.__is_cancellation_requested = True
-            elif (condition is None and condition_fn is not None):
-                if(condition_fn()):
-                    self.__is_cancellation_requested = True
-            elif (condition is not None and condition_fn is not None):
-                raise exps.ArgumentError()
             else:
                 raise exps.NotSupportedError()
 

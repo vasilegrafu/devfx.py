@@ -15,3 +15,10 @@ if __name__ == "__main__":
     app = App()
     app.MainLoop()
 
+# to do:
+# - run, cancel
+# - run turbo, cancel turbo
+
+
+
+

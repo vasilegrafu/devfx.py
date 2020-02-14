@@ -7,7 +7,7 @@ class Environment(object):
     def __init__(self):
         self.set_agents(agents=[])
 
-        self.training_agent_status = core.SignalHandlers()
+        self.running_status = core.SignalHandlers()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -78,20 +78,37 @@ class Environment(object):
     """------------------------------------------------------------------------------------------------
     """
     @property
-    def training_agent_status(self):
-        return self.__training_agent_status
+    def running_status(self):
+        return self.__running_status
 
-    @training_agent_status.setter
-    def training_agent_status(self, signal_handlers):
-        self.__training_agent_status = signal_handlers
+    @running_status.setter
+    def running_status(self, signal_handlers):
+        self.__running_status = signal_handlers
 
 
-    class TrainingParameters(object):
+    class RunningCancellationToken(object):
+        def __init__(self):
+            self.__is_cancellation_requested = False
+
+        def request_cancellation(self, condition=None):
+            if (condition is None):
+                self.__is_cancellation_requested = True
+            elif (condition is not None):
+                if(condition):
+                    self.__is_cancellation_requested = True
+            else:
+                raise exps.NotSupportedError()
+
+        def is_cancellation_requested(self):
+            return (self.__is_cancellation_requested == True)
+
+
+    class RunningParameters(object):
         def __init__(self):
             self.agent = None
             self.action_count = None
             self.action_number = None
-            self.epsilon = None
+            self.randomness = None
 
         @property
         def action_count(self):
@@ -112,30 +129,40 @@ class Environment(object):
 
 
         @property
-        def epsilon(self):
-            return self.__epsilon
+        def randomness(self):
+            return self.__randomness
 
-        @epsilon.setter
-        def epsilon(self, value):
-            self.__epsilon = value
+        @randomness.setter
+        def randomness(self, value):
+            self.__randomness = value
 
 
-    def train(self, action_count, epsilon):
-        training_parameters = Environment.TrainingParameters()
-        training_parameters.action_count = action_count
-        training_parameters.action_number = 0
-        training_parameters.epsilon = epsilon
+        @property
+        def cancellation_token(self):
+            return self.__cancellation_token
 
-        while(training_parameters.action_number < training_parameters.action_count):
+        @cancellation_token.setter
+        def cancellation_token(self, value):
+            self.__cancellation_token = value
+
+
+    def run(self, randomness=1.0, action_count=None):
+        running_parameters = Environment.RunningParameters()
+        running_parameters.action_count = action_count if(action_count is not None) else 1024**4
+        running_parameters.action_number = 0
+        running_parameters.randomness = randomness
+        running_parameters.cancellation_token = Environment.RunningCancellationToken()
+
+        while((not running_parameters.cancellation_token.is_cancellation_requested()) or (running_parameters.action_number < running_parameters.action_count)):
             for agent in self.get_agents():
                 if(agent.get_state().is_non_terminal()):
                     rv = np.random.uniform(size=1)
-                    if(rv <= training_parameters.epsilon):
+                    if(rv <= running_parameters.randomness):
                         agent.do_random_action()
                     else:
                         agent.do_action()
                 else:
                     agent.set_state(state=self.get_random_non_terminal_state())
 
-                training_parameters.action_number += 1
-                self.training_status(source=self, signal_args=core.SignalArgs(training_parameters=training_parameters, agent=agent))
+                running_parameters.action_number += 1
+                self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters, agent=agent))
