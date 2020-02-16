@@ -30,10 +30,9 @@ class MainFrame(wx.Frame):
 
         self.environment = GridEnvironment()
         self.environment.running_status += core.SignalHandler(self.__environment_running_status)
-        agent1 = self.environment.create_agent(name='agent1',
-                                               state=self.environment.get_random_non_terminal_state(),
-                                               policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        
+        agent1 = self.environment.create_agent(name='agent1')
+        agent1.set_state(state=self.environment.get_random_non_terminal_state_and_reward(agent=agent1)[0])
+        agent1.set_policy(policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
 
     def __apply_styles(self):
         self.SetTitle("RL")
@@ -84,31 +83,31 @@ class MainFrame(wx.Frame):
         dc.Clear()
 
         # draw cells
-        for (cell_index, cell_content) in self.environment.get_cells():
-            self.__draw_grid_cell(cell_index=cell_index, cell_content=cell_content, dc=dc)
+        for (ci, cc) in self.environment.get_cells():
+            self.__draw_grid_cell(ci=ci, cc=cc, dc=dc)
 
         # draw agents
         for agent in self.environment.get_agents():
             self.__draw_grid_agent(agent=agent, dc=dc)
 
-         # draw agent policies
+        # draw agent policies
         for agent in self.environment.get_agents():
-            for state in self.environment.get_states():
-                self.__draw_grid_agent_policy(agent=agent, state=state, dc=dc)
+            for (ci, cc) in self.environment.get_cells():
+                self.__draw_grid_agent_policy(agent=agent, ci=ci, cc=cc, dc=dc)
 
-    def __draw_grid_cell(self, cell_index, cell_content, dc):
-        (c_ri, c_ci) = cell_index
+    def __draw_grid_cell(self, ci, cc, dc):
+        (c_ri, c_ci) = ci
         (env_rc, env_cc) = self.environment.get_size()
         (dc_w, dc_h) = dc.GetSize()
         (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
         (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
 
-        if(cell_content is None):
+        if(cc is None):
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
             dc.DrawRectangle(r_w0, r_h0, r_dw, r_dh) 
         else:
-            state = cell_content
+            (state, reward) = cc
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
             if(state.kind == ml.rl.StateKind.TERMINAL):
                 dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
@@ -117,10 +116,10 @@ class MainFrame(wx.Frame):
             else:
                 raise exps.NotImplementedError()
             dc.DrawRectangle(r_w0, r_h0, r_dw, r_dh) 
-            dc.DrawText(f'r:{state.reward:.2f}', r_w0+2, r_h0+2) 
+            dc.DrawText(f'r:{reward.value:.2f}', r_w0+2, r_h0+2) 
 
     def __draw_grid_agent(self, agent, dc):
-        (c_ri, c_ci) = self.environment.get_cell_index(state=agent.get_state())
+        (c_ri, c_ci) = agent.get_state().value
         (env_rc, env_cc) = self.environment.get_size()
         (dc_w, dc_h) = dc.GetSize()
         (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
@@ -130,30 +129,34 @@ class MainFrame(wx.Frame):
         dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
         dc.DrawCircle(r_w0 + r_dw/2, r_h0 + r_dh/2, min(r_dw/4, r_dh/4)) 
 
-    def __draw_grid_agent_policy(self, agent, state, dc):
-        (c_ri, c_ci) = self.environment.get_cell_index(state=state)
-        (env_rc, env_cc) = self.environment.get_size()
-        (dc_w, dc_h) = dc.GetSize()
-        (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
-        (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
+    def __draw_grid_agent_policy(self, agent, ci, cc, dc):
+        if(cc is None):
+            pass
+        else:
+            (c_ri, c_ci) = ci
+            (env_rc, env_cc) = self.environment.get_size()
+            (dc_w, dc_h) = dc.GetSize()
+            (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
+            (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
 
-        policy = agent.get_policy()
-        if(state in policy.qtable):
-            actions = policy.qtable[state]
-            for action in actions:
-                if(action == GridActions.Left):
-                    (cw, ch) = (r_w0+2, r_h0+r_dh/2-4)
-                elif(action == GridActions.Right):
-                    (cw, ch) = (r_w0+r_dw-30, r_h0+r_dh/2-4) 
-                elif(action == GridActions.Up):
-                    (cw, ch) = (r_w0+r_dw/2-10, r_h0+2) 
-                elif(action == GridActions.Down):
-                    (cw, ch) = (r_w0+r_dw/2-10, r_h0+r_dh-16) 
-                else:
-                    raise exps.NotImplementedError()
-                dc.SetPen(wx.Pen(wx.Colour(0, 0, 0))) 
-                dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
-                dc.DrawText(f'{policy.qtable[state][action]:.2f}', cw, ch) 
+            (state, reward) = cc
+            policy = agent.get_policy()
+            if(state in policy.qtable):
+                actions = policy.qtable[state]
+                for action in actions:
+                    if(action == GridActions.Left):
+                        (cw, ch) = (r_w0+2, r_h0+r_dh/2-4)
+                    elif(action == GridActions.Right):
+                        (cw, ch) = (r_w0+r_dw-30, r_h0+r_dh/2-4) 
+                    elif(action == GridActions.Up):
+                        (cw, ch) = (r_w0+r_dw/2-10, r_h0+2) 
+                    elif(action == GridActions.Down):
+                        (cw, ch) = (r_w0+r_dw/2-10, r_h0+r_dh-16) 
+                    else:
+                        raise exps.NotImplementedError()
+                    dc.SetPen(wx.Pen(wx.Colour(0, 0, 0))) 
+                    dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
+                    dc.DrawText(f'{policy.qtable[state][action]:.2f}', cw, ch) 
 
 
 

@@ -3,10 +3,9 @@ import devfx.core as core
 from .state_kind import StateKind
 
 class State(object):
-    def __init__(self, value, state_kind=StateKind.NON_TERMINAL, reward=0.0):
+    def __init__(self, value, state_kind=StateKind.NON_TERMINAL):
         self.__set_value(value=value)
         self.__set_state_kind(state_kind=state_kind)
-        self.__set_reward(reward=reward)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -49,12 +48,4 @@ class State(object):
     def is_terminal(self):
         return self.kind == StateKind.TERMINAL
   
-    """------------------------------------------------------------------------------------------------
-    """
-    def __set_reward(self, reward):
-        self.__reward = reward
-
-    @property
-    def reward(self):
-        return self.__reward
     

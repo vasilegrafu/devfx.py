@@ -9,105 +9,88 @@ class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
-        rn = 5
-        cn = 5
-        cells_with_terminal_states = [((1, cn), +1.0), ((2, cn), -1.0)]
-        cells_blocked = [(2, 2), (3, 3), (5, 5)]
-        rclist = []
-        for ri in range(1, rn+1):
-            clist = []
-            rclist.append(clist)
-            for ci in range(1, cn+1):
+        self.__grid = np.empty(shape=(5, 5), dtype=object)
+        cells_with_terminal_states = [((0, 4), +1.0), ((1, 4), -1.0)]
+        cells_blocked = [(1, 1), (2, 2), (4, 4)]
+        for ri in range(self.__grid.shape[0]):
+            for ci in range(self.__grid.shape[1]):
                 if((ri, ci) in [state_value for (state_value, reward) in cells_with_terminal_states]):
-                    clist.append(ml.rl.State((ri, ci), ml.rl.StateKind.TERMINAL, [reward for (state_value, reward) in cells_with_terminal_states if(state_value == (ri, ci))][0]))
+                    state = ml.rl.State(value=(ri, ci), state_kind=ml.rl.StateKind.TERMINAL)
+                    reward = ml.rl.Reward(value=[reward for (state_value, reward) in cells_with_terminal_states if(state_value == (ri, ci))][0])
+                    self.__grid[(ri, ci)] = (state, reward)
                 elif((ri, ci) in cells_blocked):
-                    clist.append(None)
+                    self.__grid[(ri, ci)] = None
                 else:
-                    clist.append(ml.rl.State((ri, ci), ml.rl.StateKind.NON_TERMINAL, 0.0))
-
-        self.__grid = np.asarray(rclist)
+                    state = ml.rl.State((ri, ci), ml.rl.StateKind.NON_TERMINAL)
+                    reward = ml.rl.Reward(value=0.0)
+                    self.__grid[(ri, ci)] = (state, reward)
 
     """------------------------------------------------------------------------------------------------
     """
     def __get_cells_generator(self):
-        return ((cell_index, cell_content) for cell_index, cell_content in np.ndenumerate(self.__grid))
+        return ((ci, cc) for ci, cc in np.ndenumerate(self.__grid))
 
     def get_cells(self):
-        return [(cell_index, cell_content) for (cell_index, cell_content) in self.__get_cells_generator()]
-
-    def get_cell_index(self, state):
-        return [cell_index for (cell_index, cell_content) in self.__get_cells_generator() if(cell_content == state)][0]
-
-    def get_state(self, cell_index):
-        cell_content = self.__grid[cell_index]
-        if(cell_content is None):
-            raise exps.ApplicationError()
-        state = cell_content
-        return state
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def __get_states_generator(self):
-        return (cell_content for (cell_index, cell_content) in self.__get_cells_generator() if(cell_content is not None))
-
-    def get_states(self):
-        return [state for state in self.__get_states_generator()]
+        return [(ci, cc) for (ci, cc) in self.__get_cells_generator()]
 
     def get_size(self):
         return self.__grid.shape
 
+    def __get_cells_with_content_generator(self):
+        return ((ci, cc) for (ci, cc) in self.__get_cells_generator() if(cc is not None))
+
+    def __get_cells_without_content_generator(self):
+        return ((ci, cc) for (ci, cc) in self.__get_cells_generator() if(cc is None))
+
+
     """------------------------------------------------------------------------------------------------
     """
-    def _get_random_state(self):
-        states = [state for state in self.__get_states_generator()]
-        state = np.random.choice(states)
-        return state
+    def _get_random_state_and_reward(self, agent):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator()]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return (state, reward)
 
-    def _get_random_non_terminal_state(self):
-        states = [state for state in self.__get_states_generator() if(state.kind == ml.rl.StateKind.NON_TERMINAL)]
-        state = np.random.choice(states)
-        return state
+    def _get_random_non_terminal_state_and_reward(self, agent):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.NON_TERMINAL)]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return (state, reward)
 
-    def _get_random_terminal_state(self):
-        states = [state for state in self.__get_states_generator() if(state.kind == ml.rl.StateKind.TERMINAL)]
-        state = np.random.choice(states)
-        return state
+    def _get_random_terminal_state_and_reward(self, agent):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.TERMINAL)]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return (state, reward)
 
-    def _get_next_state(self, state, action):
-        ix = (state.value[0]-1, state.value[1]-1)
+    def _get_next_state_and_reward(self, agent, action):
+        state = agent.get_state()
         if(action == GridActions.Left):
-            next_state = self.__grid[ix[0], ix[1]-1]
+            next_state = self.__grid[state.value[0], state.value[1]-1]
         if(action == GridActions.Right):
-            next_state = self.__grid[ix[0], ix[1]+1]
+            next_state = self.__grid[state.value[0], state.value[1]+1]
         if(action == GridActions.Up):
-            next_state = self.__grid[ix[0]-1, ix[1]]
+            next_state = self.__grid[state.value[0]-1, state.value[1]]
         if(action == GridActions.Down):
-            next_state = self.__grid[ix[0]+1, ix[1]]
+            next_state = self.__grid[state.value[0]+1, state.value[1]]
         return next_state
 
     """------------------------------------------------------------------------------------------------
     """
-    def __get_actions_generator(self, state):
+    def __get_actions_generator(self, agent):
+        state = agent.get_state()
         if(state.kind == ml.rl.StateKind.TERMINAL):
             return
-        ix = (state.value[0]-1, state.value[1]-1)
-        if((ix[0] > 0) and (self.__grid[ix[0]-1, ix[1]] is not None)):
+        if((state.value[0] > 0) and (self.__grid[state.value[0]-1, state.value[1]] is not None)):
             yield GridActions.Up
-        if((ix[0] < (self.__grid.shape[0]-1)) and (self.__grid[ix[0]+1, ix[1]] is not None)):
+        if((state.value[0] < (self.__grid.shape[0]-1)) and (self.__grid[state.value[0]+1, state.value[1]] is not None)):
             yield GridActions.Down
-        if((ix[1] > 0) and (self.__grid[ix[0], ix[1]-1] is not None)):
+        if((state.value[1] > 0) and (self.__grid[state.value[0], state.value[1]-1] is not None)):
             yield GridActions.Left
-        if((ix[1] < (self.__grid.shape[1]-1)) and (self.__grid[ix[0], ix[1]+1] is not None)):
+        if((state.value[1] < (self.__grid.shape[1]-1)) and (self.__grid[state.value[0], state.value[1]+1] is not None)):
             yield GridActions.Right     
-
-    def get_actions(self, state):
-        actions = [action for action in self.__get_actions_generator(state)]
-        return actions
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_random_action(self, state):
-        actions = [action for action in self.__get_actions_generator(state)]
+    def _get_random_action(self, agent):
+        actions = [action for action in self.__get_actions_generator(agent=agent)]
         action = np.random.choice(actions)
         return action
 

@@ -30,7 +30,7 @@ class QPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _update(self, state, action, next_state):
+    def _update(self, state, action, next_state, reward):
         if(state not in self.qtable):
             self.qtable[state] = {}
         if(action not in self.qtable[state]):
@@ -40,10 +40,10 @@ class QPolicy(Policy):
             self.qtable[next_state] = {}
         
         if(len(self.qtable[next_state]) == 0):
-            error = next_state.reward - self.qtable[state][action]
+            error = reward.value - self.qtable[state][action]
         else:
             next_action = max(self.qtable[next_state], key=lambda action: self.qtable[next_state][action])
-            error = next_state.reward + self.discount_factor*self.qtable[next_state][next_action] - self.qtable[state][action]
+            error = reward.value + self.discount_factor*self.qtable[next_state][next_action] - self.qtable[state][action]
 
         self.qtable[state][action] = self.qtable[state][action] + self.learning_rate*error
 
