@@ -29,10 +29,13 @@ class MainFrame(wx.Frame):
         self.__apply_styles()
 
         self.environment = GridEnvironment()
-        self.environment.running_status += core.SignalHandler(self.__environment_running_status)
-        agent1 = self.environment.create_agent(name='agent1')
-        agent1.set_state(state=self.environment.get_random_non_terminal_state_and_reward(agent=agent1)[0])
-        agent1.set_policy(policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+        self.environment.create_agent(id='agent1',
+                                      kind='AGENT', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+ 
+        self.runner = ml.rl.Runner(agent=self.environment())
+        self.runner.running_status += core.SignalHandler(self.__running_status)
 
     def __apply_styles(self):
         self.SetTitle("RL")
@@ -67,10 +70,10 @@ class MainFrame(wx.Frame):
     """
     def __train_grid_agents(self):
         self.train_button.Enabled = False
-        self.environment.run(randomness=self.randomness_variator.GetValue(), action_count=1000)
+        self.runner.run(randomness=self.randomness_variator.GetValue(), action_count=1000)
         self.train_button.Enabled = True
 
-    def __environment_running_status(self, source, signal_args):
+    def __running_status(self, source, signal_args):
         self.__draw_grid_environment()
         
         t.sleep(self.speed_variator.GetValue())

@@ -42,24 +42,25 @@ class GridEnvironment(ml.rl.Environment):
     def __get_cells_without_content_generator(self):
         return ((ci, cc) for (ci, cc) in self.__get_cells_generator() if(cc is None))
 
+    """------------------------------------------------------------------------------------------------
+    """
+    def _get_random_state(self, agent_kind):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator()]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return state
+
+    def _get_random_non_terminal_state(self, agent_kind):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.NON_TERMINAL)]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return state
+
+    def _get_random_terminal_state(self, agent_kind):
+        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.TERMINAL)]
+        (state, reward) = ccs[np.random.choice(len(ccs))]
+        return state
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_random_state_and_reward(self, agent):
-        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator()]
-        (state, reward) = ccs[np.random.choice(len(ccs))]
-        return (state, reward)
-
-    def _get_random_non_terminal_state_and_reward(self, agent):
-        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.NON_TERMINAL)]
-        (state, reward) = ccs[np.random.choice(len(ccs))]
-        return (state, reward)
-
-    def _get_random_terminal_state_and_reward(self, agent):
-        ccs = [cc for (ci, cc) in self.__get_cells_with_content_generator() if(cc[0].kind == ml.rl.StateKind.TERMINAL)]
-        (state, reward) = ccs[np.random.choice(len(ccs))]
-        return (state, reward)
-
     def _get_next_state_and_reward(self, agent, action):
         state = agent.get_state()
         if(action == GridActions.Left):
