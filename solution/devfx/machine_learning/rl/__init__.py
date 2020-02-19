@@ -5,4 +5,4 @@ from .reward import *
 from .policies import *
 from .environment import *
 from .agent import *
-from .runner import *
+from .runners import *

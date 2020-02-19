@@ -33,8 +33,12 @@ class MainFrame(wx.Frame):
                                       kind='AGENT', 
                                       state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+        self.environment.create_agent(id='agent2',
+                                      kind='AGENT', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))                              
  
-        self.runner = ml.rl.Runner(agent=self.environment())
+        self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
         self.runner.running_status += core.SignalHandler(self.__running_status)
 
     def __apply_styles(self):
@@ -70,7 +74,7 @@ class MainFrame(wx.Frame):
     """
     def __train_grid_agents(self):
         self.train_button.Enabled = False
-        self.runner.run(randomness=self.randomness_variator.GetValue(), action_count=1000)
+        self.runner.run(episode_count=1, randomness=self.randomness_variator.GetValue())
         self.train_button.Enabled = True
 
     def __running_status(self, source, signal_args):
