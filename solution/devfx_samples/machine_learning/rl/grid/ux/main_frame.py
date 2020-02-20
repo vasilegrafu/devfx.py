@@ -74,7 +74,7 @@ class MainFrame(wx.Frame):
     """
     def __train_grid_agents(self):
         self.train_button.Enabled = False
-        self.runner.run(episode_count=1, randomness=self.randomness_variator.GetValue())
+        self.runner.run(episode_count=2, randomness=self.randomness_variator.GetValue())
         self.train_button.Enabled = True
 
     def __running_status(self, source, signal_args):
@@ -158,7 +158,9 @@ class MainFrame(wx.Frame):
                     elif(action == GridActions.Up):
                         (cw, ch) = (r_w0+r_dw/2-10, r_h0+2) 
                     elif(action == GridActions.Down):
-                        (cw, ch) = (r_w0+r_dw/2-10, r_h0+r_dh-16) 
+                        (cw, ch) = (r_w0+r_dw/2-10, r_h0+r_dh-16)
+                    elif(action == GridActions.Stay):
+                        (cw, ch) = (r_w0+r_dw/2-10, r_h0+r_dh/2-16) 
                     else:
                         raise exps.NotImplementedError()
                     dc.SetPen(wx.Pen(wx.Colour(0, 0, 0))) 

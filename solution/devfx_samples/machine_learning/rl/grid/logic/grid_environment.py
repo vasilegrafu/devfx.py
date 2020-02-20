@@ -71,6 +71,8 @@ class GridEnvironment(ml.rl.Environment):
             next_state = self.__grid[state.value[0]-1, state.value[1]]
         if(action == GridActions.Down):
             next_state = self.__grid[state.value[0]+1, state.value[1]]
+        if(action == GridActions.Stay):
+            next_state = self.__grid[state.value[0], state.value[1]]
         return next_state
 
     """------------------------------------------------------------------------------------------------
@@ -87,6 +89,7 @@ class GridEnvironment(ml.rl.Environment):
             yield GridActions.Left
         if((state.value[1] < (self.__grid.shape[1]-1)) and (self.__grid[state.value[0], state.value[1]+1] is not None)):
             yield GridActions.Right     
+        yield GridActions.Stay   
 
     """------------------------------------------------------------------------------------------------
     """

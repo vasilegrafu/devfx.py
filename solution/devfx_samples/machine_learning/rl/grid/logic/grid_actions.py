@@ -7,3 +7,4 @@ class GridActions(object):
     Right = ml.rl.Action('Right')
     Up = ml.rl.Action('Up')
     Down = ml.rl.Action('Down')
+    Stay = ml.rl.Action('Stay')
