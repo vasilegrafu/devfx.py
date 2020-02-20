@@ -74,6 +74,8 @@ class MainFrame(wx.Frame):
     """
     def __train_grid_agents(self):
         self.train_button.Enabled = False
+        for agent in self.runner.get_agents():
+            agent.set_random_non_terminal_state()
         self.runner.run(episode_count=2, randomness=self.randomness_variator.GetValue())
         self.train_button.Enabled = True
 
@@ -98,9 +100,8 @@ class MainFrame(wx.Frame):
             self.__draw_grid_agent(agent=agent, dc=dc)
 
         # draw agent policies
-        for agent in self.environment.get_agents():
-            for (ci, cc) in self.environment.get_cells():
-                self.__draw_grid_agent_policy(agent=agent, ci=ci, cc=cc, dc=dc)
+        for (ci, cc) in self.environment.get_cells():
+            self.__draw_grid_agent_policy(agents=self.environment.get_agents(), ci=ci, cc=cc, dc=dc)
 
     def __draw_grid_cell(self, ci, cc, dc):
         (c_ri, c_ci) = ci
@@ -136,7 +137,7 @@ class MainFrame(wx.Frame):
         dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
         dc.DrawCircle(r_w0 + r_dw/2, r_h0 + r_dh/2, min(r_dw/4, r_dh/4)) 
 
-    def __draw_grid_agent_policy(self, agent, ci, cc, dc):
+    def __draw_grid_agent_policy(self, agents, ci, cc, dc):
         if(cc is None):
             pass
         else:

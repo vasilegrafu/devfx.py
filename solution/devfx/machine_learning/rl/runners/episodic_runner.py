@@ -63,11 +63,12 @@ class EpisodicRunner(Runner):
                 else:
                     if(running_parameters.episode_number[agent] <= (running_parameters.episode_count-1)):
                         agent.set_random_non_terminal_state()
+                    if(running_parameters.episode_number[agent] <= running_parameters.episode_count):
                         running_parameters.episode_number[agent] += 1
 
             self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
 
-            if(all((running_parameters.episode_number[agent] >= running_parameters.episode_count) for agent in self.get_agents())):
+            if(all((running_parameters.episode_number[agent] > running_parameters.episode_count) for agent in self.get_agents())):
                 break
             if(running_parameters.cancellation_token.is_cancellation_requested()):
                 break

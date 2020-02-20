@@ -16,12 +16,12 @@ class InfiniteRunner(Runner):
             self.randomness = 1.0
 
         @property
-        def episode_numbers(self):
-            return self.__episode_numbers
+        def episode_number(self):
+            return self.__episode_number
 
-        @episode_numbers.setter
-        def episode_numbers(self, value):
-            self.__episode_numbers = value
+        @episode_number.setter
+        def episode_number(self, value):
+            self.__episode_number = value
 
 
         @property
@@ -38,7 +38,7 @@ class InfiniteRunner(Runner):
             raise exps.ApplicationError()
 
         running_parameters = InfiniteRunner.RunningParameters(agents=self.get_agents())
-        running_parameters.episode_numbers = { agent : 1 for agent in self.get_agents() }
+        running_parameters.episode_number = { agent : 1 for agent in self.get_agents() }
         running_parameters.randomness = randomness
 
         while(True):
@@ -51,7 +51,7 @@ class InfiniteRunner(Runner):
                         agent.do_action()
                 else:
                     agent.set_random_non_terminal_state()
-                    running_parameters.episode_numbers[agent] += 1
+                    running_parameters.episode_number[agent] += 1
                     
             self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
 
