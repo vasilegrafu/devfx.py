@@ -44,13 +44,13 @@ class StepRunner(Runner):
 
 
     def _run(self, step_count=1, randomness=1.0):
-        if(not all(agent.get_state().is_non_terminal() for agent in self.get_agents())):
-            raise exps.ApplicationError()
-
         running_parameters = StepRunner.RunningParameters(agents=self.get_agents())
         running_parameters.step_count = step_count
         running_parameters.step_number = { agent : 0 for agent in self.get_agents() }
         running_parameters.randomness = randomness
+
+        for agent in self.get_agents():                
+            agent.set_random_non_terminal_state()
 
         while(True):
             for agent in self.get_agents():                

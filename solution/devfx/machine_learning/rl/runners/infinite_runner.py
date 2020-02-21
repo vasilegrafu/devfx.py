@@ -34,12 +34,13 @@ class InfiniteRunner(Runner):
 
 
     def _run(self, randomness=1.0):
-        if(not all(agent.get_state().is_non_terminal() for agent in self.get_agents())):
-            raise exps.ApplicationError()
-
         running_parameters = InfiniteRunner.RunningParameters(agents=self.get_agents())
-        running_parameters.episode_number = { agent : 1 for agent in self.get_agents() }
+        running_parameters.episode_number = { agent : 0 for agent in self.get_agents() }
         running_parameters.randomness = randomness
+
+        for agent in self.get_agents():                
+            agent.set_random_non_terminal_state()
+            running_parameters.episode_number[agent] = 1
 
         while(True):
             for agent in self.get_agents():                
