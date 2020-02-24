@@ -14,8 +14,28 @@ class MainFrame(wx.Frame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
 
+        """----------------------------------------------------------------
+        """
+        self.environment = GridEnvironment()
+        self.environment.create_agent(id='agent1',
+                                      kind='AGENT', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+        self.environment.create_agent(id='agent2',
+                                      kind='AGENT', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+        self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
+        self.runner.running_status += core.SignalHandler(self.__running_status)
+
+        """----------------------------------------------------------------
+        """
         self.grid_panel = wx.Panel(self)
         self.grid_panel.Bind(wx.EVT_PAINT, self.__grid_panel_paint)
+
+        """----------------------------------------------------------------
+        """
+        self.agent_policy_choice = wx.Choice(self, choices=[agent.get_id() for agent in self.environment.get_agents()])
 
         """----------------------------------------------------------------
         """
@@ -36,8 +56,7 @@ class MainFrame(wx.Frame):
         self.__visual_training_is_running = False
         self.__visual_training_cancelling_is_requested = False
 
-        """----------------------------------------------------------------
-        """
+ 
         self.run_training_button = wx.Button(self, label="Run training")
         self.run_training_button.Enabled = True
         self.run_training_button.Bind(wx.EVT_BUTTON, self.__run_training_button_click)
@@ -56,52 +75,45 @@ class MainFrame(wx.Frame):
         """
         self.__apply_styles()
 
-        """----------------------------------------------------------------
-        """
-        self.environment = GridEnvironment()
-        self.environment.create_agent(id='agent1',
-                                      kind='AGENT', 
-                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
-                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        self.environment.create_agent(id='agent2',
-                                      kind='AGENT', 
-                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
-                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
-        self.runner.running_status += core.SignalHandler(self.__running_status)
-
     def __apply_styles(self):
         self.SetTitle("RL")
         self.SetSize((1024, 768))
         self.Centre()
 
-        vsizer = wx.BoxSizer(wx.VERTICAL)
-        vsizer.Add(self.grid_panel, proportion=1, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-
-        hsizer1 = wx.BoxSizer(wx.HORIZONTAL)
-        hsizer1.Add(self.run_visual_training_button, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.AddSpacer(5) 
-        hsizer1.Add(self.visual_training_randomness_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.Add(self.visual_training_randomness_variator, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.AddSpacer(5)
-        hsizer1.Add(self.visual_training_speed_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.Add(self.visual_training_speed_variator, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.AddSpacer(5)
-        hsizer1.Add(self.cancel_visual_training_running_button, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer1.AddSpacer(5)
-        vsizer.Add(hsizer1, proportion=0, flag=wx.ALIGN_RIGHT | wx.TOP | wx.BOTTOM | wx.LEFT | wx.RIGHT, border=10)
-
-        hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        hsizer2.Add(self.run_training_button, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer2.AddSpacer(5) 
-        hsizer2.Add(self.training_randomness_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer2.Add(self.training_randomness_variator, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer2.AddSpacer(5)
-        hsizer2.Add(self.cancel_training_running_button, flag=wx.ALIGN_CENTER_VERTICAL)
-        hsizer2.AddSpacer(5)
-        vsizer.Add(hsizer2, proportion=0, flag=wx.ALIGN_RIGHT | wx.TOP | wx.BOTTOM | wx.LEFT | wx.RIGHT, border=10)
-        self.SetSizer(vsizer)
-
+        sizer1 = wx.BoxSizer(wx.VERTICAL)
+        sizer11 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer1.Add(sizer11, proportion=1, flag=wx.EXPAND)
+        sizer12 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer1.Add(sizer12, proportion=0, flag=wx.EXPAND)  
+        sizer121 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer12.Add(sizer121, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)  
+        sizer122 = wx.BoxSizer(wx.VERTICAL)
+        sizer12.Add(sizer122, proportion=3, flag=wx.EXPAND | wx.ALL, border=5)  
+        sizer1221 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer122.Add(sizer1221, proportion=1, flag=wx.ALIGN_RIGHT) 
+        sizer122.AddSpacer(5)
+        sizer1222 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer122.Add(sizer1222, proportion=1, flag=wx.ALIGN_RIGHT)  
+        self.SetSizer(sizer1)
+        
+        sizer11.Add(self.grid_panel, proportion=1, flag=wx.EXPAND)  
+        sizer121.Add(self.agent_policy_choice, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.Add(self.run_visual_training_button, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.AddSpacer(5) 
+        sizer1221.Add(self.visual_training_randomness_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.Add(self.visual_training_randomness_variator, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.AddSpacer(5)
+        sizer1221.Add(self.visual_training_speed_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.Add(self.visual_training_speed_variator, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1221.AddSpacer(5)
+        sizer1221.Add(self.cancel_visual_training_running_button, flag=wx.ALIGN_CENTER_VERTICAL)
+  
+        sizer1222.Add(self.run_training_button, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1222.AddSpacer(5) 
+        sizer1222.Add(self.training_randomness_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1222.Add(self.training_randomness_variator, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer1222.AddSpacer(5)
+        sizer1222.Add(self.cancel_training_running_button, flag=wx.ALIGN_CENTER_VERTICAL)
 
     """------------------------------------------------------------------------------------------------
     """

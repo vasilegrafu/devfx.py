@@ -16,7 +16,7 @@ class Environment(object):
         self.__agents_container[id] = agent
 
     def get_agents(self):
-        return self.__agents_container.values()
+        return [agent for agent in self.__agents_container.values()]
 
     def get_agent(self, id):
         if(id not in self.__agents_container):
