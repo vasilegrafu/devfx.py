@@ -54,7 +54,7 @@ class StepRunner(Runner):
 
         while(True):
             for agent in self.get_agents():                
-                if(agent.get_state().is_non_terminal()):
+                if(agent.is_in_non_terminal_state()):
                     if(running_parameters.step_number[agent] <= (running_parameters.step_count-1)):
                         rv = np.random.uniform(size=1)
                         if(rv <= running_parameters.randomness):

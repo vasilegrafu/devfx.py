@@ -55,7 +55,7 @@ class EpisodicRunner(Runner):
 
         while(True):
             for agent in self.get_agents():                
-                if(agent.get_state().is_non_terminal()):
+                if(agent.is_in_non_terminal_state()):
                     rv = np.random.uniform(size=1)
                     if(rv <= running_parameters.randomness):
                         agent.do_random_action()

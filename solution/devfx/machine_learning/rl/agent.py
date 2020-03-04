@@ -1,6 +1,7 @@
 import numpy as np
 import devfx.exceptions as exps
 import devfx.core as core
+from .state_kind import StateKind
 
 class Agent(object):
     def __init__(self, id, kind, environment, state, policy):
@@ -40,16 +41,43 @@ class Agent(object):
         self.__state = state
 
     def set_random_state(self):
-        self.set_state(state=self.get_environment().get_random_state(agent_kind=self.get_kind()))
+        environment = self.get_environment()
+        state = environment.get_random_state(agent_kind=self.get_kind())
+        self.set_state(state=state)
         
     def set_random_non_terminal_state(self):
-        self.set_state(state=self.get_environment().get_random_non_terminal_state(agent_kind=self.get_kind()))
-        
+        environment = self.get_environment()
+        state = environment.get_random_non_terminal_state(agent_kind=self.get_kind())
+        self.set_state(state=state)
+
     def set_random_terminal_state(self):
-        self.set_state(state=self.get_environment().set_random_terminal_state(agent_kind=self.get_kind()))
+        environment = self.get_environment()
+        state = environment.get_random_terminal_state(agent_kind=self.get_kind())
+        self.set_state(state=state)
 
     def get_state(self):
         return self.__state
+
+    def get_state_kind(self):
+        agent_kind = self.get_kind()
+        environment = self.get_environment()
+        state = self.get_state()
+        state_kind = environment.get_state_kind(agent_kind=agent_kind, state=state)
+        return state_kind
+
+    def is_in_non_terminal_state(self):
+        agent_kind = self.get_kind()
+        environment = self.get_environment()
+        state = self.get_state()
+        is_in_non_terminal_state = environment.is_in_non_terminal_state(agent_kind=agent_kind, state=state)
+        return is_in_non_terminal_state
+
+    def is_in_terminal_state(self):
+        agent_kind = self.get_kind()
+        environment = self.get_environment()
+        state = self.get_state()
+        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
+        return is_in_terminal_state
 
     """------------------------------------------------------------------------------------------------
     """
@@ -62,46 +90,48 @@ class Agent(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def do_random_action(self):
+        agent_kind = self.get_kind()
         environment = self.get_environment()
-
         state = self.get_state()
-        if(state.is_terminal()):
+
+        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
+        if(is_in_terminal_state):
             return
 
-        policy = self.get_policy()
-
-        action = environment.get_random_action(agent=self)
+        action = environment.get_random_action(agent_kind=agent_kind, state=state)
         if(action is None):
             return
         else:
-            (next_state, reward) = environment.get_next_state_and_reward(agent=self, action=action)
+            next_state = environment.get_next_state(agent_kind=agent_kind, state=state, action=action)
+            reward = environment.get_reward(agent_kind=agent_kind, state=next_state)
 
         self.set_state(state=next_state)
 
-        policy.update(state=state, action=action, next_state=next_state, reward=reward)
+        self.get_policy().update(state=state, action=action, next_state=next_state, reward=reward)
 
         return (state, action, next_state, reward)
   
     """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self):
+        agent_kind = self.get_kind()
         environment = self.get_environment()
-
         state = self.get_state()
-        if(state.is_terminal()):
+
+        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
+        if(is_in_terminal_state):
             return
 
-        policy = self.get_policy()
-       
-        action = policy.get_action(state=state)
+        action = self.get_policy().get_action(state=state)
         if(action is None):
             return
         else:
-            (next_state, reward) = environment.get_next_state_and_reward(agent=self, action=action)
+            next_state = environment.get_next_state(agent_kind=agent_kind, state=state, action=action)
+            reward = environment.get_reward(agent_kind=agent_kind, state=next_state)
 
         self.set_state(state=next_state)
 
-        policy.update(state=state, action=action, next_state=next_state, reward=reward)
+        self.get_policy().update(state=state, action=action, next_state=next_state, reward=reward)
 
         return (state, action, next_state, reward)
 

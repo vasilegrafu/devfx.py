@@ -35,7 +35,10 @@ class MainFrame(wx.Frame):
 
         """----------------------------------------------------------------
         """
-        self.agent_policy_choice = wx.Choice(self, choices=[agent.get_id() for agent in self.environment.get_agents()])
+        self.agent_for_displaying_policy_choice_label = wx.StaticText(self, label="Display policy for agent:")
+        self.agent_for_displaying_policy_choice = wx.Choice(self, choices=['No agent'] + [agent.get_id() for agent in self.environment.get_agents()])
+        self.agent_for_displaying_policy_choice.Bind(wx.EVT_CHOICE, self.__agent_for_displaying_policy_choice_change)
+        self.agent_for_displaying_policy_choice.SetSelection(0)
 
         """----------------------------------------------------------------
         """
@@ -97,7 +100,8 @@ class MainFrame(wx.Frame):
         self.SetSizer(sizer1)
         
         sizer11.Add(self.grid_panel, proportion=1, flag=wx.EXPAND)  
-        sizer121.Add(self.agent_policy_choice, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer121.Add(self.agent_for_displaying_policy_choice_label, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer121.Add(self.agent_for_displaying_policy_choice, flag=wx.ALIGN_CENTER_VERTICAL)
         sizer1221.Add(self.run_visual_training_button, flag=wx.ALIGN_CENTER_VERTICAL)
         sizer1221.AddSpacer(5) 
         sizer1221.Add(self.visual_training_randomness_variator_label, flag=wx.ALIGN_CENTER_VERTICAL)
@@ -134,6 +138,9 @@ class MainFrame(wx.Frame):
 
     def __cancel_training_running_button_click(self, event):
         self.__training_cancelling_is_requested = True
+
+    def __agent_for_displaying_policy_choice_change(self, event):
+        self.__draw_grid_environment()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -186,20 +193,20 @@ class MainFrame(wx.Frame):
         dc.Clear()
 
         # draw cells
-        for (ci, cc) in self.environment.get_cells():
-            self.__draw_grid_cell(ci=ci, cc=cc, dc=dc)
+        for (cell_index, cell_content) in self.environment.get_cells():
+            self.__draw_grid_cell(ci=cell_index, cc=cell_content, dc=dc)
 
         # draw agents
         for agent in self.environment.get_agents():
             self.__draw_grid_agent(agent=agent, dc=dc)
 
         # draw agent policies
-        for (ci, cc) in self.environment.get_cells():
-            self.__draw_grid_agent_policy(agents=self.environment.get_agents(), ci=ci, cc=cc, dc=dc)
+        for (cell_index, cell_content) in self.environment.get_cells():
+            self.__draw_grid_agent_policy(agents=self.environment.get_agents(), ci=cell_index, cc=cell_content, dc=dc)
 
     def __draw_grid_cell(self, ci, cc, dc):
-        (c_ri, c_ci) = ci
-        (env_rc, env_cc) = self.environment.get_size()
+        (c_ri, c_ci) = (ci[0]-1, ci[1]-1)
+        (env_rc, env_cc) = self.environment.get_shape()
         (dc_w, dc_h) = dc.GetSize()
         (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
         (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
@@ -209,11 +216,13 @@ class MainFrame(wx.Frame):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
             dc.DrawRectangle(r_w0, r_h0, r_dw, r_dh) 
         else:
-            (state, reward) = cc
+            state = ml.rl.State(value=ci)
+            state_kind = self.environment.get_state_kind(agent_kind="AGENT", state=state)
+            reward = self.environment.get_reward(agent_kind="AGENT", state=state)
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
-            if(state.kind == ml.rl.StateKind.TERMINAL):
+            if(state_kind == ml.rl.StateKind.TERMINAL):
                 dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
-            elif(state.kind == ml.rl.StateKind.NON_TERMINAL):
+            elif(state_kind == ml.rl.StateKind.NON_TERMINAL):
                 dc.SetBrush(wx.Brush(wx.Colour(0, 255, 0)))
             else:
                 raise exps.NotImplementedError()
@@ -221,8 +230,9 @@ class MainFrame(wx.Frame):
             dc.DrawText(f'r:{reward.value:.2f}', r_w0+2, r_h0+2) 
 
     def __draw_grid_agent(self, agent, dc):
-        (c_ri, c_ci) = agent.get_state().value
-        (env_rc, env_cc) = self.environment.get_size()
+        ci = agent.get_state().value
+        (c_ri, c_ci) = (ci[0]-1, ci[1]-1)
+        (env_rc, env_cc) = self.environment.get_shape()
         (dc_w, dc_h) = dc.GetSize()
         (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
         (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
@@ -235,14 +245,16 @@ class MainFrame(wx.Frame):
         if(cc is None):
             pass
         else:
-            (c_ri, c_ci) = ci
-            (env_rc, env_cc) = self.environment.get_size()
+            (c_ri, c_ci) = (ci[0]-1, ci[1]-1)
+            (env_rc, env_cc) = self.environment.get_shape()
             (dc_w, dc_h) = dc.GetSize()
             (r_w0, r_h0) = (dc_w*(c_ci/env_cc), dc_h*(c_ri/env_rc))
             (r_dw, r_dh) = (dc_w/env_cc, dc_h/env_rc)
 
-            (state, reward) = cc
-            for agent in agents:
+            state = ml.rl.State(value=ci)
+            agent_id = self.agent_for_displaying_policy_choice.GetString(n=self.agent_for_displaying_policy_choice.GetSelection())
+            if(self.environment.exists_agent(id=agent_id)):
+                agent = self.environment.get_agent(id=agent_id)
                 policy = agent.get_policy()
                 if(state in policy.qtable):
                     actions = policy.qtable[state]

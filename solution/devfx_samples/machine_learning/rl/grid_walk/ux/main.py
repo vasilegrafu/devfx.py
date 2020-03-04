@@ -1,5 +1,5 @@
 import wx
-from devfx_samples.machine_learning.rl.grid.ux.main_frame import MainFrame
+from devfx_samples.machine_learning.rl.grid_walk.ux.main_frame import MainFrame
 
 """------------------------------------------------------------------------------------------------
 """
