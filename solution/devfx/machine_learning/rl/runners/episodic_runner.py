@@ -44,9 +44,9 @@ class EpisodicRunner(Runner):
 
 
     def _run(self, episode_count=1, randomness=1.0):
-        running_parameters = EpisodicRunner.RunningParameters(agents=self.get_agents())
+        running_parameters = EpisodicRunner.RunningParameters(agents=super().get_agents())
         running_parameters.episode_count = episode_count
-        running_parameters.episode_number = { agent : 0 for agent in self.get_agents() }
+        running_parameters.episode_number = { agent : 0 for agent in super().get_agents() }
         running_parameters.randomness = randomness
 
         for agent in self.get_agents():                
@@ -54,7 +54,7 @@ class EpisodicRunner(Runner):
             running_parameters.episode_number[agent] = 1
 
         while(True):
-            for agent in self.get_agents():                
+            for agent in super().get_agents():                
                 if(agent.is_in_non_terminal_state()):
                     rv = np.random.uniform(size=1)
                     if(rv <= running_parameters.randomness):
@@ -67,9 +67,9 @@ class EpisodicRunner(Runner):
                     if(running_parameters.episode_number[agent] <= running_parameters.episode_count):
                         running_parameters.episode_number[agent] += 1
 
-            self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
+            super().running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
 
-            if(all((running_parameters.episode_number[agent] > running_parameters.episode_count) for agent in self.get_agents())):
+            if(all((running_parameters.episode_number[agent] > running_parameters.episode_count) for agent in super().get_agents())):
                 break
             if(running_parameters.cancellation_token.is_cancellation_requested()):
                 break

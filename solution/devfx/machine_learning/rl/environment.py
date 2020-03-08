@@ -21,7 +21,7 @@ class Environment(object):
             agents = [agent for agent in self.__agents_container.values()]
             return agents
         else:
-            agents = [agent for agent in self.__agents_container.values() if(agent.kind == kind)]
+            agents = [agent for agent in self.__agents_container.values() if(agent.get_kind() == kind)]
             if(len(agents) == 0):
                 return None
             else:
@@ -32,7 +32,7 @@ class Environment(object):
             agents = [agent for agent in self.__agents_container.values() if(agent.id != id)]
             return agents
         else:
-            agents = [agent for agent in self.__agents_container.values() if((agent.id != id) and (agent.kind == kind))]
+            agents = [agent for agent in self.__agents_container.values() if((agent.id != id) and (agent.get_kind() == kind))]
             if(len(agents) == 0):
                 return None
             else:
@@ -97,22 +97,22 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
+    def get_next_state_and_reward(self, agent_kind, state, action):
+        (next_state, next_reward) = self._get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
+        return (next_state, next_reward)
+        
+    def _get_next_state_and_reward(self, agent_kind, state, action):
+        raise exps.NotImplementedError()
+
+
     def get_next_state(self, agent_kind, state, action):
-        next_state = self._get_next_state(agent_kind=agent_kind, state=state, action=action)
+        (next_state, next_reward) = self.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
         return next_state
-        
-    def _get_next_state(self, agent_kind, state, action):
-        raise exps.NotImplementedError()
 
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def get_reward(self, agent_kind, state):
-        reward = self._get_reward(agent_kind=agent_kind, state=state)
-        return reward
+    def get_next_reward(self, agent_kind, state, action):
+        (next_state, next_reward) = self.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
+        return next_reward
         
-    def _get_reward(self, agent_kind, state):
-        raise exps.NotImplementedError()
-
     """------------------------------------------------------------------------------------------------
     """ 
     def get_random_action(self, agent_kind, state):

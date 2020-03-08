@@ -88,6 +88,11 @@ class Agent(object):
         return self.__policy
 
     """------------------------------------------------------------------------------------------------
+    """
+    def learn(self, state, action, next_state, next_reward):
+        self.get_policy().learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+
+    """------------------------------------------------------------------------------------------------
     """ 
     def do_random_action(self):
         agent_kind = self.get_kind()
@@ -102,14 +107,14 @@ class Agent(object):
         if(action is None):
             return
         else:
-            next_state = environment.get_next_state(agent_kind=agent_kind, state=state, action=action)
-            reward = environment.get_reward(agent_kind=agent_kind, state=next_state)
+            (next_state, next_reward) = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
 
         self.set_state(state=next_state)
 
-        self.get_policy().update(state=state, action=action, next_state=next_state, reward=reward)
+        self.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
 
-        return (state, action, next_state, reward)
+
+        return (state, action, next_state, next_reward)
   
     """------------------------------------------------------------------------------------------------
     """ 
@@ -126,14 +131,13 @@ class Agent(object):
         if(action is None):
             return
         else:
-            next_state = environment.get_next_state(agent_kind=agent_kind, state=state, action=action)
-            reward = environment.get_reward(agent_kind=agent_kind, state=next_state)
+            (next_state, next_reward) = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
 
         self.set_state(state=next_state)
 
-        self.get_policy().update(state=state, action=action, next_state=next_state, reward=reward)
+        self.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
 
-        return (state, action, next_state, reward)
+        return (state, action, next_state, next_reward)
 
 
    

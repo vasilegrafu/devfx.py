@@ -44,16 +44,16 @@ class StepRunner(Runner):
 
 
     def _run(self, step_count=1, randomness=1.0):
-        running_parameters = StepRunner.RunningParameters(agents=self.get_agents())
+        running_parameters = StepRunner.RunningParameters(agents=super().get_agents())
         running_parameters.step_count = step_count
-        running_parameters.step_number = { agent : 0 for agent in self.get_agents() }
+        running_parameters.step_number = { agent : 0 for agent in super().get_agents() }
         running_parameters.randomness = randomness
 
-        for agent in self.get_agents():                
+        for agent in super().get_agents():                
             agent.set_random_non_terminal_state()
 
         while(True):
-            for agent in self.get_agents():                
+            for agent in super().get_agents():                
                 if(agent.is_in_non_terminal_state()):
                     if(running_parameters.step_number[agent] <= (running_parameters.step_count-1)):
                         rv = np.random.uniform(size=1)
@@ -65,9 +65,9 @@ class StepRunner(Runner):
                 else:
                     agent.set_random_non_terminal_state()
 
-            self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
+            super().running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
 
-            if(all((running_parameters.step_number[agent] >= running_parameters.step_count) for agent in self.get_agents())):
+            if(all((running_parameters.step_number[agent] >= running_parameters.step_count) for agent in super().get_agents())):
                 break
             if(running_parameters.cancellation_token.is_cancellation_requested()):
                 break

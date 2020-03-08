@@ -13,9 +13,6 @@ class GridEnvironment(ml.rl.Environment):
         self.grid_shape=(5, 5)
         self.grid_cells_blocked = [(2, 2), (3, 3), (5, 5)]
 
-        self.terminal_cells = [(1, 5), (2, 5)]
-        self.cells_with_reward = {(1, 5):+1.0, (2, 5):-1.0}
-
     """------------------------------------------------------------------------------------------------
     """
     def __get_cells_generator(self):
@@ -42,28 +39,33 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator()]
-        cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
-        return state
+        raise exps.NotImplementedError()
 
     def _get_random_non_terminal_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_content not in self.terminal_cells)]
-        cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
-        return state
+        if(agent_kind == 'CHASER'):
+            agents = super().get_agents(kind='CHASED')
+        if(agent_kind == 'CHASED'):
+            agents = super().get_agents(kind='CHASER')
+            
+        if(agents is None):
+            cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator()]
+            cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
+            state = ml.rl.State(value=(cell_index, (None, None)))
+            return state
+        else:
+            other_cell_index = agents[0].get_state().value[0]
+            cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_index != other_cell_index)]
+            cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
+            state = ml.rl.State(value=(cell_index, other_cell_index))
+            return state
 
     def _get_random_terminal_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_content in self.terminal_cells)]
-        cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
-        return state
+        raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_state_kind(self, agent_kind, state):
-        cell_index = state.value
-        if(cell_index not in self.terminal_cells):
+        if(state.value[0] != state.value[1]):
             return ml.rl.StateKind.NON_TERMINAL
         else:
             return ml.rl.StateKind.TERMINAL
@@ -71,7 +73,13 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_next_state_and_reward(self, agent_kind, state, action):
-        cell_index = state.value
+        if(agent_kind == 'CHASER'):
+            agents = super().get_agents(kind='CHASED')
+        if(agent_kind == 'CHASED'):
+            agents = super().get_agents(kind='CHASER')
+        other_cell_index = agents[0].get_state().value[0]
+
+        cell_index = state.value[0]
 
         if(action == GridActions.Left):
             next_cell_index = (cell_index[0], cell_index[1]-1)
@@ -83,12 +91,16 @@ class GridEnvironment(ml.rl.Environment):
             next_cell_index = (cell_index[0]+1, cell_index[1])
         if(action == GridActions.Stay):
             next_cell_index = (cell_index[0], cell_index[1])
-        next_state = ml.rl.State(value=next_cell_index)
 
-        if(next_cell_index not in self.cells_with_reward):
+        next_state = ml.rl.State(value=(next_cell_index, other_cell_index))
+
+        if(next_cell_index != other_cell_index):
             next_reward = ml.rl.Reward(value=0.0)
         else:
-            next_reward = ml.rl.Reward(value=self.cells_with_reward[next_cell_index])
+            if(agent_kind == 'CHASER'):
+                next_reward = ml.rl.Reward(value=+10)
+            elif(agent_kind == 'CHASED'):
+                next_reward = ml.rl.Reward(value=-10)
 
         return (next_state, next_reward)
 
@@ -98,7 +110,7 @@ class GridEnvironment(ml.rl.Environment):
         state_kind = self.get_state_kind(agent_kind=agent_kind, state=state)
         if(state_kind == ml.rl.StateKind.TERMINAL):
             return
-        cell_index = state.value
+        cell_index = state.value[0]
         indexed_cells = {cell_index:cell_content for (cell_index, cell_content) in self.__get_cells_generator()}
         if((cell_index[0] > 1) and indexed_cells[cell_index[0]-1, cell_index[1]] is not None):
             yield GridActions.Up

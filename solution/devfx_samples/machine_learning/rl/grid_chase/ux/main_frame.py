@@ -18,13 +18,13 @@ class MainFrame(wx.Frame):
         """
         self.environment = GridEnvironment()
         self.environment.create_agent(id='agent1',
-                                      kind='AGENT', 
-                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+                                      kind='CHASER', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='CHASER'),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        # self.environment.create_agent(id='agent2',
-        #                               kind='AGENT', 
-        #                               state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
-        #                               policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
+        self.environment.create_agent(id='agent2',
+                                      kind='CHASED', 
+                                      state=self.environment.get_random_non_terminal_state(agent_kind='CHASED'),
+                                      policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
         self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
         self.runner.running_status += core.SignalHandler(self.__running_status)
 
@@ -201,8 +201,8 @@ class MainFrame(wx.Frame):
             self.__draw_grid_agent(agent=agent, dc=dc)
 
         # draw agent policies
-        for (cell_index, cell_content) in self.environment.get_cells():
-            self.__draw_grid_agent_policy(agents=self.environment.get_agents(), cell_index=cell_index, cell_content=cell_content, dc=dc)
+        # for (cell_index, cell_content) in self.environment.get_cells():
+        #     self.__draw_grid_agent_policy(agents=self.environment.get_agents(), cell_index=cell_index, cell_content=cell_content, dc=dc)
 
     def __draw_grid_cell(self, cell_index, cell_content, dc):
         (env_row_count, env_column_count) = self.environment.get_shape()
@@ -215,29 +215,27 @@ class MainFrame(wx.Frame):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
         else:
-            state = ml.rl.State(value=cell_index)
-            state_kind = self.environment.get_state_kind(agent_kind="AGENT", state=state)
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
-            if(state_kind == ml.rl.StateKind.TERMINAL):
-                dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
-            elif(state_kind == ml.rl.StateKind.NON_TERMINAL):
-                dc.SetBrush(wx.Brush(wx.Colour(0, 255, 0)))
-            else:
-                raise exps.NotImplementedError()
+            dc.SetBrush(wx.Brush(wx.Colour(0, 255, 0)))
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
-            if(cell_index in self.environment.cells_with_reward.keys()):
-                dc.DrawText(f'r:{self.environment.cells_with_reward[cell_index]:.2f}', rect_w0+2, rect_h0+2) 
 
     def __draw_grid_agent(self, agent, dc):
-        cell_index = agent.get_state().value
+        cell_index = agent.get_state().value[0]
         (env_row_count, env_column_count) = self.environment.get_shape()
         (dc_w, dc_h) = dc.GetSize()
         (rect_w0, rect_h0) = (dc_w*((cell_index[1]-1)/env_column_count), dc_h*((cell_index[0]-1)/env_row_count))
         (rect_dw, rect_dh) = (dc_w/env_column_count, dc_h/env_row_count)
 
         dc.SetPen(wx.Pen(wx.Colour(0, 0, 0))) 
-        dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
-        dc.DrawCircle(rect_w0 + rect_dw/2, rect_h0 + rect_dh/2, min(rect_dw/4, rect_dh/4)) 
+        if(agent.get_kind() == 'CHASER'):
+            dc.SetBrush(wx.Brush(wx.Colour(255, 0, 0))) 
+            dc.DrawCircle(rect_w0 + rect_dw/2, rect_h0 + rect_dh/2, min(rect_dw/3, rect_dh/3)) 
+        elif(agent.get_kind() == 'CHASED'):
+            dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255)))
+            dc.DrawCircle(rect_w0 + rect_dw/2, rect_h0 + rect_dh/2, min(rect_dw/4, rect_dh/4)) 
+        else:
+            raise exps.ApplicationError()
+        
 
     def __draw_grid_agent_policy(self, agents, cell_index, cell_content, dc):
         if(cell_content is None):

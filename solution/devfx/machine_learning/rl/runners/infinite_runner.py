@@ -34,8 +34,8 @@ class InfiniteRunner(Runner):
 
 
     def _run(self, randomness=1.0):
-        running_parameters = InfiniteRunner.RunningParameters(agents=self.get_agents())
-        running_parameters.episode_number = { agent : 0 for agent in self.get_agents() }
+        running_parameters = InfiniteRunner.RunningParameters(agents=super().get_agents())
+        running_parameters.episode_number = { agent : 0 for agent in super().get_agents() }
         running_parameters.randomness = randomness
 
         for agent in self.get_agents():                
@@ -43,7 +43,7 @@ class InfiniteRunner(Runner):
             running_parameters.episode_number[agent] = 1
 
         while(True):
-            for agent in self.get_agents():                
+            for agent in super().get_agents():                
                 if(agent.is_in_non_terminal_state()):
                     rv = np.random.uniform(size=1)
                     if(rv <= running_parameters.randomness):
@@ -54,7 +54,7 @@ class InfiniteRunner(Runner):
                     agent.set_random_non_terminal_state()
                     running_parameters.episode_number[agent] += 1
                     
-            self.running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
+            super().running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
 
             if(running_parameters.cancellation_token.is_cancellation_requested()):
                 break

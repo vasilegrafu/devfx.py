@@ -17,10 +17,10 @@ class Policy(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def update(self, state, action, next_state, reward):
-        self._update(state=state, action=action, next_state=next_state, reward=reward)
+    def learn(self, state, action, next_state, next_reward):
+        self._learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
 
-    def _update(self, state, action, next_state, reward):
+    def _learn(self, state, action, next_state, next_reward):
         raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
