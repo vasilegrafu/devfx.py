@@ -25,7 +25,7 @@ class MainFrame(wx.Frame):
                                       kind='CHASED', 
                                       state=self.environment.get_random_non_terminal_state(agent_kind='CHASED'),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
+        self.runner = ml.rl.EpisodicTaskRunner(agents=self.environment.get_agents())
         self.runner.running_status += core.SignalHandler(self.__running_status)
 
         """----------------------------------------------------------------

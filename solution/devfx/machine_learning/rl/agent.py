@@ -1,4 +1,3 @@
-import numpy as np
 import devfx.exceptions as exps
 import devfx.core as core
 from .state_kind import StateKind
@@ -39,45 +38,16 @@ class Agent(object):
     """
     def set_state(self, state):
         self.__state = state
+      
+    def get_state(self):
+        return self.__state
 
+    """------------------------------------------------------------------------------------------------
+    """
     def set_random_state(self):
         environment = self.get_environment()
         state = environment.get_random_state(agent_kind=self.get_kind())
         self.set_state(state=state)
-        
-    def set_random_non_terminal_state(self):
-        environment = self.get_environment()
-        state = environment.get_random_non_terminal_state(agent_kind=self.get_kind())
-        self.set_state(state=state)
-
-    def set_random_terminal_state(self):
-        environment = self.get_environment()
-        state = environment.get_random_terminal_state(agent_kind=self.get_kind())
-        self.set_state(state=state)
-
-    def get_state(self):
-        return self.__state
-
-    def get_state_kind(self):
-        agent_kind = self.get_kind()
-        environment = self.get_environment()
-        state = self.get_state()
-        state_kind = environment.get_state_kind(agent_kind=agent_kind, state=state)
-        return state_kind
-
-    def is_in_non_terminal_state(self):
-        agent_kind = self.get_kind()
-        environment = self.get_environment()
-        state = self.get_state()
-        is_in_non_terminal_state = environment.is_in_non_terminal_state(agent_kind=agent_kind, state=state)
-        return is_in_non_terminal_state
-
-    def is_in_terminal_state(self):
-        agent_kind = self.get_kind()
-        environment = self.get_environment()
-        state = self.get_state()
-        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
-        return is_in_terminal_state
 
     """------------------------------------------------------------------------------------------------
     """
@@ -89,55 +59,52 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def learn(self, state, action, next_state, next_reward):
-        self.get_policy().learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+    def learn(self, state, action, next_state_and_reward):
+        self.get_policy().learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_random_action(self):
-        agent_kind = self.get_kind()
+    def do_action(self, action):
+        if(action is None):
+            raise exps.ArgumentNoneError()
+
         environment = self.get_environment()
+        agent_kind = self.get_kind()
         state = self.get_state()
 
-        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
+        is_in_terminal_state = state.kind == StateKind.TERMINAL
         if(is_in_terminal_state):
-            return
+            raise exps.ApplicationError()
+
+        next_state_and_reward = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
+        if(next_state_and_reward is None):
+            return (state, action, None)
+
+        (next_state, next_reward) = next_state_and_reward
+        self.set_state(state=next_state)
+
+        self.learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
+
+        return (state, action, next_state_and_reward)
+
+
+    def do_random_action(self):
+        environment = self.get_environment()
+        agent_kind = self.get_kind()
+        state = self.get_state()
 
         action = environment.get_random_action(agent_kind=agent_kind, state=state)
-        if(action is None):
-            return
-        else:
-            (next_state, next_reward) = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
-
-        self.set_state(state=next_state)
-
-        self.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
-
-
-        return (state, action, next_state, next_reward)
-  
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def do_action(self):
-        agent_kind = self.get_kind()
-        environment = self.get_environment()
+        (state, action, next_state_and_reward) = self.do_action(action=action)
+        return (state, action, next_state_and_reward)
+ 
+    def do_optimal_action(self):
         state = self.get_state()
 
-        is_in_terminal_state = environment.is_in_terminal_state(agent_kind=agent_kind, state=state)
-        if(is_in_terminal_state):
-            return
+        action = self.get_policy().get_optimal_action(state=state)
+        (state, action, next_state_and_reward) = self.do_action(action=action)
+        return (state, action, next_state_and_reward)
 
-        action = self.get_policy().get_action(state=state)
-        if(action is None):
-            return
-        else:
-            (next_state, next_reward) = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
-
-        self.set_state(state=next_state)
-
-        self.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
-
-        return (state, action, next_state, next_reward)
+  
 
 
    

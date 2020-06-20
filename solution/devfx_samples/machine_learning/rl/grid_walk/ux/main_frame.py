@@ -5,8 +5,8 @@ import random as rnd
 import devfx.exceptions as exps
 import devfx.core as core
 import devfx.machine_learning as ml
-from .. logic.grid_environment import GridEnvironment
-from .. logic.grid_actions import GridActions
+from ..logic.grid_environment import GridEnvironment
+from ..logic.grid_actions import GridActions
 
 class MainFrame(wx.Frame):
     """------------------------------------------------------------------------------------------------
@@ -17,15 +17,11 @@ class MainFrame(wx.Frame):
         """----------------------------------------------------------------
         """
         self.environment = GridEnvironment()
-        self.environment.create_agent(id='agent1',
-                                      kind='AGENT', 
-                                      state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
+        self.environment.create_agent(id='walker1',
+                                      kind="WALKER",
+                                      state=self.environment.get_random_state(agent_kind="WALKER"),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        # self.environment.create_agent(id='agent2',
-        #                               kind='AGENT', 
-        #                               state=self.environment.get_random_non_terminal_state(agent_kind='AGENT'),
-        #                               policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
-        self.runner = ml.rl.EpisodicRunner(agents=self.environment.get_agents())
+        self.runner = ml.rl.TrainingRunner(agents=self.environment.get_agents())
         self.runner.running_status += core.SignalHandler(self.__running_status)
 
         """----------------------------------------------------------------
@@ -149,7 +145,7 @@ class MainFrame(wx.Frame):
         self.cancel_visual_training_running_button.Enabled = True
 
         self.__visual_training_is_running = True
-        self.runner.run(episode_count=10000, randomness=self.visual_training_randomness_variator.GetValue())
+        self.runner.run(randomness=self.visual_training_randomness_variator.GetValue())
         self.__visual_training_is_running = False
 
         self.run_visual_training_button.Enabled = True
@@ -162,7 +158,7 @@ class MainFrame(wx.Frame):
         self.cancel_training_running_button.Enabled = True
 
         self.__training_is_running = True
-        self.runner.run(episode_count=10000, randomness=self.training_randomness_variator.GetValue())
+        self.runner.run(randomness=self.training_randomness_variator.GetValue())
         self.__training_is_running = False
 
         self.run_training_button.Enabled = True
@@ -215,8 +211,7 @@ class MainFrame(wx.Frame):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
         else:
-            state = ml.rl.State(value=cell_index)
-            state_kind = self.environment.get_state_kind(agent_kind="AGENT", state=state)
+            state_kind = ml.rl.StateKind.NON_TERMINAL if(cell_index not in self.environment.grid_terminal_cells.keys()) else ml.rl.StateKind.TERMINAL
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
             if(state_kind == ml.rl.StateKind.TERMINAL):
                 dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
@@ -225,8 +220,8 @@ class MainFrame(wx.Frame):
             else:
                 raise exps.NotImplementedError()
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
-            if(cell_index in self.environment.cells_with_reward.keys()):
-                dc.DrawText(f'r:{self.environment.cells_with_reward[cell_index]:.2f}', rect_w0+2, rect_h0+2) 
+            if(cell_index in self.environment.grid_terminal_cells.keys()):
+                dc.DrawText(f'r:{self.environment.grid_terminal_cells[cell_index]:.2f}', rect_w0+2, rect_h0+2) 
 
     def __draw_grid_agent(self, agent, dc):
         cell_index = agent.get_state().value
@@ -248,7 +243,7 @@ class MainFrame(wx.Frame):
             (rect_w0, rect_h0) = (dc_w*((cell_index[1]-1)/env_column_count), dc_h*((cell_index[0]-1)/env_row_count))
             (rect_dw, rect_dh) = (dc_w/env_column_count, dc_h/env_row_count)
 
-            state = ml.rl.State(value=cell_index)
+            state = ml.rl.State(value=cell_index, kind = ml.rl.StateKind.NON_TERMINAL if(cell_index not in self.environment.grid_terminal_cells.keys()) else ml.rl.StateKind.TERMINAL)
             agent_id = self.agent_for_displaying_policy_choice.GetString(n=self.agent_for_displaying_policy_choice.GetSelection())
             if(self.environment.exists_agent(id=agent_id)):
                 agent = self.environment.get_agent(id=agent_id)

@@ -26,7 +26,8 @@ class Runner(object):
     def running_status(self, signal_handlers):
         self.__running_status = signal_handlers
 
-
+    """------------------------------------------------------------------------------------------------
+    """
     class RunningCancellationToken(object):
         def __init__(self):
             self.__is_cancellation_requested = False
@@ -43,7 +44,8 @@ class Runner(object):
         def is_cancellation_requested(self):
             return (self.__is_cancellation_requested == True)
 
-
+    """------------------------------------------------------------------------------------------------
+    """
     class RunningParameters(object):
         def __init__(self, agents):
             self.agents = agents
@@ -57,6 +59,24 @@ class Runner(object):
         def agents(self, value):
             self.__agents = value
 
+        
+        @property
+        def continuing_agents(self):
+            return self.__continuing_agents
+
+        @continuing_agents.setter
+        def continuing_agents(self, value):
+            self.__continuing_agents = value
+
+        
+        @property
+        def episodic_agents(self):
+            return self.__episodic_agents
+
+        @episodic_agents.setter
+        def episodic_agents(self, value):
+            self.__episodic_agents = value
+
 
         @property
         def cancellation_token(self):
@@ -66,7 +86,8 @@ class Runner(object):
         def cancellation_token(self, value):
             self.__cancellation_token = value
 
-
+    """------------------------------------------------------------------------------------------------
+    """
     def run(self, *args, **kwargs):
         self._run(*args, **kwargs)
 

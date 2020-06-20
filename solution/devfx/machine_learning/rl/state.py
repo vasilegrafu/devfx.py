@@ -2,8 +2,9 @@ import devfx.exceptions as exps
 import devfx.core as core
 
 class State(object):
-    def __init__(self, value):
+    def __init__(self, value, kind):
         self.__set_value(value=value)
+        self.__set_kind(kind=kind)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -13,6 +14,15 @@ class State(object):
     @property
     def value(self):
         return self.__value
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_kind(self, kind):
+        self.__kind = kind
+
+    @property
+    def kind(self):
+        return self.__kind
 
     """------------------------------------------------------------------------------------------------
     """
@@ -26,10 +36,10 @@ class State(object):
             return False
         if(not core.is_instance(state, State)):
             raise exps.ArgumentError()
-        return state.value == self.value
+        return state.value == self.value and state.kind == self.kind
 
     def __hash__(self):
-        return hash(self.value)
+        return hash((self.value, self.kind))
 
 
     

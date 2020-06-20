@@ -17,17 +17,17 @@ class Policy(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def learn(self, state, action, next_state, next_reward):
-        self._learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+    def learn(self, state, action, next_state_and_reward):
+        self._learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
 
-    def _learn(self, state, action, next_state, next_reward):
+    def _learn(self, state, action, next_state_and_reward):
         raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_action(self, state):
-        return self._get_action(state=state)
+    def get_optimal_action(self, state):
+        return self._get_optimal_action(state=state)
 
-    def _get_action(self, state):
+    def _get_optimal_action(self, state):
         raise exps.NotImplementedError()
 

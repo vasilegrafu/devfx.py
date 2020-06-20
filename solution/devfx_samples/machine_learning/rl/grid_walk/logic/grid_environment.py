@@ -11,16 +11,14 @@ class GridEnvironment(ml.rl.Environment):
         super().__init__()
 
         self.grid_shape=(5, 5)
-        self.grid_cells_blocked = [(2, 2), (3, 3), (5, 5)]
-
-        self.terminal_cells = [(1, 5), (2, 5)]
-        self.cells_with_reward = {(1, 5):+1.0, (2, 5):-1.0}
+        self.grid_blocked_cells = [(2, 2), (3, 3), (5, 5)]
+        self.grid_terminal_cells = {(1, 5):+1.0, (2, 5):-1.0}
 
     """------------------------------------------------------------------------------------------------
     """
     def __get_cells_generator(self):
         for (ri, ci) in it.product(range(1, self.grid_shape[0]+1), range(1, self.grid_shape[1]+1)):
-            if((ri, ci) in self.grid_cells_blocked):
+            if((ri, ci) in self.grid_blocked_cells):
                 (cell_index, cell_content) = ((ri, ci), None)
                 yield (cell_index, cell_content)
             else:
@@ -42,35 +40,17 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator()]
+        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_index not in self.grid_terminal_cells.keys())]
         cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
+        state = ml.rl.State(value=cell_index, kind=ml.rl.StateKind.NON_TERMINAL)
         return state
-
-    def _get_random_non_terminal_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_content not in self.terminal_cells)]
-        cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
-        return state
-
-    def _get_random_terminal_state(self, agent_kind):
-        cell_indexes = [cell_index for (cell_index, cell_content) in self.__get_non_blocked_cells_generator() if(cell_content in self.terminal_cells)]
-        cell_index = cell_indexes[np.random.choice(len(cell_indexes))]
-        state = ml.rl.State(value=cell_index)
-        return state
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _get_state_kind(self, agent_kind, state):
-        cell_index = state.value
-        if(cell_index not in self.terminal_cells):
-            return ml.rl.StateKind.NON_TERMINAL
-        else:
-            return ml.rl.StateKind.TERMINAL
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_next_state_and_reward(self, agent_kind, state, action):
+        if(state.kind == ml.rl.StateKind.TERMINAL):
+            return None
+
         cell_index = state.value
 
         if(action == GridActions.Left):
@@ -83,21 +63,21 @@ class GridEnvironment(ml.rl.Environment):
             next_cell_index = (cell_index[0]+1, cell_index[1])
         if(action == GridActions.Stay):
             next_cell_index = (cell_index[0], cell_index[1])
-        next_state = ml.rl.State(value=next_cell_index)
+        next_state = ml.rl.State(value=next_cell_index, kind=ml.rl.StateKind.NON_TERMINAL if(next_cell_index not in self.grid_terminal_cells.keys()) else ml.rl.StateKind.TERMINAL)
 
-        if(next_cell_index not in self.cells_with_reward):
+        if(next_cell_index not in self.grid_terminal_cells):
             next_reward = ml.rl.Reward(value=0.0)
         else:
-            next_reward = ml.rl.Reward(value=self.cells_with_reward[next_cell_index])
+            next_reward = ml.rl.Reward(value=self.grid_terminal_cells[next_cell_index])
 
         return (next_state, next_reward)
 
     """------------------------------------------------------------------------------------------------
     """
     def __get_actions_generator(self, agent_kind, state):
-        state_kind = self.get_state_kind(agent_kind=agent_kind, state=state)
-        if(state_kind == ml.rl.StateKind.TERMINAL):
-            return
+        if(state.kind == ml.rl.StateKind.TERMINAL):
+            return None
+            
         cell_index = state.value
         indexed_cells = {cell_index:cell_content for (cell_index, cell_content) in self.__get_cells_generator()}
         if((cell_index[0] > 1) and indexed_cells[cell_index[0]-1, cell_index[1]] is not None):

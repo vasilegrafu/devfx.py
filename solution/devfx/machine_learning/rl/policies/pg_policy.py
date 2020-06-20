@@ -7,10 +7,10 @@ class PGPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, next_state, next_reward):
+    def _learn(self, state, action, next_state_and_reward):
         raise exps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _get_action(self, state):
+    def _get_optimal_action(self, state):
         raise exps.NotImplementedError()

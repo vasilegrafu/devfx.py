@@ -30,11 +30,13 @@ class QPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, next_state, next_reward):
+    def _learn(self, state, action, next_state_and_reward):
         if(state not in self.qtable):
             self.qtable[state] = {}
         if(action not in self.qtable[state]):
             self.qtable[state][action] = 0.0
+
+        (next_state, next_reward) = next_state_and_reward
 
         if(next_state not in self.qtable):
             self.qtable[next_state] = {}
@@ -49,7 +51,7 @@ class QPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _get_action(self, state):
+    def _get_optimal_action(self, state):
         if(state not in self.qtable):
              return None
         if(len(self.qtable[state]) == 0):
