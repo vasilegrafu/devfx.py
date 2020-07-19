@@ -65,15 +65,12 @@ class Agent(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self, action):
-        if(action is None):
-            raise exps.ArgumentNoneError()
-
         environment = self.get_environment()
         agent_kind = self.get_kind()
         state = self.get_state()
 
-        is_in_terminal_state = state.kind == StateKind.TERMINAL
-        if(is_in_terminal_state):
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
             raise exps.ApplicationError()
 
         next_state_and_reward = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
@@ -93,12 +90,20 @@ class Agent(object):
         agent_kind = self.get_kind()
         state = self.get_state()
 
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise exps.ApplicationError()
+
         action = environment.get_random_action(agent_kind=agent_kind, state=state)
         (state, action, next_state_and_reward) = self.do_action(action=action)
         return (state, action, next_state_and_reward)
  
     def do_optimal_action(self):
         state = self.get_state()
+
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise exps.ApplicationError()
 
         action = self.get_policy().get_optimal_action(state=state)
         (state, action, next_state_and_reward) = self.do_action(action=action)

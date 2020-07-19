@@ -45,7 +45,7 @@ class TrainingRunner(Runner):
                 else:
                     raise exps.NotSupportedError()
 
-            super().running_status(source=self, signal_args=core.SignalArgs(running_parameters=running_parameters))
+            super().running_status(source=self, event_args=core.EventArgs(running_parameters=running_parameters))
 
             if(running_parameters.cancellation_token.is_cancellation_requested()):
                 break

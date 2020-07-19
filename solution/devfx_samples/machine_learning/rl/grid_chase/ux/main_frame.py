@@ -26,7 +26,7 @@ class MainFrame(wx.Frame):
                                       state=self.environment.get_random_non_terminal_state(agent_kind='CHASED'),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
         self.runner = ml.rl.EpisodicTaskRunner(agents=self.environment.get_agents())
-        self.runner.running_status += core.SignalHandler(self.__running_status)
+        self.runner.running_status += self.__running_status
 
         """----------------------------------------------------------------
         """
@@ -171,19 +171,19 @@ class MainFrame(wx.Frame):
         self.__draw_grid_environment()
         
 
-    def __running_status(self, source, signal_args):
+    def __running_status(self, source, event_args):
         if(self.__visual_training_is_running):
             self.__draw_grid_environment()
             t.sleep(self.visual_training_speed_variator.GetValue())
-            signal_args.running_parameters.randomness=self.visual_training_randomness_variator.GetValue()
+            event_args.running_parameters.randomness=self.visual_training_randomness_variator.GetValue()
             if(self.__visual_training_cancelling_is_requested):
-                signal_args.running_parameters.cancellation_token.request_cancellation()
+                event_args.running_parameters.cancellation_token.request_cancellation()
                 self.__visual_training_cancelling_is_requested = False
 
         if(self.__training_is_running):
-            signal_args.running_parameters.randomness=self.training_randomness_variator.GetValue()
+            event_args.running_parameters.randomness=self.training_randomness_variator.GetValue()
             if(self.__training_cancelling_is_requested):
-                signal_args.running_parameters.cancellation_token.request_cancellation()
+                event_args.running_parameters.cancellation_token.request_cancellation()
                 self.__training_cancelling_is_requested = False
 
     """------------------------------------------------------------------------------------------------

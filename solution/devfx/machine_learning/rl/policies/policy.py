@@ -1,4 +1,5 @@
 import devfx.exceptions as exps
+from ..state_kind import StateKind
 
 class Policy(object):
     def __init__(self, discount_factor):
@@ -26,8 +27,15 @@ class Policy(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def get_optimal_action(self, state):
-        return self._get_optimal_action(state=state)
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise exps.ApplicationError()
+
+        action =  self._get_optimal_action(state=state)
+        return action
 
     def _get_optimal_action(self, state):
         raise exps.NotImplementedError()
+
+    
 

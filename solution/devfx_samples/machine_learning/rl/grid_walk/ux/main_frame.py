@@ -22,7 +22,7 @@ class MainFrame(wx.Frame):
                                       state=self.environment.get_random_state(agent_kind="WALKER"),
                                       policy=ml.rl.QPolicy(discount_factor=0.95, learning_rate=0.25))
         self.runner = ml.rl.TrainingRunner(agents=self.environment.get_agents())
-        self.runner.running_status += core.SignalHandler(self.__running_status)
+        self.runner.running_status += self.__running_status
 
         """----------------------------------------------------------------
         """
@@ -167,19 +167,19 @@ class MainFrame(wx.Frame):
         self.__draw_grid_environment()
         
 
-    def __running_status(self, source, signal_args):
+    def __running_status(self, source, event_args):
         if(self.__visual_training_is_running):
             self.__draw_grid_environment()
             t.sleep(self.visual_training_speed_variator.GetValue())
-            signal_args.running_parameters.randomness=self.visual_training_randomness_variator.GetValue()
+            event_args.running_parameters.randomness=self.visual_training_randomness_variator.GetValue()
             if(self.__visual_training_cancelling_is_requested):
-                signal_args.running_parameters.cancellation_token.request_cancellation()
+                event_args.running_parameters.cancellation_token.request_cancellation()
                 self.__visual_training_cancelling_is_requested = False
 
         if(self.__training_is_running):
-            signal_args.running_parameters.randomness=self.training_randomness_variator.GetValue()
+            event_args.running_parameters.randomness=self.training_randomness_variator.GetValue()
             if(self.__training_cancelling_is_requested):
-                signal_args.running_parameters.cancellation_token.request_cancellation()
+                event_args.running_parameters.cancellation_token.request_cancellation()
                 self.__training_cancelling_is_requested = False
 
     """------------------------------------------------------------------------------------------------
@@ -189,19 +189,19 @@ class MainFrame(wx.Frame):
         dc.Clear()
 
         # draw cells
-        for (cell_index, cell_content) in self.environment.get_cells():
+        for (cell_index, cell_content) in self.environment.cells.items():
             self.__draw_grid_cell(cell_index=cell_index, cell_content=cell_content, dc=dc)
 
         # draw agents
         for agent in self.environment.get_agents():
             self.__draw_grid_agent(agent=agent, dc=dc)
 
-        # draw agent policies
-        for (cell_index, cell_content) in self.environment.get_cells():
-            self.__draw_grid_agent_policy(agents=self.environment.get_agents(), cell_index=cell_index, cell_content=cell_content, dc=dc)
+        # # draw agent policies
+        # for (cell_index, cell_content) in self.environment.get_cells():
+        #     self.__draw_grid_agent_policy(agents=self.environment.get_agents(), cell_index=cell_index, cell_content=cell_content, dc=dc)
 
     def __draw_grid_cell(self, cell_index, cell_content, dc):
-        (env_row_count, env_column_count) = self.environment.get_shape()
+        (env_row_count, env_column_count) = self.environment.shape
         (dc_w, dc_h) = dc.GetSize()
         (rect_w0, rect_h0) = (dc_w*((cell_index[1]-1)/env_column_count), dc_h*((cell_index[0]-1)/env_row_count))
         (rect_dw, rect_dh) = (dc_w/env_column_count, dc_h/env_row_count)
@@ -211,21 +211,20 @@ class MainFrame(wx.Frame):
             dc.SetBrush(wx.Brush(wx.Colour(0, 0, 0))) 
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
         else:
-            state_kind = ml.rl.StateKind.NON_TERMINAL if(cell_index not in self.environment.grid_terminal_cells.keys()) else ml.rl.StateKind.TERMINAL
+            state_kind = cell_content[0]
             dc.SetPen(wx.Pen(wx.Colour(0, 0, 0, wx.ALPHA_TRANSPARENT))) 
-            if(state_kind == ml.rl.StateKind.TERMINAL):
-                dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
-            elif(state_kind == ml.rl.StateKind.NON_TERMINAL):
+            if(state_kind == ml.rl.StateKind.NON_TERMINAL):
                 dc.SetBrush(wx.Brush(wx.Colour(0, 255, 0)))
+            elif(state_kind == ml.rl.StateKind.TERMINAL):
+                dc.SetBrush(wx.Brush(wx.Colour(0, 0, 255))) 
             else:
                 raise exps.NotImplementedError()
             dc.DrawRectangle(rect_w0, rect_h0, rect_dw, rect_dh) 
-            if(cell_index in self.environment.grid_terminal_cells.keys()):
-                dc.DrawText(f'r:{self.environment.grid_terminal_cells[cell_index]:.2f}', rect_w0+2, rect_h0+2) 
-
+            dc.DrawText(f'r:{cell_content[1]:.2f}', rect_w0+2, rect_h0+2) 
+            
     def __draw_grid_agent(self, agent, dc):
         cell_index = agent.get_state().value
-        (env_row_count, env_column_count) = self.environment.get_shape()
+        (env_row_count, env_column_count) = self.environment.shape
         (dc_w, dc_h) = dc.GetSize()
         (rect_w0, rect_h0) = (dc_w*((cell_index[1]-1)/env_column_count), dc_h*((cell_index[0]-1)/env_row_count))
         (rect_dw, rect_dh) = (dc_w/env_column_count, dc_h/env_row_count)

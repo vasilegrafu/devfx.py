@@ -2,6 +2,7 @@ import numpy as np
 import devfx.exceptions as exps
 import devfx.core as core
 from .agent import Agent
+from .state_kind import StateKind
 
 class Environment(object):
     def __init__(self):
@@ -60,6 +61,10 @@ class Environment(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def get_next_state_and_reward(self, agent_kind, state, action):
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise exps.ApplicationError()
+        
         next_state_and_reward = self._get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
         return next_state_and_reward
         
@@ -84,7 +89,12 @@ class Environment(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def get_random_action(self, agent_kind, state):
-        return self._get_random_action(agent_kind=agent_kind, state=state)
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise exps.ApplicationError()
+
+        action = self._get_random_action(agent_kind=agent_kind, state=state)
+        return action
 
     def _get_random_action(self, agent_kind, state):
         raise exps.NotImplementedError()

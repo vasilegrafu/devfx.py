@@ -6,7 +6,7 @@ class Runner(object):
     def __init__(self, agents):
         self.__set_agents(agents=agents)
 
-        self.running_status = core.SignalHandlers()
+        self.running_status = core.EventHandler()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -23,8 +23,8 @@ class Runner(object):
         return self.__running_status
 
     @running_status.setter
-    def running_status(self, signal_handlers):
-        self.__running_status = signal_handlers
+    def running_status(self, event_handler):
+        self.__running_status = event_handler
 
     """------------------------------------------------------------------------------------------------
     """
