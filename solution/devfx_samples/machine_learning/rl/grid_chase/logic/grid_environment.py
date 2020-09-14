@@ -67,17 +67,17 @@ class GridEnvironment(ml.rl.Environment):
     def _setup(self):
         if(not self.exists_agent(id=1)):
             self.add_agent(GridAgent(id=1, name='Wolf', kind=GridAgentKind.CHASER, 
-                                    environment=self,
-                                    policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=0.01), 
-                                    randomness=0.05))
+                                     environment=self,
+                                     policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=0.01), 
+                                     randomness=0.05))
         else:
             self.__setup_positional_state(self.get_agent(id=1))
 
         if(not self.exists_agent(id=2)):             
             self.add_agent(GridAgent(id=2, name='Rabbit', kind=GridAgentKind.CHASED, 
-                                    environment=self,
-                                    policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=0.01), 
-                                    randomness=0.05))
+                                     environment=self,
+                                     policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=0.01), 
+                                     randomness=0.05))
         else:
             self.__setup_positional_state(self.get_agent(id=2))
 
