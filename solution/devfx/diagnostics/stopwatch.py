@@ -3,15 +3,11 @@ import devfx.exceptions as exps
 
 class stopwatch(object):
     def __init__(self):
-        self.reset()
-
-    def reset(self):
         self.__running = False
 
-        self.__start = 0
+        self.__start = None
         self.__elapsed = dt.timedelta(microseconds=0)
-        return self
-        
+       
     def start(self):
         if(self.__running == True):
             raise exps.OperationError()
@@ -28,7 +24,6 @@ class stopwatch(object):
         self.__elapsed = self.__elapsed + (dt.datetime.utcnow() - self.__start)
         return self
 
-
     @property
     def elapsed(self):
         if(self.__running == True):
@@ -36,6 +31,11 @@ class stopwatch(object):
         else:
             return self.__elapsed
 
+    @classmethod
+    def start_new(cls):
+        sw = stopwatch()
+        sw.start()
+        return sw
 
 """------------------------------------------------------------------------------------------------
 """

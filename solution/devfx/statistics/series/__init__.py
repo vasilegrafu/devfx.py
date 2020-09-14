@@ -1,9 +1,6 @@
 from .validation import is_series
 from .validation import validate_is_series
 
-from .rolling import *
-from .expanding import *
-
 from .aggregation import sum
 
 from .center import mean
@@ -55,3 +52,6 @@ from .ops import split
 
 from .random import sample
 from .random import choose_one
+
+from . import rolling
+from . import expanding

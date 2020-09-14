@@ -6,28 +6,28 @@ from .. import validation
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_series('data')
-def rolling_mean(data, n):
+def mean(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).mean()
     else:
         data = np.asarray(data)
-        return rolling_mean(data=pd.Series(data), n=n).values
+        return mean(data=pd.Series(data), n=n).values
 
 @validation.validate_args_is_series('data')
-def rolling_ewmean(data, n, alpha=0.05):
+def ewmean(data, n, alpha=0.05):
     if(core.is_typeof(data, pd.Series)):
         return data.ewm(alpha=alpha).mean()
     else:
         data = np.asarray(data)
-        return rolling_expmean(data=pd.Series(data), n=n).values
+        return ewmean(data=pd.Series(data), n=n).values
 
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_series('data')
-def rolling_median(data, n):
+def median(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).median()
     else:
         data = np.asarray(data)
-        return rolling_median(data=pd.Series(data), n=n).values
+        return median(data=pd.Series(data), n=n).values
 

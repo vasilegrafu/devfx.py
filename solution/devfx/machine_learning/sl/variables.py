@@ -7,9 +7,9 @@ from .model import Model
 """------------------------------------------------------------------------------------------------
 """
 def __exists_variable(model, name):
-    if(not core.hasattr(object=model, name=name)):
+    if(not core.hasattr(obj=model, name=name)):
         return False
-    value = core.getattr(object=model, name=name)
+    value = core.getattr(obj=model, name=name)
     if(not core.is_instance(value, tf.Variable)):
         return False
     return True
@@ -17,12 +17,12 @@ def __exists_variable(model, name):
 def __set_variable(model, name, variable):
     if(not core.is_instance(variable, tf.Variable)):
         raise exps.ArgumentError()
-    core.setattr(object=model, name=name, value=variable)
+    core.setattr(obj=model, name=name, value=variable)
 
 def __get_variable(model, name):
     if(not __exists_variable(model=model, name=name)):
         raise exps.ArgumentError()
-    variable = core.getattr(object=model, name=name)
+    variable = core.getattr(obj=model, name=name)
     if(not core.is_instance(variable, tf.Variable)):
         raise exps.ArgumentError()
     return variable
@@ -30,7 +30,7 @@ def __get_variable(model, name):
 def __remove_variable(model, name):
     if(not __exists_variable(model=model, name=name)):
         raise exps.ArgumentError()
-    core.delattr(object=model, name=name)
+    core.delattr(obj=model, name=name)
 
 """------------------------------------------------------------------------------------------------
 """

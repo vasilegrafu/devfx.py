@@ -35,8 +35,8 @@ def input_as_tensor(**tkwargs):
         def __(*args, **kwargs):
             bound_arguments = signature.bind(*args, **kwargs)
             bound_arguments.apply_defaults()
-            for tkarg in tkwargs.keys():
-                bound_arguments.arguments[tkarg] = as_tensor(bound_arguments.arguments[tkarg], dtype=tkwargs[tkarg][0], shape=tkwargs[tkarg][1])
+            for tkwarg in tkwargs.keys():
+                bound_arguments.arguments[tkwarg] = as_tensor(bound_arguments.arguments[tkwarg], dtype=tkwargs[tkwarg][0], shape=tkwargs[tkwarg][1])
             output = fn(*bound_arguments.args, **bound_arguments.kwargs)
             return output
         return __

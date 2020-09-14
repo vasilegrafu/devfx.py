@@ -6,19 +6,19 @@ from .. import validation
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_series('data')
-def rolling_skew(data, n):
+def skew(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).skew()
     else:
         data = np.asarray(data)
-        return rolling_skew(data=pd.Series(data), n=n).values
+        return skew(data=pd.Series(data), n=n).values
 
 """------------------------------------------------------------------------------------------------
 """
 @validation.validate_args_is_series('data')
-def rolling_kurtosis(data, n):
+def kurtosis(data, n):
     if(core.is_typeof(data, pd.Series)):
         return data.rolling(window=n).kurt()
     else:
         data = np.asarray(data)
-        return rolling_kurtosis(data=pd.Series(data), n=n).values
+        return kurtosis(data=pd.Series(data), n=n).values

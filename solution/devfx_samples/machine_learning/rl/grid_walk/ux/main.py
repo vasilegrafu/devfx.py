@@ -1,22 +1,20 @@
-import wx
-from devfx_samples.machine_learning.rl.grid_walk.ux.main_frame import MainFrame
+import devfx.ux.windows.wx as ux
+
+from devfx_samples.machine_learning.rl.grid_walk.ux.main_window import MainWindow
 
 """------------------------------------------------------------------------------------------------
 """
-class App(wx.App):
+class Application(ux.Application):
     def OnInit(self):
-        self.frame = MainFrame(None)
-        self.frame.Show()
+        super().OnInit()
+        self.main_window = MainWindow(title="MainWindow",
+                                      size=(1024, 768),
+                                      align=(ux.CENTER, ux.CENTER))
+        self.main_window.Show()
         return True
 
 """------------------------------------------------------------------------------------------------
 """
 if __name__ == "__main__":
-    app = App()
-    app.MainLoop()
-
-
-
-
-
-
+    application = Application()
+    application.MainLoop()

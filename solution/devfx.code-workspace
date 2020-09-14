@@ -4,14 +4,25 @@
 			"path": "."
 		}
 	],
-	
+
 	"settings": {
 		"editor.minimap.enabled": false,
-
-		"python.linting.pylintEnabled": true,
-		
 		"files.exclude": {
 			"**/__pycache__": true
-		}
+		},
+	
+		"python.pythonPath": "i:\\Installations\\WinPython64-3.8.3.0.dot\\WPy64-3830\\python-3.8.3.amd64\\python.exe",
+
+		"terminal.integrated.env.windows": {
+			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}",
+		},
+		"terminal.integrated.env.linux": {
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
+		},
+		"terminal.integrated.env.osx": {
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
+		},
+
+		"python.linting.pylintEnabled": true
 	}
 }

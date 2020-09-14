@@ -88,7 +88,7 @@ class cdhistogram(object):
             align = kwargs.pop('align', None)
             if (align is None):
                 align = 'center'
-            self.__chart.bar(left=self.__cdhistogram.x, height=self.__cdhistogram.cfreq, width=self.__cdhistogram.dx, align=align, *args, **kwargs)
+            self.__chart.bar(x=self.__cdhistogram.x, height=self.__cdhistogram.cfreq, width=self.__cdhistogram.dx, align=align, *args, **kwargs)
 
     def on_chart(self, chart):
         return cdhistogram._cdhistogram_on_chart(self, chart)

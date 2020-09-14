@@ -37,5 +37,13 @@ class Policy(object):
     def _get_optimal_action(self, state):
         raise exps.NotImplementedError()
 
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def copy(self):
+        self._copy()
+
+    def _copy(self):
+        raise exps.NotImplementedError()
     
 

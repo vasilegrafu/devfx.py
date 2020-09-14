@@ -1,0 +1,135 @@
+import wx
+
+"""------------------------------------------------------------------------------------------------
+""" 
+CENTER = wx.CENTER
+CENTRE = wx.CENTRE
+
+LEFT = wx.LEFT
+RIGHT = wx.RIGHT
+BOTTOM = wx.BOTTOM
+TOP = wx.TOP
+ALL = wx.ALL
+
+ALIGN_CENTER_HORIZONTAL = wx.ALIGN_CENTER_HORIZONTAL
+ALIGN_CENTRE_HORIZONTAL = wx.ALIGN_CENTRE_HORIZONTAL
+ALIGN_CENTER_VERTICAL = wx.ALIGN_CENTER_VERTICAL
+ALIGN_CENTRE_VERTICAL = wx.ALIGN_CENTRE_VERTICAL
+ALIGN_CENTER = wx.ALIGN_CENTER
+ALIGN_CENTRE = wx.ALIGN_CENTRE
+
+ALIGN_LEFT = wx.ALIGN_LEFT
+ALIGN_TOP = wx.ALIGN_TOP
+ALIGN_RIGHT = wx.ALIGN_RIGHT
+ALIGN_BOTTOM = wx.ALIGN_BOTTOM
+
+EXPAND = wx.EXPAND
+SHAPED = wx.SHAPED
+
+HORIZONTAL = wx.HORIZONTAL
+VERTICAL = wx.VERTICAL
+
+"""------------------------------------------------------------------------------------------------
+""" 
+KEY_ENTER = wx.WXK_RETURN
+KEY_SPACE = wx.WXK_SPACE
+
+"""------------------------------------------------------------------------------------------------
+""" 
+EVT_MOUSE_LEFT_DOWN = wx.EVT_LEFT_DOWN
+EVT_MOUSE_LEFT_UP = wx.EVT_LEFT_UP
+EVT_MOUSE_LEFT_CLICK = EVT_MOUSE_LEFT_UP
+EVT_MOUSE_MIDDLE_DOWN = wx.EVT_MIDDLE_DOWN
+EVT_MOUSE_MIDDLE_UP = wx.EVT_MIDDLE_UP
+EVT_MOUSE_MIDDLE_CLICK = EVT_MOUSE_MIDDLE_UP
+EVT_MOUSE_RIGHT_DOWN = wx.EVT_RIGHT_DOWN
+EVT_MOUSE_RIGHT_UP = wx.EVT_RIGHT_UP
+EVT_MOUSE_RIGHT_CLICK = EVT_MOUSE_RIGHT_UP
+EVT_MOUSE_LEFT_DOUBLECLICK = wx.EVT_LEFT_DCLICK
+EVT_MOUSE_MIDDLE_DOUBLECLICK = wx.EVT_MIDDLE_DCLICK
+EVT_MOUSE_RIGHT_DOUBLECLICK = wx.EVT_RIGHT_DCLICK
+EVT_MOUSE_ENTER = wx.EVT_ENTER_WINDOW
+EVT_MOUSE_MOVE = wx.EVT_MOTION
+EVT_MOUSE_LEAVE = wx.EVT_LEAVE_WINDOW
+
+EVT_KEY_DOWN = wx.EVT_KEY_DOWN
+EVT_KEY_UP = wx.EVT_KEY_UP
+EVT_HOTKEY = wx.EVT_HOTKEY
+EVT_GOT_FOCUS = wx.EVT_SET_FOCUS
+EVT_LOST_FOCUS = wx.EVT_KILL_FOCUS
+
+EVT_PAINT = wx.EVT_PAINT
+EVT_ERASE_BACKGROUND = wx.EVT_ERASE_BACKGROUND
+EVT_SIZE_CHANGED = wx.EVT_SIZE
+
+EVT_WINDOW_SHOW = wx.EVT_SHOW
+EVT_WINDOW_CLOSE = wx.EVT_CLOSE
+EVT_WINDOW_MOVE = wx.EVT_MOVE
+EVT_WINDOW_MAXIMIZE = wx.EVT_MAXIMIZE
+EVT_WINDOW_ICONIZE = wx.EVT_ICONIZE
+EVT_WINDOW_CREATE = wx.EVT_WINDOW_CREATE
+EVT_WINDOW_DESTROY = wx.EVT_WINDOW_DESTROY
+
+"""------------------------------------------------------------------------------------------------
+""" 
+EVT_BUTTON_MOUSE_LEFT_CLICK = wx.EVT_BUTTON
+EVT_INTSPINBOX_VALUE_CHANGED = wx.EVT_SPINCTRL
+EVT_FLOATSPINBOX_VALUE_CHANGED = wx.EVT_SPINCTRLDOUBLE
+EVT_COMBOBOX_ITEM_SELECTED = wx.EVT_COMBOBOX
+
+"""------------------------------------------------------------------------------------------------
+""" 
+WHITE = wx.Colour()
+BLACK = wx.Colour()
+RED = wx.Colour()
+LIME = wx.Colour()
+BLUE = wx.Colour()
+YELLOW = wx.Colour()
+CYAN = wx.Colour()
+MAGENTA = wx.Colour()
+SILVER = wx.Colour()
+GRAY = wx.Colour()
+MAROON = wx.Colour()
+OLIVE = wx.Colour()
+GREEN = wx.Colour()
+PURPLE = wx.Colour()
+TEAL = wx.Colour()
+NAVY = wx.Colour()
+
+TRANSPARENT_PEN = wx.TRANSPARENT_PEN
+WHITE_PEN = wx.Pen()
+BLACK_PEN = wx.Pen()
+RED_PEN = wx.Pen()
+LIME_PEN = wx.Pen()
+BLUE_PEN = wx.Pen()
+YELLOW_PEN = wx.Pen()
+CYAN_PEN = wx.Pen()
+MAGENTA_PEN = wx.Pen()
+SILVER_PEN = wx.Pen()
+GRAY_PEN = wx.Pen()
+MAROON_PEN = wx.Pen()
+OLIVE_PEN = wx.Pen()
+GREEN_PEN = wx.Pen()
+PURPLE_PEN = wx.Pen()
+TEAL_PEN = wx.Pen()
+NAVY_PEN = wx.Pen()
+
+TRANSPARENT_BRUSH = wx.TRANSPARENT_BRUSH
+WHITE_BRUSH = wx.Brush()
+BLACK_BRUSH = wx.Brush()
+RED_BRUSH = wx.Brush()
+LIME_BRUSH = wx.Brush()
+BLUE_BRUSH = wx.Brush()
+YELLOW_BRUSH = wx.Brush()
+CYAN_BRUSH = wx.Brush()
+MAGENTA_BRUSH = wx.Brush()
+SILVER_BRUSH = wx.Brush()
+GRAY_BRUSH = wx.Brush()
+MAROON_BRUSH = wx.Brush()
+OLIVE_BRUSH = wx.Brush()
+GREEN_BRUSH = wx.Brush()
+PURPLE_BRUSH = wx.Brush()
+TEAL_BRUSH = wx.Brush()
+NAVY_BRUSH = wx.Brush()
+
+

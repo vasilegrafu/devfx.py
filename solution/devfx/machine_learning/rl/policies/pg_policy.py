@@ -1,3 +1,4 @@
+import numpy as np
 import devfx.exceptions as exps
 from .policy import Policy
 
@@ -13,4 +14,9 @@ class PGPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_optimal_action(self, state):
+        raise exps.NotImplementedError()
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _copy(self):
         raise exps.NotImplementedError()

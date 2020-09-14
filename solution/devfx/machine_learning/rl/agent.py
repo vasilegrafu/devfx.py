@@ -3,8 +3,9 @@ import devfx.core as core
 from .state_kind import StateKind
 
 class Agent(object):
-    def __init__(self, id, kind, environment, state, policy):
+    def __init__(self, id, name, kind, environment, state=None, policy=None):
         self.__set_id(id=id)
+        self.__set_name(name=name)
         self.__set_kind(kind=kind)
         self.__set_environment(environment=environment)
         self.set_state(state=state)
@@ -17,6 +18,14 @@ class Agent(object):
 
     def get_id(self):
         return self.__id
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_name(self, name):
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
 
     """------------------------------------------------------------------------------------------------
     """
@@ -42,12 +51,16 @@ class Agent(object):
     def get_state(self):
         return self.__state
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def set_random_state(self):
-        environment = self.get_environment()
-        state = environment.get_random_state(agent_kind=self.get_kind())
-        self.set_state(state=state)
+
+    def is_in_non_terminal_state(self):
+        state = self.get_state()
+        is_in_non_terminal_state = state.kind == StateKind.NON_TERMINAL
+        return is_in_non_terminal_state
+
+    def is_in_terminal_state(self):
+        state = self.get_state()
+        is_in_terminal_state = state.kind == StateKind.TERMINAL
+        return is_in_terminal_state
 
     """------------------------------------------------------------------------------------------------
     """
@@ -57,6 +70,32 @@ class Agent(object):
     def get_policy(self):
         return self.__policy
 
+
+    def share_policy_with(self, agent):
+        policy = self.get_policy()
+        agent.set_policy(policy=policy)
+
+
+    def transfer_policy_to(self, agent):
+        policy = self.get_policy()
+        self.set_policy(policy=None)
+        agent.set_policy(policy=policy)
+
+    def transfer_policy_from(self, agent):
+        policy = agent.get_policy()
+        agent.set_policy(policy=None)
+        self.set_policy(policy=policy)
+
+
+    def copy_policy_to(self, agent):
+        policy = self.get_policy().copy()
+        agent.set_policy(policy=policy)
+
+    def copy_policy_from(self, agent):
+        policy = agent.get_policy().copy()
+        self.set_policy(policy=policy)
+
+        
     """------------------------------------------------------------------------------------------------
     """
     def learn(self, state, action, next_state_and_reward):
@@ -66,14 +105,13 @@ class Agent(object):
     """ 
     def do_action(self, action):
         environment = self.get_environment()
-        agent_kind = self.get_kind()
         state = self.get_state()
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
             raise exps.ApplicationError()
 
-        next_state_and_reward = environment.get_next_state_and_reward(agent_kind=agent_kind, state=state, action=action)
+        next_state_and_reward = environment.get_next_state_and_reward(agent=self, state=state, action=action)
         if(next_state_and_reward is None):
             return (state, action, None)
 
@@ -84,17 +122,15 @@ class Agent(object):
 
         return (state, action, next_state_and_reward)
 
-
     def do_random_action(self):
         environment = self.get_environment()
-        agent_kind = self.get_kind()
         state = self.get_state()
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
             raise exps.ApplicationError()
 
-        action = environment.get_random_action(agent_kind=agent_kind, state=state)
+        action = environment.get_random_action(agent=self, state=state)
         (state, action, next_state_and_reward) = self.do_action(action=action)
         return (state, action, next_state_and_reward)
  
@@ -106,8 +142,20 @@ class Agent(object):
             raise exps.ApplicationError()
 
         action = self.get_policy().get_optimal_action(state=state)
-        (state, action, next_state_and_reward) = self.do_action(action=action)
+        if(action is None):
+            (state, action, next_state_and_reward) = (state, None, None)
+        else:
+            (state, action, next_state_and_reward) = self.do_action(action=action)
         return (state, action, next_state_and_reward)
+
+    
+    """------------------------------------------------------------------------------------------------
+    """
+    def do_iteration(self, *args, **kwargs):
+        self._do_iteration(*args, **kwargs)
+
+    def _do_iteration(self, *args, **kwargs):
+        raise exps.NotImplementedError()
 
   
 

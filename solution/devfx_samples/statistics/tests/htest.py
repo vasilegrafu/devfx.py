@@ -5,7 +5,7 @@ import devfx.data_vizualization as dv
 """------------------------------------------------------------------------------------------------
 """       
 def test_htest():
-    # Initial we have a teortical distribution which we ssume it is correct
+    # Initial we have a teortical distribution which we assume it is correct
     mu0 = 8.0
     sigma0 = 2.0
 

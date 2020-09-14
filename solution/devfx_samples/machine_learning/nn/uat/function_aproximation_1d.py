@@ -75,9 +75,9 @@ class FunctionAproximationModel(ml.sl.Model):
 
         print(training_log[-1])
 
-        figure = core.persistent_variable('figure', lambda: dv.Figure(size=(12, 4)))
-        chart1 = core.persistent_variable('chart1', lambda: dv.Chart2d(figure=figure, position=121))
-        chart2 = core.persistent_variable('chart2', lambda: dv.Chart2d(figure=figure, position=122))
+        figure = core.ObjectStorage.intercept(self, 'figure', lambda: dv.Figure(size=(12, 4)))
+        chart1 = core.ObjectStorage.intercept(self, 'chart1', lambda: dv.Chart2d(figure=figure, position=121))
+        chart2 = core.ObjectStorage.intercept(self, 'chart2', lambda: dv.Chart2d(figure=figure, position=122))
         figure.clear_charts()
         chart1.plot(training_log[:].training_data_cost, color='green')
         chart2.scatter(context.test_data_sample[0], context.test_data_sample[1], color='blue')

@@ -6,7 +6,7 @@ def test_mean():
     mu = 2.0
     sigma = 2.0
     def compute():
-        data = stats.distributionss.normal(mu, sigma).rvs(64)
+        data = stats.distributions.normal(mu, sigma).rvs(64)
         (thetaL, thetaU) = stats.estimators.ci.mean.normal(data).two_sided(ccoef=95)
         return (thetaL, thetaU)
         

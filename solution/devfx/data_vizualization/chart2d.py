@@ -1,5 +1,5 @@
 import matplotlib as mpl
-import mpl_finance
+import mplfinance as mplf
 import matplotlib.dates
 import numpy as np
 import pandas as pd
@@ -242,15 +242,15 @@ class Chart2d(Chart):
             quotes = np.asarray((opens, highs, lows, closes)).T
 
             if(eliminate_gaps is False):
-                mpl_finance.candlestick_ohlc(self.__chart.axes,
-                                             quotes=[(mpl.dates.date2num(datetime.astype(dt.datetime)), *quote) for datetime, quote in zip(datetimes, quotes)],
-                                             width=(1.0/1.25)*(min(np.diff(datetimes)))/np.timedelta64(1, 'D'),
-                                             colorup=colorup, colordown=colordown, alpha=alpha)
+                mplf.candlestick_ohlc(self.__chart.axes,
+                                      quotes=[(mpl.dates.date2num(datetime.astype(dt.datetime)), *quote) for datetime, quote in zip(datetimes, quotes)],
+                                      width=(1.0/1.25)*(min(np.diff(datetimes)))/np.timedelta64(1, 'D'),
+                                      colorup=colorup, colordown=colordown, alpha=alpha)
             else:
-                mpl_finance.candlestick_ohlc(self.__chart.axes,
-                                             quotes=[(i, *_) for i, _ in enumerate(quotes)],
-                                             width=1.0/1.25,
-                                             colorup=colorup, colordown=colordown, alpha=alpha)
+                mplf.candlestick_ohlc(self.__chart.axes,
+                                      quotes=[(i, *_) for i, _ in enumerate(quotes)],
+                                      width=1.0/1.25,
+                                      colorup=colorup, colordown=colordown, alpha=alpha)
 
             self.__set_axes_properties(datetimes, eliminate_gaps)
 
