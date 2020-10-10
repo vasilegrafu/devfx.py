@@ -152,7 +152,7 @@ class MainWindow(ux.Window):
                 agent = next(agents_iterator)
                 self.training_grid_environment.do_iteration(agents=(agent,), randomness=1.0)
                 i += 1
-                if(i % 10000 == 0):
+                if(i % 1000 == 0):
                     self.train_count_text.Label = str(i)
         thread = parallel.Thread().target(fn=_)
         thread.start()
