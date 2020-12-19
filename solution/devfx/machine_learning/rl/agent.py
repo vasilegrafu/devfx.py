@@ -1,15 +1,17 @@
-import devfx.exceptions as exps
+import numpy as np
+import devfx.exceptions as excs
 import devfx.core as core
 from .state_kind import StateKind
 
 class Agent(object):
-    def __init__(self, id, name, kind, environment, state=None, policy=None):
+    def __init__(self, id, name, kind, environment, state=None, policy=None, iteration_randomness=0.0):
         self.__set_id(id=id)
         self.__set_name(name=name)
         self.__set_kind(kind=kind)
         self.__set_environment(environment=environment)
         self.set_state(state=state)
         self.set_policy(policy=policy)
+        self.set_iteration_randomness(iteration_randomness=iteration_randomness)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -71,31 +73,40 @@ class Agent(object):
         return self.__policy
 
 
-    def share_policy_with(self, agent):
+    def share_policy_from(self, agent):
+        policy = agent.get_policy()
+        self.set_policy(policy=policy)
+
+    def share_policy_to(self, agent):
         policy = self.get_policy()
         agent.set_policy(policy=policy)
 
 
-    def transfer_policy_to(self, agent):
-        policy = self.get_policy()
-        self.set_policy(policy=None)
-        agent.set_policy(policy=policy)
+    def switch_policy_with(self, agent):
+        policy = agent.get_policy()
+        agent.set_policy(policy=self.get_policy())
+        self.set_policy(policy=policy)
+        
 
     def transfer_policy_from(self, agent):
         policy = agent.get_policy()
         agent.set_policy(policy=None)
         self.set_policy(policy=policy)
 
-
-    def copy_policy_to(self, agent):
-        policy = self.get_policy().copy()
+    def transfer_policy_to(self, agent):
+        policy = self.get_policy()
+        self.set_policy(policy=None)
         agent.set_policy(policy=policy)
+
 
     def copy_policy_from(self, agent):
         policy = agent.get_policy().copy()
         self.set_policy(policy=policy)
 
-        
+    def copy_policy_to(self, agent):
+        policy = self.get_policy().copy()
+        agent.set_policy(policy=policy)
+
     """------------------------------------------------------------------------------------------------
     """
     def learn(self, state, action, next_state_and_reward):
@@ -109,7 +120,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
         next_state_and_reward = environment.get_next_state_and_reward(agent=self, state=state, action=action)
         if(next_state_and_reward is None):
@@ -120,6 +131,8 @@ class Agent(object):
 
         self.learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
 
+        environment.on_action_done(self, state, action, next_state_and_reward)
+
         return (state, action, next_state_and_reward)
 
     def do_random_action(self):
@@ -128,7 +141,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
         action = environment.get_random_action(agent=self, state=state)
         (state, action, next_state_and_reward) = self.do_action(action=action)
@@ -139,7 +152,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
         action = self.get_policy().get_optimal_action(state=state)
         if(action is None):
@@ -148,15 +161,29 @@ class Agent(object):
             (state, action, next_state_and_reward) = self.do_action(action=action)
         return (state, action, next_state_and_reward)
 
-    
     """------------------------------------------------------------------------------------------------
     """
-    def do_iteration(self, *args, **kwargs):
-        self._do_iteration(*args, **kwargs)
+    def set_iteration_randomness(self, iteration_randomness):
+        self.__iteration_randomness = iteration_randomness
 
-    def _do_iteration(self, *args, **kwargs):
-        raise exps.NotImplementedError()
+    def get_iteration_randomness(self):
+        return self.__iteration_randomness
 
+
+    def do_iteration(self):
+        self._do_iteration()
+
+    def _do_iteration(self):
+        if(self.is_in_non_terminal_state()):
+            rv = np.random.uniform(size=1)
+            if(rv <= self.get_iteration_randomness()):
+                self.do_random_action()
+            else:
+                self.do_optimal_action()
+        elif(self.is_in_terminal_state()):
+            pass
+        else:
+            raise excs.NotSupportedError()
   
 
 

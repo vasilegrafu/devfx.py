@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 from .policy import Policy
 
 class DQNPolicy(Policy):
@@ -9,16 +9,19 @@ class DQNPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, state, action, next_state_and_reward):
-        raise exps.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_optimal_action(self, state):
-        raise exps.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _copy(self):
-        raise exps.NotImplementedError()
+        raise excs.NotImplementedError()
     
-
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _assign_from(self, policies):
+        raise excs.NotImplementedError()

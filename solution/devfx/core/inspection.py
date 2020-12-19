@@ -1,6 +1,6 @@
 import builtins as bt
 import inspect as insp
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 
 """------------------------------------------------------------------------------------------------
 """
@@ -9,7 +9,7 @@ def is_typeof(arg, classinfo):
         return is_instance(arg, classinfo)
     if(is_instance(arg, type)):
         return is_class_or_subclass(arg, classinfo)
-    raise exps.NotSupportedError()
+    raise excs.NotSupportedError()
 
 def is_class_or_subclass(arg, classinfo):
     return bt.issubclass(arg, classinfo)

@@ -1,14 +1,15 @@
-import itertools as it
-import time as t
-import devfx.exceptions as exps
+import itertools
+import time
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.parallel.threading as parallel
+import devfx.processing as processing
 import devfx.ux.windows.wx as ux
 
 from ..logic.grid_environment import GridEnvironment
 from ..logic.grid_agent_kind import GridAgentKind
+from ..logic.trainer import TrainingManager
 
 class MainWindow(ux.Window):
     def __init__(self, **kwargs):
@@ -22,34 +23,29 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __init_model(self):
-        self.training_grid_environment = GridEnvironment()
-        self.training_grid_environment.create()
-        self.viewable_grid_environment = GridEnvironment()
-        self.viewable_grid_environment.create()
+        self.grid_environment = GridEnvironment()
+        self.grid_environment.create()
+        self.grid_environment.setup()
         
-        for training_agent in self.training_grid_environment.get_agents():
-            viewable_agent = self.viewable_grid_environment.get_agent(training_agent.get_id())
-            training_agent.share_policy_with(viewable_agent)
-
     """------------------------------------------------------------------------------------------------
     """
     def __init_widgets(self):
         self.grid_canvas = ux.Canvas(self, size=(64, 64))
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
-        self.agent_randomness_label = ux.Text(self, label='Randomness:') 
-        self.agent_randomness_combobox = ux.ComboBox(self, choices=[str(agent.get_id()) + '|' + agent.get_name() for agent in self.viewable_grid_environment.get_agents()])
-        self.agent_randomness_combobox.SetSelection(0)
-        def agent_randomness_combobox__OnItemSelected(sender, event_args): 
-            self.agent_randomness_spinbox.SetValue(self.viewable_grid_environment.get_agent(id=int(self.agent_randomness_combobox.GetValue().split('|')[0])).get_randomness())
+        self.agent_iteration_randomness_label = ux.Text(self, label='Randomness:') 
+        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.get_id()) + '|' + agent.get_name() for agent in self.grid_environment.get_agents()])
+        self.agent_iteration_randomness_combobox.SetSelection(0)
+        def agent_iteration_randomness_combobox__OnItemSelected(sender, event_args): 
+            self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
             self.grid_canvas.UpdateDrawing()
-        self.agent_randomness_combobox.OnItemSelected += agent_randomness_combobox__OnItemSelected
-        self.agent_randomness_spinbox = ux.FloatSpinBox(self, min=0.0, max=1.0, initial=0.0, inc=0.01, size=(64, -1))
-        self.agent_randomness_spinbox.SetValue(self.viewable_grid_environment.get_agent(id=int(self.agent_randomness_combobox.GetValue().split('|')[0])).get_randomness())
-        def agent_randomness_spinbox_OnValueChanged(sender, event_args): 
-            self.viewable_grid_environment.get_agent(id=int(self.agent_randomness_combobox.GetValue().split('|')[0])).set_randomness(self.agent_randomness_spinbox.GetValue())
+        self.agent_iteration_randomness_combobox.OnItemSelected += agent_iteration_randomness_combobox__OnItemSelected
+        self.agent_iteration_randomness_spinbox = ux.FloatSpinBox(self, min=0.0, max=1.0, initial=0.0, inc=0.01, size=(64, -1))
+        self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
+        def agent_iteration_randomness_spinbox_OnValueChanged(sender, event_args): 
+            self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).set_iteration_randomness(self.agent_iteration_randomness_spinbox.GetValue())
             self.grid_canvas.UpdateDrawing()
-        self.agent_randomness_spinbox.OnValueChanged += agent_randomness_spinbox_OnValueChanged
+        self.agent_iteration_randomness_spinbox.OnValueChanged += agent_iteration_randomness_spinbox_OnValueChanged
 
         self.train_button = ux.Button(parent=self, label='Train')
         self.train_button.OnPress += self.__train_button__OnPress
@@ -88,9 +84,9 @@ class MainWindow(ux.Window):
         # 
         self.grid_canvas.AddToSizer(self.grid_sizer, pos=(0, 0), flag=ux.ALIGN_CENTER | ux.SHAPED)
 
-        self.agent_randomness_label.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
-        self.agent_randomness_combobox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-        self.agent_randomness_spinbox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
+        self.agent_iteration_randomness_label.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+        self.agent_iteration_randomness_combobox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
+        self.agent_iteration_randomness_spinbox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
 
         self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
         self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
@@ -109,11 +105,11 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # cell size
-        cell_width = cgc.GetSize()[0]/(self.viewable_grid_environment.shape[0] - 2)
-        cell_height = cgc.GetSize()[1]/(self.viewable_grid_environment.shape[1] - 2)
+        cell_width = cgc.GetSize()[0]/(self.grid_environment.shape[0] - 2)
+        cell_height = cgc.GetSize()[1]/(self.grid_environment.shape[1] - 2)
 
         # draw grid
-        for (cell_index, cell_content) in self.viewable_grid_environment.get_cells().items():
+        for (cell_index, cell_content) in self.grid_environment.cells.items():
             x = (cell_index[1] - 2)*cell_width 
             y = (cell_index[0] - 2)*cell_height
             w = cell_width
@@ -124,7 +120,7 @@ class MainWindow(ux.Window):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
 
         # draw agents
-        for agent in self.viewable_grid_environment.get_agents():
+        for agent in self.grid_environment.get_agents():
             cell_index = agent.get_state().value[0]
             x = (cell_index[1] - 2)*cell_width + cell_width/2
             y = (cell_index[0] - 2)*cell_height + cell_height/2
@@ -136,7 +132,7 @@ class MainWindow(ux.Window):
                 r = min(cell_width/5, cell_height/5)
                 cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
     
     """------------------------------------------------------------------------------------------------
     """
@@ -146,15 +142,14 @@ class MainWindow(ux.Window):
         self.training_is_running = True
 
         def _():
-            agents_iterator = core.ObjectStorage.intercept(self, 'training_agents_iterator', lambda: it.cycle(self.training_grid_environment.get_agents()))
-            i = 0
+            trainingManager = TrainingManager() 
+            D = 0
             while self.training_is_running:
-                agent = next(agents_iterator)
-                self.training_grid_environment.do_iteration(agents=(agent,), randomness=1.0)
-                i += 1
-                if(i % 1000 == 0):
-                    self.train_count_text.Label = str(i)
-        thread = parallel.Thread().target(fn=_)
+                d = trainingManager.learn(self.grid_environment.get_agent_kind_policies())
+                D += d
+                self.train_count_text.Label = str(D)
+            trainingManager.close()
+        thread = processing.concurrent.Thread(fn=_)
         thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):
@@ -165,9 +160,9 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __do_iteration_button__OnPress(self, sender, event_args):
-        agents_iterator = core.ObjectStorage.intercept(self, 'viewable_agents_iterator', lambda: it.cycle(self.viewable_grid_environment.get_agents()))
+        agents_iterator = core.ObjectStorage.intercept(self, 'agents_iterator', lambda: itertools.cycle(self.grid_environment.get_agents()))
         agent = next(agents_iterator)
-        self.viewable_grid_environment.do_iteration(agents=(agent,))
+        self.grid_environment.do_iteration(agents=(agent,))
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -180,13 +175,13 @@ class MainWindow(ux.Window):
         self.do_iteration_sizer.DisableChildren()
 
         def _():
-            agents_iterator = core.ObjectStorage.intercept(self, 'viewable_agents_iterator', lambda: it.cycle(self.viewable_grid_environment.get_agents()))
+            agents_iterator = core.ObjectStorage.intercept(self, 'agents_iterator', lambda: itertools.cycle(self.grid_environment.get_agents()))
             while self.do_iterations_is_running:
                 agent = next(agents_iterator)
-                self.viewable_grid_environment.do_iteration(agents=(agent,))
+                self.grid_environment.do_iteration(agents=(agent,))
                 self.grid_canvas.UpdateDrawing()
-                t.sleep(self.do_iterations_speed_spinbox.GetValue())          
-        thread = parallel.Thread().target(fn=_)
+                time.sleep(self.do_iterations_speed_spinbox.GetValue())          
+        thread = parallel.Thread(fn=_)
         thread.start()
 
     def __cancel_iterations_button__OnPress(self, sender, event_args):

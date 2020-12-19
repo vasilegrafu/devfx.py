@@ -1,4 +1,5 @@
+from .BaseError import BaseError
 
-class ApplicationError(Exception):
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
+class ApplicationError(BaseError):
+    def __init__(self, *, message=None, data={}, inner=None):
+        BaseError.__init__(self, message=message, data=data, inner=inner)

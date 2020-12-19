@@ -1,4 +1,4 @@
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 
 class GlobalStorage(object):
     __storage__ = {}
@@ -25,7 +25,7 @@ class GlobalStorage(object):
             if(source_fn is not None):
                 GlobalStorage.__storage__[key] = source_fn()
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
         else:
             if(refresh_condition_fn is not None):
                 if(refresh_condition_fn(GlobalStorage.__storage__[key])):

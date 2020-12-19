@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.core as core
 from .. import initialization
 from ..sl import variables
@@ -23,28 +23,28 @@ def convNd(name,
     name = name + '__convNd'
 
     if (not 3 <= len(input.shape) <= 5):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     N = len(input.shape) - 2
 
     if(not core.is_typeof(filters_n, int)):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
 
     if(not core.is_iterable(kernel_size)):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     if(not len(kernel_size) == N):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
 
     if(strides is None):
         strides = tuple([1]*N)
     if(not core.is_iterable(strides)):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     if(not len(strides) == N):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
         
     if(padding is None):
         padding = 'VALID'
     if(padding != 'VALID' and padding != 'SAME'):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
 
     if (data_format is None and len(input.shape) == 3):
         data_format = 'NWC'
@@ -53,13 +53,13 @@ def convNd(name,
     if (data_format is None and len(input.shape) == 5):
         data_format = 'NDHWC'
     if(len(data_format) != len(input.shape)):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 3 and (data_format != 'NWC' and data_format != 'NCW')):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 4 and (data_format != 'NHWC' and data_format != 'NCHW')):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 5 and (data_format != 'NDHWC' and data_format != 'NCDHW')):
-        raise exps.ArgumentError()
+        raise excs.ArgumentError()
     
     if(kernel_initializer is None):
         kernel_initializer = initialization.random_glorot_normal_initializer()

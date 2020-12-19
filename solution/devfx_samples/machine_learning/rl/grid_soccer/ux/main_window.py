@@ -1,10 +1,10 @@
 import itertools as it
 import time as t
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.parallel.threading as parallel
+import devfx.processing as processing
 import devfx.ux.windows.wx as ux
 
 
@@ -139,7 +139,7 @@ class MainWindow(ux.Window):
                 r = min(cell_width/5, cell_height/5)
                 cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
     
     """------------------------------------------------------------------------------------------------
     """
@@ -157,7 +157,7 @@ class MainWindow(ux.Window):
                 i += 1
                 if(i % 1000 == 0):
                     self.train_count_text.Label = str(i)
-        thread = parallel.Thread().target(fn=_)
+        thread = processing.concurrent.Thread(fn=_)
         thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):
@@ -189,7 +189,7 @@ class MainWindow(ux.Window):
                 self.viewable_grid_environment.do_iteration(agents=(agent,))
                 self.grid_canvas.UpdateDrawing()
                 t.sleep(self.do_iterations_speed_spinbox.GetValue())          
-        thread = parallel.Thread().target(fn=_)
+        thread = processing.concurrent.Thread(fn=_)
         thread.start()
 
     def __cancel_iterations_button__OnPress(self, sender, event_args):

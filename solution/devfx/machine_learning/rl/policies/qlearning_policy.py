@@ -1,80 +1,106 @@
+import random as rnd
 import numpy as np
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 from .policy import Policy
 
 class QLearningPolicy(Policy):
     def __init__(self, discount_factor, learning_rate):
         super().__init__(discount_factor=discount_factor)
 
-        self.qtable = {}
-        self.learning_rate = learning_rate
+        self.__table = {}
+        self.__learning_rate = learning_rate
 
     """------------------------------------------------------------------------------------------------
     """ 
-    @property
-    def qtable(self):
-        return self.__qtable
+    def get_states(self):
+        return self.__table.keys()
 
-    @qtable.setter
-    def qtable(self, qtable):
-        self.__qtable = qtable
+    def get_actions(self, state):
+        return self.__table[state].keys()
+
+    def set_value(self, state, action, value):
+        if(state not in self.__table):
+            self.__table[state] = {}
+        self.__table[state][action] = value
+
+    def get_value(self, state, action):
+        return self.__table[state][action]
+
+    def has_value(self, state, action):
+        if(state not in self.__table):
+            return False
+        if(action not in self.__table[state]):
+            return False
+        return True
 
     """------------------------------------------------------------------------------------------------
     """ 
-    @property
-    def learning_rate(self):
+    def get_random_state_actions(self, n):
+        _ = {}
+        for state in rnd.sample(list(self.__table.keys()), n):
+            _[state] = self.__table[state]
+        return _
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def get_learning_rate(self):
         return self.__learning_rate
 
-    @learning_rate.setter
-    def learning_rate(self, learning_rate):
+    def set_learning_rate(self, learning_rate):
         self.__learning_rate = learning_rate
 
     """------------------------------------------------------------------------------------------------
     """
     def _learn(self, state, action, next_state_and_reward):
-        if(state not in self.qtable):
-            self.qtable[state] = {}
-        if(action not in self.qtable[state]):
-            self.qtable[state][action] = 0.0
+        if(state not in self.__table):
+            self.__table[state] = {}
+        if(action not in self.__table[state]):
+            self.__table[state][action] = 0.0
 
         (next_state, next_reward) = next_state_and_reward
-
-        if(next_state not in self.qtable):
-            self.qtable[next_state] = {}
-
-        qs = self.qtable[state]
-        qs_next = self.qtable[next_state]
-        
-        if(len(qs_next) == 0):
-            error = next_reward.value - qs[action]
+        if(next_state not in self.__table):
+            error = next_reward.value - self.__table[state][action]
         else:
-            qmax = qs_next[max(qs_next, key=lambda action: qs_next[action])]
-            error = next_reward.value + self.discount_factor*qmax - qs[action]
-
-        qs[action] = qs[action] + self.learning_rate*error
+            error = next_reward.value + self.get_discount_factor()*max(self.__table[next_state].values()) - self.__table[state][action]
+        self.__table[state][action] = self.__table[state][action] + self.get_learning_rate()*error
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_optimal_action(self, state):
-        if(state not in self.qtable):
+        if(state not in self.__table):
              return None
-        if(len(self.qtable[state]) == 0):
+        if(len(self.__table[state]) == 0):
             return None
-            
-        qs = self.qtable[state]
-            
-        action = max(qs, key=lambda action: qs[action])
+
+        action = max(self.__table[state], key=lambda action: self.__table[state][action])
         return action
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _copy(self):
-        policy = QLearningPolicy(discount_factor=self.discount_factor, learning_rate=self.learning_rate)
-        for state in self.qtable:
-            if(state not in policy.qtable):
-                policy.qtable[state] = {}
-            for action in self.qtable[state]:
-                policy.qtable[state][action] = self.qtable[state][action]
+        policy = QLearningPolicy(discount_factor=self.get_discount_factor(), learning_rate=self.get_learning_rate())
+        for state in self.get_states():
+            for action in self.get_actions(state):
+                policy.set_value(state=state, action=action, value=self.get_value(state, action))
         return policy
 
-        
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _assign_from(self, policies):
+        for policy in policies:
+            for state in policy.get_states():
+                if(state not in self.__table):
+                    self.__table[state] = {}
+                for action in policy.get_actions(state):
+                    if(action not in self.__table[state]):
+                        self.__table[state][action] = 0.0
+        for state in self.__table:
+            for action in self.__table[state]:
+                a = [policy.get_value(state, action) for policy in policies if policy.has_value(state, action)]
+                if(len(a) >= 1):
+                    m = sum(a)/len(a)
+                    self.__table[state][action] = m
+                    
+
+
+

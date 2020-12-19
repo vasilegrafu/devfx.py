@@ -1,10 +1,10 @@
 import itertools as it
 import time as t
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.parallel.threading as parallel
+import devfx.processing as processing
 import devfx.ux.windows.wx as ux
 
 
@@ -25,12 +25,14 @@ class MainWindow(ux.Window):
     def __init_model(self):
         self.training_grid_environment = GridEnvironment()
         self.training_grid_environment.create()
+        self.training_grid_environment.setup()
         self.viewable_grid_environment = GridEnvironment()
         self.viewable_grid_environment.create()
+        self.viewable_grid_environment.setup()
         
         for training_agent in self.training_grid_environment.get_agents():
             viewable_agent = self.viewable_grid_environment.get_agent(training_agent.get_id())
-            training_agent.share_policy_with(viewable_agent)
+            training_agent.share_policy_from(viewable_agent)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -114,7 +116,7 @@ class MainWindow(ux.Window):
         cell_height = cgc.GetSize()[1]/(self.viewable_grid_environment.shape[1] - 2)
 
         # draw grid
-        for (cell_index, cell_content) in self.viewable_grid_environment.get_cells().items():
+        for (cell_index, cell_content) in self.viewable_grid_environment.cells.items():
             x = (cell_index[1] - 2)*cell_width 
             y = (cell_index[0] - 2)*cell_height
             w = cell_width
@@ -139,7 +141,7 @@ class MainWindow(ux.Window):
                 r = min(cell_width/5, cell_height/5)
                 cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
     
     """------------------------------------------------------------------------------------------------
     """
@@ -157,7 +159,7 @@ class MainWindow(ux.Window):
                 i += 1
                 if(i % 1000 == 0):
                     self.train_count_text.Label = str(i)
-        thread = parallel.Thread().target(fn=_)
+        thread = processing.concurrent.Thread(fn=_)
         thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):
@@ -189,7 +191,7 @@ class MainWindow(ux.Window):
                 self.viewable_grid_environment.do_iteration(agents=(agent,))
                 self.grid_canvas.UpdateDrawing()
                 t.sleep(self.do_iterations_speed_spinbox.GetValue())          
-        thread = parallel.Thread().target(fn=_)
+        thread = parallel.Thread(fn=_)
         thread.start()
 
     def __cancel_iterations_button__OnPress(self, sender, event_args):

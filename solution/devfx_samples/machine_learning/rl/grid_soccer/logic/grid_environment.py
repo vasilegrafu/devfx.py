@@ -2,7 +2,7 @@ import numpy as np
 import random as rnd
 import itertools as it
 import devfx.core as core
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.machine_learning as ml
 
 from .grid_agent import GridAgent
@@ -101,17 +101,6 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _do_iteration(self, agents=None, randomness=None):
-        if(any([agent.is_in_terminal_state() for agent in self.get_agents()])):
-            self.setup()
-        else:
-            if(agents is None):
-                agents = self.get_agents()
-            for agent in agents:
-                agent.do_iteration(randomness=randomness)
-
-    """------------------------------------------------------------------------------------------------
-    """
     def _destroy(self):
         for agent in self.get_agents():                
             self.destroy_agent(agent.get_id())
@@ -131,10 +120,10 @@ class GridEnvironment(ml.rl.Environment):
         elif(action == GridAgentMovementActions.Stay):
             agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1])
         else:
-            raise exps.ApplicationError() 
+            raise excs.ApplicationError() 
 
         if(agent_next_cell_index not in self.get_walkable_cells()):
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
         other_kind_agents = self.get_other_kind_agents(kind=agent_kind)
         other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in other_kind_agents]
@@ -147,7 +136,7 @@ class GridEnvironment(ml.rl.Environment):
                 next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
                 next_reward = ml.rl.Reward(value=+5000.0)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
             return (next_state, next_reward)
 
         if(agent_next_cell_index in other_kind_agents_cell_indexes):
@@ -158,7 +147,7 @@ class GridEnvironment(ml.rl.Environment):
                 next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
                 next_reward = ml.rl.Reward(value=-1000.0)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
             return (next_state, next_reward)
 
         if(agent_next_cell_index not in other_kind_agents_cell_indexes):
@@ -169,10 +158,10 @@ class GridEnvironment(ml.rl.Environment):
                 next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
                 next_reward = ml.rl.Reward(value=0.0)
             else:
-                raise exps.ApplicationError()
+                raise excs.ApplicationError()
             return (next_state, next_reward)
 
-        raise exps.ApplicationError()
+        raise excs.ApplicationError()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -207,3 +196,7 @@ class GridEnvironment(ml.rl.Environment):
 
         return (agent_movement_action, agent_hitting_ball_action)
 
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _on_action_done(self, agent, state, action, next_state_and_reward):
+        pass

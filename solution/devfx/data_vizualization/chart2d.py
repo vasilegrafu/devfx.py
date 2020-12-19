@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 import devfx.core as core
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 from .figure import Figure as Figure
 from .chart import Chart
 
@@ -126,7 +126,7 @@ class Chart2d(Chart):
         elif (core.is_iterable(args[0])):
             result = self.axes.plot(args[0], *args[1:], **kwargs)
         else:
-            raise exps.NotSupportedError()
+            raise excs.NotSupportedError()
         self._do_post_draw()
         return result
 
@@ -179,7 +179,7 @@ class Chart2d(Chart):
         elif(core.is_iterable(args[0])):
             result = self.axes.scatter(range(1, len(args[0]) + 1), args[0], *args[1:], marker = kwargs.pop('marker', '.'), **kwargs)
         else:
-            raise exps.NotSupportedError()
+            raise excs.NotSupportedError()
         self._do_post_draw()
         return result
 
@@ -223,12 +223,12 @@ class Chart2d(Chart):
             elif(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, opens, highs, lows, closes) = (data.index.values, data.iloc[:, 0].values, data.iloc[:, 1].values, data.iloc[:, 2].values, data.iloc[:, 3].values)
             else:
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
             
             if(len(datetimes) is None):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
             if(len(datetimes) <= 1):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
 
@@ -269,12 +269,12 @@ class Chart2d(Chart):
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
 
             if(len(datetimes) is None):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
             if(len(datetimes) <= 1):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
 
@@ -305,12 +305,12 @@ class Chart2d(Chart):
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
 
             if(len(datetimes) is None):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
             if(len(datetimes) <= 1):
-                raise exps.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
 

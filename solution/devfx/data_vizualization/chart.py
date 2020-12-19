@@ -1,16 +1,16 @@
 import seaborn as sb
 sb.set_style('darkgrid')
 
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 
 class Chart(object):
     def __init__(self, figure=None, axes=None, title=None, grid=None):                              
         if(figure is None):
-            raise exps.ArgumentNoneError()
+            raise excs.ArgumentNoneError()
         self.figure = figure
         
         if(axes is None):
-            raise exps.ArgumentNoneError()
+            raise excs.ArgumentNoneError()
         self.axes = axes
         
         if(title is not None):

@@ -2,7 +2,7 @@ import numpy as np
 import random as rnd
 import itertools as it
 import devfx.core as core
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.machine_learning as ml
 
 from .grid_agent import GridAgent
@@ -40,37 +40,31 @@ class GridEnvironment(ml.rl.Environment):
             cells[cell_index] = cell_content
         self.__cells = cells
 
-    def get_cells(self):
+    @property
+    def cells(self):
         return self.__cells
-
-    def get_walkable_cells(self):
-        walkable_cells = core.ObjectStorage.intercept(self, 'walkable_cells', 
-                                                      lambda: {cell_index: cell_content for (cell_index, cell_content) in self.get_cells().items() if(cell_content != None)})
-        return walkable_cells
 
     """------------------------------------------------------------------------------------------------
     """
     def _create(self):
         self.__create_cells()
 
-        self.setup()
-
     """------------------------------------------------------------------------------------------------
     """       
     def _setup(self):
         if(not self.exists_agent(id=1)):
             self.add_agent(GridAgent(id=1, name='Wolf', kind=GridAgentKind.CHASER, 
-                                    environment=self,
-                                    policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=1e-2), 
-                                    randomness=0.05))
+                                     environment=self,
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-3), 
+                                     randomness=0.05))
         else:
             self.__setup_positional_state(self.get_agent(id=1))
 
         if(not self.exists_agent(id=2)):             
             self.add_agent(GridAgent(id=2, name='Rabbit', kind=GridAgentKind.CHASED, 
-                                    environment=self,
-                                    policy=ml.rl.ESarsaPolicy(discount_factor=0.99, learning_rate=1e-2), 
-                                    randomness=0.05))
+                                     environment=self,
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-3), 
+                                     randomness=0.05))
         else:
             self.__setup_positional_state(self.get_agent(id=2))
 
@@ -91,32 +85,19 @@ class GridEnvironment(ml.rl.Environment):
             state = ml.rl.State(value=(position_cell_index, ), kind=ml.rl.StateKind.NON_TERMINAL)
             agent.set_state(state)
         elif(agent_kind == GridAgentKind.CHASED):
-            other_agents = self.get_other_agents(id=agent.get_id())
-            other_agents_cell_indexes = [other_agent.get_state().value[0] for other_agent in other_agents]
-            choosable_cell_indexes = [cell_index for cell_index in self.get_walkable_cells() 
-                                                 if(cell_index not in other_agents_cell_indexes) and (cell_index[0] >= cell_index[1])]
+            other_agents_cell_indexes = [other_agent.get_state().value[0] for other_agent in self.get_other_agents(id=agent.get_id())]
+            choosable_cell_indexes = [cell_index for cell_index in self.cells 
+                                                 if((self.cells[cell_index] is not None) and (cell_index not in other_agents_cell_indexes) and (cell_index[0] >= cell_index[1]))]
             position_cell_index = rnd.choice(choosable_cell_indexes)
             state = ml.rl.State(value=(position_cell_index, ), kind=ml.rl.StateKind.NON_TERMINAL)
             agent.set_state(state)
         else:
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
     def __setup_contextual_state(self, agent):
-        other_kind_agents = self.get_other_kind_agents(kind=agent.get_kind())
-        other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in other_kind_agents]
+        other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in self.get_other_kind_agents(kind=agent.get_kind())]
         state = ml.rl.State(value=(agent.get_state().value[0], *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
         agent.set_state(state)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _do_iteration(self, agents=None, randomness=None):
-        if(any([agent.is_in_terminal_state() for agent in self.get_agents()])):
-            self.setup()
-        else:
-            if(agents is None):
-                agents = self.get_agents()
-            for agent in agents:
-                agent.do_iteration(randomness=randomness)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -128,9 +109,8 @@ class GridEnvironment(ml.rl.Environment):
     """
     def _get_next_state_and_reward(self, agent, state, action):
         agent_kind = agent.get_kind()
-
+        agent_cell_index = state.value[0]
         if(agent_kind == GridAgentKind.CHASER):
-            agent_cell_index = state.value[0]
             if(action == GridChaserAgentActions.Left):
                 agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]-1)
             elif(action == GridChaserAgentActions.Right):
@@ -142,9 +122,8 @@ class GridEnvironment(ml.rl.Environment):
             elif(action == GridChaserAgentActions.Stay):
                 agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1])
             else:
-                raise exps.ApplicationError() 
+                raise excs.ApplicationError() 
         elif(agent_kind == GridAgentKind.CHASED):
-            agent_cell_index = state.value[0]
             if(action == GridChasedAgentActions.Left):
                 agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]-1)
             elif(action == GridChasedAgentActions.Right):
@@ -154,93 +133,56 @@ class GridEnvironment(ml.rl.Environment):
             elif(action == GridChasedAgentActions.Down):
                 agent_next_cell_index = (agent_cell_index[0]+1, agent_cell_index[1])
             else:
-                raise exps.ApplicationError() 
+                raise excs.ApplicationError() 
         else:
-            raise exps.ApplicationError()
+            raise excs.ApplicationError()
 
-        if(agent_next_cell_index not in self.get_walkable_cells()):
-            raise exps.ApplicationError()
+        if(self.cells[agent_next_cell_index] is None):
+            next_state = state
+            next_reward = ml.rl.Reward(value=-1.0)
+            return (next_state, next_reward)
 
         other_kind_agents = self.get_other_kind_agents(kind=agent_kind)
         other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in other_kind_agents]
-
-        if(agent_next_cell_index in [cell_index for cell_index in self.get_walkable_cells() if(cell_index == self.target_cell[0])]):
-            if(agent_kind == GridAgentKind.CHASER):
-                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                next_reward = ml.rl.Reward(value=-1.0)
-            elif(agent_kind == GridAgentKind.CHASED):
-                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                next_reward = ml.rl.Reward(value=+5000.0)
-            else:
-                raise exps.ApplicationError()
-            return (next_state, next_reward)
-
-        if(agent_next_cell_index in other_kind_agents_cell_indexes):
-            if(agent_kind == GridAgentKind.CHASER):
+        if(agent_kind == GridAgentKind.CHASER):
+            if(agent_next_cell_index in other_kind_agents_cell_indexes):
                 next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
                 next_reward = ml.rl.Reward(value=+1000.0)
-            elif(agent_kind == GridAgentKind.CHASED):
-                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                next_reward = ml.rl.Reward(value=-1000.0)
-                # next_reward = ml.rl.Reward(value=0.0)
             else:
-                raise exps.ApplicationError()
-            return (next_state, next_reward)
-
-        if(agent_next_cell_index not in other_kind_agents_cell_indexes):
-            if(agent_kind == GridAgentKind.CHASER):
                 next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
                 next_reward = ml.rl.Reward(value=-1.0)
-                # if(action == GridChaserAgentActions.Stay):
-                #     next_reward = ml.rl.Reward(value=0.0)
-                # else:
-                #     next_reward = ml.rl.Reward(value=-10.0)
-            elif(agent_kind == GridAgentKind.CHASED):
-                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                next_reward = ml.rl.Reward(value=0.0)
+        elif(agent_kind == GridAgentKind.CHASED):
+            if(agent_next_cell_index == self.target_cell[0]):
+                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
+                next_reward = ml.rl.Reward(value=+1000.0)
+            elif(agent_next_cell_index in other_kind_agents_cell_indexes):
+                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
+                next_reward = ml.rl.Reward(value=-1000.0)
             else:
-                raise exps.ApplicationError()
-            return (next_state, next_reward)
-
-        raise exps.ApplicationError()
-
+                next_state = ml.rl.State(value=(agent_next_cell_index, *other_kind_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
+                next_reward = ml.rl.Reward(value=+1.0)
+        else:
+            raise excs.ApplicationError()
+        return (next_state, next_reward)
+        
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_action(self, agent, state):  
         agent_kind = agent.get_kind()
         if(agent_kind == GridAgentKind.CHASER):
-            possibile_actions = core.ObjectStorage.intercept(self, 'possibile_actions_chaser_agent', lambda: {})
-            if(state not in possibile_actions):       
-                possibile_actions[state] = []
-                agent_cell_index = state.value[0]
-                if(self.get_cells()[(agent_cell_index[0], agent_cell_index[1]-1)] is not None):
-                    possibile_actions[state].append(GridChaserAgentActions.Left)
-                if(self.get_cells()[(agent_cell_index[0], agent_cell_index[1]+1)] is not None):
-                    possibile_actions[state].append(GridChaserAgentActions.Right) 
-                if(self.get_cells()[(agent_cell_index[0]-1, agent_cell_index[1])] is not None):
-                    possibile_actions[state].append(GridChaserAgentActions.Up)
-                if(self.get_cells()[(agent_cell_index[0]+1, agent_cell_index[1])] is not None):
-                    possibile_actions[state].append(GridChaserAgentActions.Down)
-                possibile_actions[state].append(GridChaserAgentActions.Stay)
-            action = rnd.choice(possibile_actions[state])
+            actions = [GridChaserAgentActions.Left, GridChaserAgentActions.Right, GridChaserAgentActions.Up, GridChaserAgentActions.Down, GridChaserAgentActions.Stay]
+            action = rnd.choice(actions)
             return action
         elif(agent_kind == GridAgentKind.CHASED):
-            possibile_actions = core.ObjectStorage.intercept(self, 'possibile_actions_chased_agent', lambda: {})
-            if(state not in possibile_actions):       
-                possibile_actions[state] = []
-                agent_cell_index = state.value[0]
-                if(self.get_cells()[(agent_cell_index[0], agent_cell_index[1]-1)] is not None):
-                    possibile_actions[state].append(GridChasedAgentActions.Left)
-                if(self.get_cells()[(agent_cell_index[0], agent_cell_index[1]+1)] is not None):
-                    possibile_actions[state].append(GridChasedAgentActions.Right) 
-                if(self.get_cells()[(agent_cell_index[0]-1, agent_cell_index[1])] is not None):
-                    possibile_actions[state].append(GridChasedAgentActions.Up)
-                if(self.get_cells()[(agent_cell_index[0]+1, agent_cell_index[1])] is not None):
-                    possibile_actions[state].append(GridChasedAgentActions.Down)
-            action = rnd.choice(possibile_actions[state])
+            actions = [GridChasedAgentActions.Left, GridChasedAgentActions.Right, GridChasedAgentActions.Up, GridChasedAgentActions.Down]
+            action = rnd.choice(actions)
             return action
         else:
-            raise exps.ApplicationError()
- 
+            raise excs.ApplicationError()
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _on_action_done(self, agent, state, action, next_state_and_reward):
+        pass
 
 

@@ -19,6 +19,8 @@ from .SecurityError import SecurityError
 from .AuthenticationError import AuthenticationError
 from .AutorizationError import AutorizationError
 
+from .ErrorInfo import ErrorInfo
+
 
 
 

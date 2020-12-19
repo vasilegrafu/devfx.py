@@ -1,3 +1,4 @@
 class StateKind(object):
+    UNDEFINED = 'UNDEFINED',
     NON_TERMINAL = 'NON_TERMINAL',
     TERMINAL = 'TERMINAL'

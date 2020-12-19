@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as exps
+import devfx.exceptions as excs
 import devfx.core as core
 
 class ModelExecuter(object):
@@ -18,7 +18,7 @@ class ModelExecuter(object):
     """
     def __getattr__(self, attr):
         if(self.__model is None):
-            raise exps.ValueError()
+            raise excs.ValueError()
         return core.getattr(self.__model, attr)
 
 

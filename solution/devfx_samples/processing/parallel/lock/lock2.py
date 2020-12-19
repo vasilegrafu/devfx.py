@@ -1,10 +1,10 @@
 import time
 import devfx.core as core
 import devfx.diagnostics as dgn
-import devfx.parallel.processing as parallel
+import devfx.processing as processing
 
 class Targets(object):
-    lock = parallel.Lock()
+    lock = processing.parallel.Lock()
 
     @classmethod
     def target(cls, *args, **kwargs):
@@ -15,20 +15,18 @@ class Targets(object):
 def main():
     sw = dgn.stopwatch().start()
 
-    process1 = parallel.Process().target(fn=Targets.target)
+    process1 = processing.parallel.Process(fn=Targets.target)
     process1.start()
 
-    process2 = parallel.Process().target(fn=Targets.target)
+    process2 = processing.parallel.Process(fn=Targets.target)
     process2.start()
 
     process1.join()
     process2.join()
 
-    if(process1.result.is_exception()):
-        print(process1.result.value)
+    print(process1.result)
 
-    if(process2.result.is_exception()):
-        print(process2.result.value)
+    print(process2.result)
 
     print("time elapsed: ", sw.stop().elapsed)
 
