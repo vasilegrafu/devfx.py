@@ -7,7 +7,7 @@ import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 
 from .grid_agent_kind import GridAgentKind
 from .grid_environment import GridEnvironment

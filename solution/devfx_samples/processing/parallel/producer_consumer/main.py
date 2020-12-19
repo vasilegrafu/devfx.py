@@ -1,6 +1,6 @@
 import devfx.core as core
 import devfx.diagnostics as dgn
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 
 from devfx_samples.processing.parallel.producer_consumer.producer import Producer
 from devfx_samples.processing.parallel.producer_consumer.consumer import Consumer
@@ -12,10 +12,10 @@ def main():
     producer2 = Producer(id=2)
     consumer = Consumer()
 
-    queue = processing.parallel.Queue()
+    queue = pp.Queue()
 
-    producer_processes = processing.parallel.Processes([processing.parallel.Process(fn=fn, args=(queue,)) for fn in (producer1.run, producer2.run)])
-    consumer_process = processing.parallel.Process(fn=consumer.run, args=(queue,))
+    producer_processes = pp.Processes([pp.Process(fn=fn, args=(queue,)) for fn in (producer1.run, producer2.run)])
+    consumer_process = pp.Process(fn=consumer.run, args=(queue,))
     
     producer_processes.start()  
     consumer_process.start()

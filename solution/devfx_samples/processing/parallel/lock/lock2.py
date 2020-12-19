@@ -1,10 +1,10 @@
 import time
 import devfx.core as core
 import devfx.diagnostics as dgn
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 
 class Targets(object):
-    lock = processing.parallel.Lock()
+    lock = pp.Lock()
 
     @classmethod
     def target(cls, *args, **kwargs):
@@ -15,10 +15,10 @@ class Targets(object):
 def main():
     sw = dgn.stopwatch().start()
 
-    process1 = processing.parallel.Process(fn=Targets.target)
+    process1 = pp.Process(fn=Targets.target)
     process1.start()
 
-    process2 = processing.parallel.Process(fn=Targets.target)
+    process2 = pp.Process(fn=Targets.target)
     process2.start()
 
     process1.join()

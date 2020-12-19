@@ -1,7 +1,7 @@
 import time
 import devfx.core as core
 import devfx.diagnostics as dgn
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 
 class Targets(object):
     @classmethod
@@ -19,11 +19,11 @@ class Targets(object):
 def main():
     sw = dgn.stopwatch().start()
 
-    process1 = processing.parallel.Process(fn=Targets.target1, args=(1, 1))
+    process1 = pp.Process(fn=Targets.target1, args=(1, 1))
     process1.start()
 
-    process2 = processing.parallel.Process(fn=Targets.target2, args=(2, 2))
-    process1.start()
+    process2 = pp.Process(fn=Targets.target2, args=(2, 2))
+    process2.start()
 
     process1.join()
     process2.join()

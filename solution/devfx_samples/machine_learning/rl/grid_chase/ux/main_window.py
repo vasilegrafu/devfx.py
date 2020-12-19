@@ -4,7 +4,7 @@ import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 import devfx.ux.windows.wx as ux
 
 from ..logic.grid_environment import GridEnvironment
@@ -149,7 +149,7 @@ class MainWindow(ux.Window):
                 D += d
                 self.train_count_text.Label = str(D)
             trainingManager.close()
-        thread = processing.concurrent.Thread(fn=_)
+        thread = pc.Thread(fn=_)
         thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):

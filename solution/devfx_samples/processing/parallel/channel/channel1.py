@@ -1,7 +1,7 @@
 import time
 import devfx.core as core
 import devfx.diagnostics as dgn
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 
 """------------------------------------------------------------------------------------------------
 """
@@ -13,8 +13,8 @@ def worker(n, channel_end):
         channel_end.send((n, i, obj))       
 
 if __name__ == '__main__':
-    channel = processing.parallel.Channel()
-    process = processing.parallel.Processes.create(n=8, fn=lambda i: worker, args=lambda i: ((i+1), channel.end2))
+    channel = pp.Channel()
+    process = pp.Processes.create(n=8, fn=lambda i: worker, args=lambda i: ((i+1), channel.end2))
     process.start()
 
     while(True):

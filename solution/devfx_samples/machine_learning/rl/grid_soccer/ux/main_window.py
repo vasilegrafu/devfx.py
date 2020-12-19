@@ -4,7 +4,7 @@ import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.processing as processing
+import devfx.processing.parallel as pp
 import devfx.ux.windows.wx as ux
 
 
@@ -157,7 +157,7 @@ class MainWindow(ux.Window):
                 i += 1
                 if(i % 1000 == 0):
                     self.train_count_text.Label = str(i)
-        thread = processing.concurrent.Thread(fn=_)
+        thread = pc.Thread(fn=_)
         thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):
@@ -189,7 +189,7 @@ class MainWindow(ux.Window):
                 self.viewable_grid_environment.do_iteration(agents=(agent,))
                 self.grid_canvas.UpdateDrawing()
                 t.sleep(self.do_iterations_speed_spinbox.GetValue())          
-        thread = processing.concurrent.Thread(fn=_)
+        thread = pc.Thread(fn=_)
         thread.start()
 
     def __cancel_iterations_button__OnPress(self, sender, event_args):

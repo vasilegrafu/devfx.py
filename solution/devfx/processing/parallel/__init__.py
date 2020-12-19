@@ -9,6 +9,5 @@ from .pipe import Pipe
 from .queue import Queue
 from .channel import Channel
 from .channels import Channels
-from .ray import *
 
 
