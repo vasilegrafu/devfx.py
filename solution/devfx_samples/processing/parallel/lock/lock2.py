@@ -13,7 +13,7 @@ class Targets(object):
         cls.lock.release()
 
 def main():
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     process1 = pp.Process(fn=Targets.target)
     process1.start()

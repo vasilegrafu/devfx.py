@@ -6,7 +6,7 @@ from devfx_samples.processing.parallel.producer_consumer.producer import Produce
 from devfx_samples.processing.parallel.producer_consumer.consumer import Consumer
 
 def main():
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     producer1 = Producer(id=1)
     producer2 = Producer(id=2)

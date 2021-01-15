@@ -17,7 +17,7 @@ class Targets(object):
         return (p1, p2)
 
 def main():
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     process1 = pp.Process(fn=Targets.target1, args=(1, 1))
     process1.start()

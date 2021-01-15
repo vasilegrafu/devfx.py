@@ -4,7 +4,7 @@ import devfx.data_vizualization as dv
 """------------------------------------------------------------------------------------------------
 """ 
 X = stats.distributions.normal(0.0, 1.0)
-E = stats.distributions.normal(0.0, 10.0)
+E = stats.distributions.normal(0.0, 1.0)
 
 x = X(1024*4)
 y = lambda x: 2*x + E(x.size)

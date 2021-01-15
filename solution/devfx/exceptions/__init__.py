@@ -20,6 +20,7 @@ from .AuthenticationError import AuthenticationError
 from .AutorizationError import AutorizationError
 
 from .ErrorInfo import ErrorInfo
+from .ErrorInfo import print_error_info
 
 
 

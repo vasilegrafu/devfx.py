@@ -62,11 +62,11 @@ class Environment(object):
         return agents
 
 
-    def get_same_kind_agents(self, kind):
+    def get_agents_like(self, kind):
         agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_kind() == kind)]
         return agents
 
-    def get_other_kind_agents(self, kind):
+    def get_agents_not_like(self, kind):
         agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_kind() != kind)]
         return agents
 
@@ -100,6 +100,14 @@ class Environment(object):
                 agents = self.get_agents()
             for agent in agents:
                 agent.do_iteration()
+
+
+    def do_iterations(self, n, agents=None):
+        self._do_iterations(n=n, agents=agents)
+
+    def _do_iterations(self, n, agents=None):
+        for i in range(0, n):
+            self.do_iteration(agents=agents)
 
     """------------------------------------------------------------------------------------------------
     """ 

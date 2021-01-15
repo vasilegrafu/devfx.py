@@ -14,7 +14,7 @@ class Targets(object):
         return 0
 
 def main():
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     targets = Targets()
 

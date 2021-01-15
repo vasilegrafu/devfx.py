@@ -10,7 +10,7 @@ def test_algebra1():
     N3 = stats.distributions.normal(mu=2.0, sigma=1.0)
     N4 = stats.distributions.normal(mu=2.0, sigma=1.0)
 
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     Y = N1 + N2 ** 2
     E = stats.distributions.empirical(Y.sample())
@@ -39,7 +39,7 @@ def test_algebra2():
     L0 = stats.distributions.uniform(a=9.0, b=11.0)
     dT = stats.distributions.normal(mu=1.0, sigma=1.0)
 
-    sw = dgn.stopwatch().start()
+    sw = dgn.Stopwatch().start()
 
     K = dL/(L0*dT)
 

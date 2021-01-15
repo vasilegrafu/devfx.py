@@ -1,5 +1,6 @@
 import sys
 import traceback
+import contextlib
 
 class ErrorInfo(object):
     @staticmethod
@@ -12,3 +13,13 @@ class ErrorInfo(object):
         exc_info = ErrorInfo.get()
         print(exc_info, file=file)
 
+
+@contextlib.contextmanager
+def print_error_info():
+    try:
+        yield None
+    except Exception as e:
+        ErrorInfo.print()
+        raise e
+    finally:
+        pass

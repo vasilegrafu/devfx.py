@@ -10,5 +10,4 @@ def sum(data):
     if(core.is_typeof(data, pd.Series)):
         return data.sum()
     else:
-        data = np.asarray(data)
-        return np.sum(data, axis=None)
+        return sum(data=pd.Series(data), axis=None)

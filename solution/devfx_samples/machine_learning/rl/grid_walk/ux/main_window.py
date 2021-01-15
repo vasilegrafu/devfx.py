@@ -3,13 +3,13 @@ import time
 import devfx.exceptions as excs
 import devfx.core as core
 import devfx.machine_learning as ml
-import devfx.processing.parallel as pp
+import devfx.processing.concurrent as pc
 import devfx.ux.windows.wx as ux
 
 from ..logic.grid_environment import GridEnvironment
 from ..logic.grid_actions import GridActions
 from ..logic.grid_agent_kind import GridAgentKind
-from ..logic.trainer import TrainingManager
+from ..logic.trainer import Trainer
 
 class MainWindow(ux.Window):
     def __init__(self, **kwargs):
@@ -144,7 +144,7 @@ class MainWindow(ux.Window):
         agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
         policy = agent.get_policy()
         for state in policy.get_states():
-            for action in policy.get_actions(state=state):
+            for action in policy.get_actions(state):
                 text = f'{policy.get_value(state, action):.2f}'
                 cell_index = state.value
                 if(action == GridActions.Left):
@@ -178,13 +178,12 @@ class MainWindow(ux.Window):
         self.training_is_running = True
 
         def _():
-            trainingManager = TrainingManager() 
-            D = 0
+            trainer = Trainer() 
+            N = 0
             while self.training_is_running:
-                d = trainingManager.learn(self.grid_environment.get_agent_kind_policies())
-                D += d
-                self.train_count_text.Label = str(D)
-            trainingManager.close()
+                n = trainer.learn(self.grid_environment.get_agent_kind_policies())
+                N += n
+                self.train_count_text.Label = str(N)
         thread = pc.Thread(fn=_)
         thread.start()
         

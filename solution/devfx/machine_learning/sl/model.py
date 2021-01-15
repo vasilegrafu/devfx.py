@@ -178,7 +178,7 @@ class Model(tf.Module):
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
-        stopwatch = dgn.stopwatch().start()
+        stopwatch = dgn.Stopwatch().start()
 
         cancellation_token = Model.TrainingCancellationToken()
 

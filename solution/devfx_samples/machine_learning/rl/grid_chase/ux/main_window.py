@@ -2,14 +2,14 @@ import itertools
 import time
 import devfx.exceptions as excs
 import devfx.core as core
-import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
-import devfx.processing.parallel as pp
+import devfx.processing.concurrent as pc
 import devfx.ux.windows.wx as ux
 
 from ..logic.grid_environment import GridEnvironment
 from ..logic.grid_agent_kind import GridAgentKind
-from ..logic.trainer import TrainingManager
+from ..logic.trainer__one_cpu import Trainer
+# from ..logic.trainer__many_cpu import TrainingManager
 
 class MainWindow(ux.Window):
     def __init__(self, **kwargs):
@@ -26,6 +26,8 @@ class MainWindow(ux.Window):
         self.grid_environment = GridEnvironment()
         self.grid_environment.create()
         self.grid_environment.setup()
+        self.grid_environment.set_agent_kind_policy(agent_kind=GridAgentKind.CHASER, policy=ml.rl.MPolicy())
+        self.grid_environment.set_agent_kind_policy(agent_kind=GridAgentKind.CHASED, policy=ml.rl.MPolicy())
         
     """------------------------------------------------------------------------------------------------
     """
@@ -142,15 +144,20 @@ class MainWindow(ux.Window):
         self.training_is_running = True
 
         def _():
-            trainingManager = TrainingManager() 
-            D = 0
+            trainer = Trainer() 
             while self.training_is_running:
-                d = trainingManager.learn(self.grid_environment.get_agent_kind_policies())
-                D += d
-                self.train_count_text.Label = str(D)
-            trainingManager.close()
+                N = trainer.learn(self.grid_environment.get_agent_kind_policies())
+                self.train_count_text.Label = str(N)
         thread = pc.Thread(fn=_)
         thread.start()
+
+        # def _():
+        #     trainingManager = TrainingManager()
+        #     while self.training_is_running:
+        #         N = trainingManager.learn(self.grid_environment.get_agent_kind_policies())
+        #         self.train_count_text.Label = str(N)
+        # thread = pc.Thread(fn=_)
+        # thread.start()
 
     def __cancel_training_button__OnPress(self, sender, event_args):
         if(not self.training_is_running):
@@ -181,7 +188,7 @@ class MainWindow(ux.Window):
                 self.grid_environment.do_iteration(agents=(agent,))
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_iterations_speed_spinbox.GetValue())          
-        thread = parallel.Thread(fn=_)
+        thread = pc.Thread(fn=_)
         thread.start()
 
     def __cancel_iterations_button__OnPress(self, sender, event_args):

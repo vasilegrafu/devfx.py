@@ -33,6 +33,8 @@ class GridEnvironment(ml.rl.Environment):
     """
     def set_agent_kind_policy(self, agent_kind, policy):
         self.__agent_kind_policies[agent_kind] = policy
+        for agent in self.get_agents_like(kind=agent_kind):
+            agent.set_policy(policy=policy)
 
     def get_agent_kind_policy(self, agent_kind):
         return self.__agent_kind_policies[agent_kind]
@@ -89,11 +91,11 @@ class GridEnvironment(ml.rl.Environment):
         choosable_cell_indexes = [cell_index for cell_index in self.cells 
                                              if((self.cells[cell_index] is not None) and (cell_index not in other_agents_cell_indexes))]
         random_cell_index = rnd.choice(choosable_cell_indexes)
-        state = ml.rl.State(value=(random_cell_index, ), kind=ml.rl.StateKind.NON_TERMINAL)
+        state = ml.rl.State(value=(random_cell_index,), kind=ml.rl.StateKind.NON_TERMINAL)
         agent.set_state(state)
 
     def __setup_contextual_state(self, agent):
-        other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in self.get_other_kind_agents(kind=agent.get_kind())]
+        other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in self.get_agents_not_like(kind=agent.get_kind())]
         state = ml.rl.State(value=(agent.get_state().value[0], *other_kind_agents_cell_indexes), kind=agent.get_state().kind)
         agent.set_state(state)
 
@@ -124,7 +126,7 @@ class GridEnvironment(ml.rl.Environment):
             return (next_state, next_reward)
 
         agent_kind = agent.get_kind()
-        other_kind_agents = self.get_other_kind_agents(kind=agent_kind)
+        other_kind_agents = self.get_agents_not_like(kind=agent_kind)
         other_kind_agents_cell_indexes = [other_kind_agent.get_state().value[0] for other_kind_agent in other_kind_agents]
         if(agent_kind == GridAgentKind.CHASER):
             if(agent_next_cell_index in other_kind_agents_cell_indexes):

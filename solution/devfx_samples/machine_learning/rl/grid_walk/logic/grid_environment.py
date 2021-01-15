@@ -33,6 +33,8 @@ class GridEnvironment(ml.rl.Environment):
     """
     def set_agent_kind_policy(self, agent_kind, policy):
         self.__agent_kind_policies[agent_kind] = policy
+        for agent in self.get_agents_like(kind=agent_kind):
+            agent.set_policy(policy=policy)
 
     def get_agent_kind_policy(self, agent_kind):
         return self.__agent_kind_policies[agent_kind]
@@ -60,24 +62,13 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def set_agent_kind_policy(self, agent_kind, policy):
-        self.__agent_kind_policies[agent_kind] = policy
-
-    def get_agent_kind_policy(self, agent_kind):
-        return self.__agent_kind_policies[agent_kind]
-
-    def get_agent_kind_policies(self):
-        return self.__agent_kind_policies
-       
-    """------------------------------------------------------------------------------------------------
-    """
     def _setup(self, iteration_randomness=None):
         if(not self.exists_agent(id=1)):
             self.set_agent_kind_policy(agent_kind=GridAgentKind.WALKER, policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
             self.add_agent(GridAgent(id=1, name='Johnny Walker 1', kind=GridAgentKind.WALKER, 
-                                    environment=self, 
-                                    policy=self.get_agent_kind_policy(GridAgentKind.WALKER),
-                                    iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
+                                     environment=self, 
+                                     policy=self.get_agent_kind_policy(GridAgentKind.WALKER),
+                                     iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
         else:
             self.__setup_positional_state(self.get_agent(id=1))
 

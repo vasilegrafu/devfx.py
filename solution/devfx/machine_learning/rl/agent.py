@@ -154,7 +154,7 @@ class Agent(object):
         if(is_terminal_state):
             raise excs.ApplicationError()
 
-        action = self.get_policy().get_optimal_action(state=state)
+        (action, value) = self.get_policy().get_optimal_action(state=state)
         if(action is None):
             (state, action, next_state_and_reward) = (state, None, None)
         else:

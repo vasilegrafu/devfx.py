@@ -18,3 +18,5 @@ print(v_slice)
 
 v_slice = list(it.islice(v_iter, 3))
 print(v_slice)
+
+
