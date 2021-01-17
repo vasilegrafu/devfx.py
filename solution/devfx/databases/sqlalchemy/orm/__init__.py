@@ -30,12 +30,24 @@ from .column import Column_as_Timedelta
 from .column import Column_as_BigIntegerPrimaryKey
 from .column import Column_as_IntegerPrimaryKey
 from .column import Column_as_SmallIntegerPrimaryKey
+from .column import Column_as_StringPrimaryKey
+from .column import Column_as_TextPrimaryKey
+from .column import Column_as_DatePrimaryKey
+from .column import Column_as_DateTimePrimaryKey
+from .column import Column_as_TimePrimaryKey
+from .column import Column_as_TimedeltaPrimaryKey
 from .column import Column_as_PrimaryKey
 from .column import Column_as_ForeignKey
 
 from .column import Column_as__BigInteger_id
 from .column import Column_as__Integer_id
 from .column import Column_as__SmallInteger_id
+from .column import Column_as__String_id
+from .column import Column_as__Text_id
+from .column import Column_as__Date_id
+from .column import Column_as__DateTime_id
+from .column import Column_as__Time_id
+from .column import Column_as__Timedelta_id
 from .column import Column_as__id
 from .column import Column_as__created_on
 from .column import Column_as__updated_on

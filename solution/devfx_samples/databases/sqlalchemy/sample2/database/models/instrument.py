@@ -1,26 +1,16 @@
 import devfx.databases.sqlalchemy as sa
 from .database_metadata import BaseDatabaseEntity
 
-"""------------------------------------------------------------------------------------------------
-"""
 class Instrument(BaseDatabaseEntity):
     __tablename__ = "instrument"
 
-    """----------------------------------------------------------------
-    """
     id = sa.orm.Column_as__Integer_id()
 
-    """----------------------------------------------------------------
-    """
     candlesticks = sa.orm.Relationship_One_to_many('Candlestick', back_populates='instrument')
 
-    """----------------------------------------------------------------
-    """
     code = sa.orm.Column_as_String(length=16)
     name = sa.orm.Column_as_String(length=64, nullable=True)
 
-    """----------------------------------------------------------------
-    """
     @classmethod
     def copy(self, source, destination, include_primary_key=False):
         if(include_primary_key):

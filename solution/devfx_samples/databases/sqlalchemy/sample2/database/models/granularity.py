@@ -1,25 +1,15 @@
 import devfx.databases.sqlalchemy as sa
 from .database_metadata import BaseDatabaseEntity
 
-"""------------------------------------------------------------------------------------------------
-"""
 class Granularity(BaseDatabaseEntity):
     __tablename__ = "granularity"
 
-    """----------------------------------------------------------------
-    """
     id = sa.orm.Column_as__Integer_id()
 
-    """----------------------------------------------------------------
-    """
     candlesticks = sa.orm.Relationship_One_to_many('Candlestick', back_populates='granularity')
 
-    """----------------------------------------------------------------
-    """
     code = sa.orm.Column_as_String(length=4)
 
-    """----------------------------------------------------------------
-    """
     @classmethod
     def copy(self, source, destination, include_primary_key=False):
         if(include_primary_key):

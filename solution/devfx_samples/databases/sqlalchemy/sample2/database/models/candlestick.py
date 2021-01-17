@@ -1,25 +1,17 @@
 import devfx.databases.sqlalchemy as sa
 from .database_metadata import BaseDatabaseEntity
 
-"""------------------------------------------------------------------------------------------------
-"""
 class Candlestick(BaseDatabaseEntity):
     __tablename__ = "candlestick"
 
-    """----------------------------------------------------------------
-    """
     id = sa.orm.Column_as__Integer_id()
 
-    """----------------------------------------------------------------
-    """
     instrument_id = sa.orm.Column_as_ForeignKey("instrument.id")
     instrument = sa.orm.Relationship_many_to_One('Instrument', back_populates='candlesticks')
 
     granularity_id = sa.orm.Column_as_ForeignKey("granularity.id")
     granularity = sa.orm.Relationship_many_to_One('Granularity', back_populates='candlesticks')
 
-    """----------------------------------------------------------------
-    """
     datetime = sa.orm.Column_as_DateTime()
     open = sa.orm.Column_as_FloatingPointNumber()
     high = sa.orm.Column_as_FloatingPointNumber()
@@ -29,8 +21,6 @@ class Candlestick(BaseDatabaseEntity):
     volume = sa.orm.Column_as_FloatingPointNumber()
     complete = sa.orm.Column_as_Boolean()
 
-    """----------------------------------------------------------------
-    """
     @classmethod
     def copy(self, source, destination, include_primary_key=False):
         if(include_primary_key):
