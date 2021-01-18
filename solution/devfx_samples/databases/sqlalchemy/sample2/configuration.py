@@ -119,4 +119,4 @@ class candlesticks(object):
     ]
 
 class database(object):
-    connection_string = 'sqlite:///devfx_samples/databases/sqlalchemy/sample2/database.db'
+    url = 'sqlite:///devfx_samples/databases/sqlalchemy/sample2/database.db'

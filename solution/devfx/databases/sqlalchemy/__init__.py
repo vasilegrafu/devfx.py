@@ -4,8 +4,8 @@ from .common import *
 
 """----------------------------------------------------------
 """
-from .database_metadata import create_database_metadata
-from .database_metadata import deploy_database_metadata
+from .metadata import create_metadata
+from .metadata import deploy_metadata
 
 """----------------------------------------------------------
 """
@@ -61,7 +61,7 @@ from .index import Index
 
 """----------------------------------------------------------
 """
-from .database_connection import DatabaseConnection
+from .connection import Connection
 
 """----------------------------------------------------------
 """

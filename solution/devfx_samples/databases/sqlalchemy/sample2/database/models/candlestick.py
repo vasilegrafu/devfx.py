@@ -1,7 +1,7 @@
 import devfx.databases.sqlalchemy as sa
-from .database_metadata import BaseDatabaseEntity
+from .metadata import BaseEntity
 
-class Candlestick(BaseDatabaseEntity):
+class Candlestick(BaseEntity):
     __tablename__ = "candlestick"
 
     id = sa.orm.Column_as__Integer_id()
@@ -22,7 +22,7 @@ class Candlestick(BaseDatabaseEntity):
     complete = sa.orm.Column_as_Boolean()
 
     @classmethod
-    def copy(self, source, destination, include_primary_key=False):
+    def copy(cls, source, destination, include_primary_key=False):
         if(include_primary_key):
             destination.id = source.id
         destination.instrument_id = source.instrument_id

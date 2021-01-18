@@ -5,5 +5,5 @@ from devfx_samples.databases.sqlalchemy.sample2 import configuration as config
 """------------------------------------------------------------------------------------------------
 """
 if __name__ == "__main__":
-    db.DatabaseMetadataDeployer.deploy(config)
+    db.MetadataDeployer.deploy(config)
 

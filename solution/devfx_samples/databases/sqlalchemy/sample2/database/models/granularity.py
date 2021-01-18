@@ -1,7 +1,7 @@
 import devfx.databases.sqlalchemy as sa
-from .database_metadata import BaseDatabaseEntity
+from .metadata import BaseEntity
 
-class Granularity(BaseDatabaseEntity):
+class Granularity(BaseEntity):
     __tablename__ = "granularity"
 
     id = sa.orm.Column_as__Integer_id()

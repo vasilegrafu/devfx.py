@@ -2,15 +2,15 @@ import sqlalchemy as sa
 
 """------------------------------------------------------------------------------------------------
 """
-class DatabaseConnection(object):
-    def __init__(self, connection_string, echo=False, isolation_level=None):
+class Connection(object):
+    def __init__(self, url, echo=False, isolation_level=None):
         """
-        :param connection_string:
+        :param url:
         :param echo:
         :param isolation_level: Possible values: None, "SERIALIZABLE", "REPEATABLE_READ", "READ_COMMITTED", "READ_UNCOMMITTED" and "AUTOCOMMIT"
         """
 
-        self.__connection_string = connection_string
+        self.__url = url
         self.__echo = echo
         self.__isolation_level = isolation_level
 
@@ -32,8 +32,8 @@ class DatabaseConnection(object):
     """----------------------------------------------------------------
     """
     @property
-    def connection_string(self):
-        return self.__connection_string
+    def url(self):
+        return self.__url
 
     @property
     def echo(self):
@@ -48,9 +48,9 @@ class DatabaseConnection(object):
     def connect(self):
         if(self.__connection is None):
             if(self.__isolation_level is None):
-                engine = sa.create_engine(self.__connection_string, echo=self.__echo)
+                engine = sa.create_engine(self.__url, echo=self.__echo)
             else:
-                engine = sa.create_engine(self.__connection_string, echo=self.__echo, isolation_level=self.__isolation_level)
+                engine = sa.create_engine(self.__url, echo=self.__echo, isolation_level=self.__isolation_level)
             self.__connection = engine.connect()
 
     def close(self):

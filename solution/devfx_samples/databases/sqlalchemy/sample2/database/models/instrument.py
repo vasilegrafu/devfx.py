@@ -1,7 +1,7 @@
 import devfx.databases.sqlalchemy as sa
-from .database_metadata import BaseDatabaseEntity
+from .metadata import BaseEntity
 
-class Instrument(BaseDatabaseEntity):
+class Instrument(BaseEntity):
     __tablename__ = "instrument"
 
     id = sa.orm.Column_as__Integer_id()

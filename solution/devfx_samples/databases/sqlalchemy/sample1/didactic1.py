@@ -2,15 +2,15 @@ import devfx.databases.sqlalchemy as sa
 
 """ Schema
 """
-database_metadata = sa.create_database_metadata()
+metadata = sa.create_metadata()
 
-entity1 = sa.Table('entity1', database_metadata,
+entity1 = sa.Table('entity1', metadata,
                      sa.Column_as__id(sa.types.Integer(), autoincrement=True),
 
                      sa.Column_as__created_on(),
                      sa.Column_as__updated_on())
 
-entity2 = sa.Table('entity2', database_metadata,
+entity2 = sa.Table('entity2', metadata,
                      sa.Column_as__id(sa.types.Integer(), autoincrement=True),
                      sa.Column_as_ForeignKey('id_entity1', 'entity1.id'),
 
@@ -30,24 +30,24 @@ entity2 = sa.Table('entity2', database_metadata,
                      sa.Column_as__created_on(),
                      sa.Column_as__updated_on())
 
-""" Connection string
+""" Connection url
 """
-connection_string = 'sqlite:///devfx_samples/databases/sqlalchemy/sample1/didactic1.db'
+url = 'sqlite:///devfx_samples/databases/sqlalchemy/sample1/didactic1.db'
 
 """ Deploy
 """
-sa.deploy_database_metadata(database_metadata=database_metadata, connection_string=connection_string)
+sa.deploy_metadata(metadata=metadata, url=url)
 
 """ Create
 """
-with sa.DatabaseConnection(connection_string) as dbconnection:
-    entity1_insert_result = dbconnection.execute(entity1.insert())
+with sa.Connection(url) as connection:
+    entity1_insert_result = connection.execute(entity1.insert())
     print(entity1_insert_result)
 
 """ Query
 """
-with sa.DatabaseConnection(connection_string) as dbconnection:
-    entity1_select_result = dbconnection.execute(entity1.select()).fetchall()
+with sa.Connection(url) as connection:
+    entity1_select_result = connection.execute(entity1.select()).fetchall()
     print(entity1_select_result)
 
 

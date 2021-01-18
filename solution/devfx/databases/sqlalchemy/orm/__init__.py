@@ -1,6 +1,6 @@
 """----------------------------------------------------------
 """
-from .database_metadata import deploy_database_metadata
+from .metadata import deploy_metadata
 
 """----------------------------------------------------------
 """
@@ -56,7 +56,7 @@ from .column import Column_as
 
 """----------------------------------------------------------
 """
-from .base_database_entity import create_base_database_entity_type
+from .base_entity import create_base_entity_type
 
 """----------------------------------------------------------
 """
@@ -78,6 +78,6 @@ from .query import Query
 
 """----------------------------------------------------------
 """
-from .database_session import DatabaseSession
+from .session import Session
 
 

@@ -1,11 +1,11 @@
 import datetime as dt
 import devfx.databases.sqlalchemy as sa
 
-BaseDatabaseEntity = sa.orm.create_base_database_entity_type()
+BaseEntity = sa.orm.create_base_entity_type()
 
 """ Schema
 """
-class Entity1(BaseDatabaseEntity):
+class Entity1(BaseEntity):
     __tablename__ = "entity1"
 
     id = sa.orm.Column_as__Integer_id()
@@ -20,7 +20,7 @@ class Entity1(BaseDatabaseEntity):
                     "created_on={self.updated_on})".format(self=self)
 
 
-class Entity2(BaseDatabaseEntity):
+class Entity2(BaseEntity):
     __tablename__ = "entity2"
     id = sa.orm.Column_as__Integer_id()
     entity1_id = sa.orm.Column_as_ForeignKey("entity1.id")
@@ -47,35 +47,35 @@ class Entity2(BaseDatabaseEntity):
 
     def __repr__(self):
         return "Entity2(id={self.id}, "\
-                "id_entity1={self.entity1_id}, " \
-                "BigInteger={self.BigInteger}, " \
-                "Integer={self.Integer}, "\
-                "SmallInteger={self.SmallInteger}, "\
-                "FixedPointNumber={self.FixedPointNumber}, "\
-                "FloatingPointNumber={self.FloatingPointNumber}, "\
-                "String='{self.String}', " \
-                "Text='{self.Text}', " \
-                "Boolean={self.Boolean}, "\
-                "DateTime={self.DateTime}, "\
-                "Date={self.Date}, "\
-                "Time={self.Time}, "\
-                "Timedelta={self.Timedelta}, "\
-                "created_on={self.created_on}, "\
-                "created_on={self.updated_on})".format(self=self)
+                        "id_entity1={self.entity1_id}, " \
+                        "BigInteger={self.BigInteger}, " \
+                        "Integer={self.Integer}, "\
+                        "SmallInteger={self.SmallInteger}, "\
+                        "FixedPointNumber={self.FixedPointNumber}, "\
+                        "FloatingPointNumber={self.FloatingPointNumber}, "\
+                        "String='{self.String}', " \
+                        "Text='{self.Text}', " \
+                        "Boolean={self.Boolean}, "\
+                        "DateTime={self.DateTime}, "\
+                        "Date={self.Date}, "\
+                        "Time={self.Time}, "\
+                        "Timedelta={self.Timedelta}, "\
+                        "created_on={self.created_on}, "\
+                        "created_on={self.updated_on})".format(self=self)
 
 
-""" Connection string
+""" Connection url
 """
-connection_string = 'sqlite:///devfx_samples/databases/sqlalchemy/sample1/orm/didactic1.db'
+url = 'sqlite:///devfx_samples/databases/sqlalchemy/sample1/orm/didactic1.db'
 
 """ Deploy
 """
-sa.orm.deploy_database_metadata(BaseDatabaseEntity, connection_string)
+sa.orm.deploy_metadata(BaseEntity, url)
 
 
 """ Create
 """
-with sa.orm.DatabaseSession(connection_string) as session:
+with sa.orm.Session(url) as session:
     entity11 = Entity1()
     session.add(entity11)
     session.flush()
@@ -120,33 +120,33 @@ with sa.orm.DatabaseSession(connection_string) as session:
 
 """ Query
 """
-with sa.orm.DatabaseSession(connection_string) as dbsession:
-    entity1_list = dbsession.query(Entity1.id).all()
+with sa.orm.Session(url) as session:
+    entity1_list = session.query(Entity1.id).all()
     for entity1 in entity1_list:
         print(entity1)
 
-    entity2_list = dbsession.query(Entity2).all()
+    entity2_list = session.query(Entity2).all()
     for entity2 in entity2_list:
         print(entity2)
 
 """ Update
 """
-with sa.orm.DatabaseSession(connection_string) as dbsession:
-    entity2_list = dbsession.query(Entity2).all()
+with sa.orm.Session(url) as session:
+    entity2_list = session.query(Entity2).all()
     for entity2 in entity2_list:
         entity2.Integer = entity2.Integer+1
 
 """ Delete
 """
-# with sa.orm.DatabaseSession(database_connection_string) as dbsession:
-#     entity1 = dbsession.query(Entity1).first()
-#     dbsession.delete(entity1)
+# with sa.orm.Session(database_url) as session:
+#     entity1 = session.query(Entity1).first()
+#     session.delete(entity1)
 
 
 """ Relationship
 """
-with sa.orm.DatabaseSession(connection_string) as dbsession:
-    entity1 = dbsession.query(Entity1).first()
+with sa.orm.Session(url) as session:
+    entity1 = session.query(Entity1).first()
     print(entity1.entity2s)
-    entity2 = dbsession.query(Entity2).first()
+    entity2 = session.query(Entity2).first()
     print(entity2.entity1)
