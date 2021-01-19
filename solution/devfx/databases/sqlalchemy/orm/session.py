@@ -1,3 +1,4 @@
+import pandas as pd
 import sqlalchemy as sa
 import sqlalchemy.orm
 
@@ -22,7 +23,7 @@ class Session(object):
         self.__expire_on_commit = expire_on_commit
         self.__isolation_level = isolation_level
 
-        self.__sesssion = None
+        self.__session = None
 
     """----------------------------------------------------------------
     """
@@ -70,54 +71,54 @@ class Session(object):
     """----------------------------------------------------------------
     """
     def open(self):
-        if(self.__sesssion is None):
+        if(self.__session is None):
             if(self.__isolation_level is None):
                 engine = sa.create_engine(self.__url, echo=self.__echo)
             else:
                 engine = sa.create_engine(self.__url, echo=self.__echo, isolation_level=self.__isolation_level)
             Session = sa.orm.sessionmaker(bind=engine, autoflush=self.__autoflush, autocommit=self.__autocommit, expire_on_commit=self.__expire_on_commit)
-            self.__sesssion = Session()
+            self.__session = Session()
 
     @property
     def bind(self):
-        return self.__sesssion.bind
+        return self.__session.bind
 
     def begin(self):
-        return self.__sesssion.begin()
+        return self.__session.begin()
 
     def flush(self, instances=None):
-        self.__sesssion.flush(objects=instances)
+        self.__session.flush(objects=instances)
 
     def rollback(self):
-        self.__sesssion.rollback()
+        self.__session.rollback()
 
     def commit(self):
-        self.__sesssion.commit()
+        self.__session.commit()
 
     def close(self):
-        self.__sesssion.close()
-        self.__sesssion = None
+        self.__session.close()
+        self.__session = None
 
     """----------------------------------------------------------------
     """
     def execute(self, statement, params=None):
-        return self.__sesssion.execute(statement, params=params)
+        return self.__session.execute(statement, params=params)
 
     # ----------------------------------------------------------------
     def add(self, instance):
-        self.__sesssion.add(instance)
+        self.__session.add(instance)
 
     def add_all(self, instances):
-        self.__sesssion.add_all(instances)
+        self.__session.add_all(instances)
 
 
     # ----------------------------------------------------------------
     def bulk_save(self, instances):
-        self.__sesssion.bulk_save_objects(instances)
+        self.__session.bulk_save_objects(instances)
 
     # ----------------------------------------------------------------
     def expire(self, instance, attribute_names=None):
-        self.__sesssion.expire(instance, attribute_names=attribute_names)
+        self.__session.expire(instance, attribute_names=attribute_names)
 
     def expire_all(self, instances, attribute_names=None):
         for instance in instances:
@@ -125,7 +126,7 @@ class Session(object):
 
 
     def refresh(self, instance, attribute_names=None):
-        self.__sesssion.refresh(instance, attribute_names=attribute_names)
+        self.__session.refresh(instance, attribute_names=attribute_names)
 
     def refresh_all(self, instances, attribute_names=None):
         for instance in instances:
@@ -133,7 +134,7 @@ class Session(object):
 
     # ----------------------------------------------------------------
     def expunge(self, instance):
-        self.__sesssion.expunge(instance)
+        self.__session.expunge(instance)
 
     def expunge_all(self, instances):
         for instance in instances:
@@ -141,7 +142,7 @@ class Session(object):
 
     # ----------------------------------------------------------------
     def delete(self, instance):
-        self.__sesssion.delete(instance)
+        self.__session.delete(instance)
 
     def delete_all(self, instances):
         for instance in instances:
@@ -150,21 +151,44 @@ class Session(object):
     """----------------------------------------------------------------
     """
     def is_modified(self, instance, include_collections=True):
-        return self.__sesssion.is_modified(instance, include_collections=include_collections)
+        return self.__session.is_modified(instance, include_collections=include_collections)
 
     """----------------------------------------------------------------
     """
     def query(self, *entities, **kwargs):
-        return self.__sesssion.query(*entities, **kwargs)
+        return self.__session.query(*entities, **kwargs)
 
 
     """----------------------------------------------------------------
     """
-    def data_append(self, entity, data, index=False, index_label=None, chunksize=256):
+    def append_data(self, entity, data, index=False, index_label=None, chunksize=1024):
         data.to_sql(name=entity.__tablename__, con=self.__session.bind, if_exists='append', index=index, index_label=index_label, chunksize=chunksize)
+    
+    def set_data(self, entity, data, index=False, index_label=None, chunksize=1024):
+        data.to_sql(name=entity.__tablename__, con=self.__session.bind, if_exists='replace', index=index, index_label=index_label, chunksize=chunksize)
 
-    def data_remove(self, query=None):
-        pass
+    def remove_data(self, entity, where):
+        query = self.__session.query(entity)
+        if(where is not None):
+            query = query.filter(where(entity))
+        query.delete()
 
-    def data_get(self, query=None):
-        pass
+    def get_data(self, entity, where=None, order_by=None, limit=None):
+        query = self.__session.query(entity)
+        if(where is not None):
+            query = query.filter(where(entity))
+        if(order_by is not None):
+            query = query.order_by(order_by(entity))
+        if(limit is not None):
+            query = query.limit(limit)
+        data = pd.read_sql(sql=query.statement, con=self.__session.bind)
+        return data
+
+    def get_data_count(self, entity, where=None, limit=None):
+        query = self.__session.query(entity)
+        if(where is not None):
+            query = query.filter(where(entity))
+        if(limit is not None):
+            query = query.limit(limit)
+        data_count = query.count()
+        return data_count
