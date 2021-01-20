@@ -45,5 +45,4 @@ if __name__ == "__main__":
                                      spread=0.2,
                                      volume=100,
                                      complete=True)
-
         db.CandlestickCtrl(session).save(candlestick)

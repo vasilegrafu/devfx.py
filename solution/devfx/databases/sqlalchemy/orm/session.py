@@ -1,6 +1,8 @@
 import pandas as pd
 import sqlalchemy as sa
 import sqlalchemy.orm
+import sqlalchemy.inspection
+import devfx.core as core
 
 """------------------------------------------------------------------------------------------------
 """
@@ -161,33 +163,46 @@ class Session(object):
 
     """----------------------------------------------------------------
     """
-    def append_data(self, entity, data, index=False, index_label=None, chunksize=1024):
-        data.to_sql(name=entity.__tablename__, con=self.__session.bind, if_exists='append', index=index, index_label=index_label, chunksize=chunksize)
-    
-    def set_data(self, entity, data, index=False, index_label=None, chunksize=1024):
-        data.to_sql(name=entity.__tablename__, con=self.__session.bind, if_exists='replace', index=index, index_label=index_label, chunksize=chunksize)
+    def save_data(self, entity_type, data):
+        # delete
+        query = self.__session.query(entity_type)
+        query = query.filter(sa.or_(sa.and_(*[pkc == data.loc[i, pkc.name] for pkc in sa.inspection.inspect(entity_type).primary_key]) for i in range(len(data))))
+        instances = query.all()
+        for instance in instances:
+            self.__session.delete(instance)
+        #add
+        instances = []
+        for i in range(len(data)):
+            instance = entity_type()
+            for column in sa.inspection.inspect(entity_type).c:
+                core.setattr(instance, column.name, data.loc[i, column.name])
+            instances.append(instance)
+        self.__session.add_all(instances)
+   
+    def remove_data(self, entity_type, data):
+        query = self.__session.query(entity_type)
+        query = query.filter(sa.or_(sa.and_(*[pkc == data.loc[i, pkc.name] for pkc in sa.inspection.inspect(entity_type).primary_key]) for i in range(len(data))))
+        instances = query.all()
+        for instance in instances:
+            self.__session.delete(instance)
 
-    def remove_data(self, entity, where):
-        query = self.__session.query(entity)
+    def get_data(self, entity_type, where=None, order_by=None, limit=None):
+        query = self.__session.query(entity_type)
         if(where is not None):
-            query = query.filter(where(entity))
-        query.delete()
-
-    def get_data(self, entity, where=None, order_by=None, limit=None):
-        query = self.__session.query(entity)
-        if(where is not None):
-            query = query.filter(where(entity))
+            query = query.filter(where(entity_type))
         if(order_by is not None):
-            query = query.order_by(order_by(entity))
+            query = query.order_by(order_by(entity_type))
         if(limit is not None):
             query = query.limit(limit)
-        data = pd.read_sql(sql=query.statement, con=self.__session.bind)
+        instances = query.all()
+        data = pd.DataFrame.from_records(data=[instance.__dict__ for instance in instances], 
+                                         columns=[column.name for column in sa.inspection.inspect(entity_type).c])
         return data
 
-    def get_data_count(self, entity, where=None, limit=None):
-        query = self.__session.query(entity)
+    def get_data_count(self, entity_type, where=None, limit=None):
+        query = self.__session.query(entity_type)
         if(where is not None):
-            query = query.filter(where(entity))
+            query = query.filter(where(entity_type))
         if(limit is not None):
             query = query.limit(limit)
         data_count = query.count()
