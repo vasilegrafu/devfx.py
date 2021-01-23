@@ -3,11 +3,12 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 import sqlalchemy.inspection
 import devfx.core as core
+import devfx.diagnostics as dgn
 
 """------------------------------------------------------------------------------------------------
 """
 class Session(object):
-    def __init__(self, url, echo=False, autoflush=True, autocommit=False, expire_on_commit=True, isolation_level=None):
+    def __init__(self, url, echo=False, autoflush=False, autocommit=False, expire_on_commit=True, isolation_level=None):
         """
 
         :param url:
@@ -163,28 +164,42 @@ class Session(object):
 
     """----------------------------------------------------------------
     """
+    instances = []
     def save_data(self, entity_type, data):
-        # delete
-        query = self.__session.query(entity_type)
-        query = query.filter(sa.or_(sa.and_(*[pkc == data.loc[i, pkc.name] for pkc in sa.inspection.inspect(entity_type).primary_key]) for i in range(len(data))))
-        instances = query.all()
-        for instance in instances:
-            self.__session.delete(instance)
-        #add
-        instances = []
-        for i in range(len(data)):
-            instance = entity_type()
-            for column in sa.inspection.inspect(entity_type).c:
-                core.setattr(instance, column.name, data.loc[i, column.name])
-            instances.append(instance)
-        self.__session.add_all(instances)
-   
+        columns = {column.name: column for column in sa.inspection.inspect(entity_type).c}
+        pkcolumns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
+        non_pkcolumns = {name: columns[name] for name in set(columns) - set(pkcolumns)}
+        for index, row in data.iterrows():
+            index = [index] if (data.index.nlevels == 1) else index
+            query = self.__session.query(entity_type)
+            query = query.filter(sa.and_(*[pkcolumns[column_name] == index[data.index.names.index(column_name)] for column_name in pkcolumns]))
+            instance = query.one_or_none()
+            if(instance is None):
+                instance = entity_type()                   
+                for column_name in pkcolumns:
+                    core.setattr(instance, column_name, index[data.index.names.index(column_name)])
+                for column_name in non_pkcolumns:
+                    core.setattr(instance, column_name, row[column_name])
+                self.__session.add(instance)
+            else:
+                for column_name in pkcolumns:
+                    core.setattr(instance, column_name, index[data.index.names.index(column_name)])
+                for column_name in non_pkcolumns:
+                    core.setattr(instance, column_name, row[column_name])
+                  
     def remove_data(self, entity_type, data):
-        query = self.__session.query(entity_type)
-        query = query.filter(sa.or_(sa.and_(*[pkc == data.loc[i, pkc.name] for pkc in sa.inspection.inspect(entity_type).primary_key]) for i in range(len(data))))
-        instances = query.all()
-        for instance in instances:
-            self.__session.delete(instance)
+        columns = {column.name: column for column in sa.inspection.inspect(entity_type).c}
+        pkcolumns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
+        non_pkcolumns = {name: columns[name] for name in set(columns) - set(pkcolumns)}
+        for index, row in data.iterrows():
+            index = [index] if (data.index.nlevels == 1) else index
+            query = self.__session.query(entity_type)
+            query = query.filter(sa.and_(*[pkcolumns[column_name] == index[data.index.names.index(column_name)] for column_name in pkcolumns]))
+            instance = query.one_or_none()
+            if(instance is None):
+                pass
+            else:
+                self.__session.delete(instance)
 
     def get_data(self, entity_type, where=None, order_by=None, limit=None):
         query = self.__session.query(entity_type)
@@ -197,6 +212,7 @@ class Session(object):
         instances = query.all()
         data = pd.DataFrame.from_records(data=[instance.__dict__ for instance in instances], 
                                          columns=[column.name for column in sa.inspection.inspect(entity_type).c])
+        data.set_index([column.name for column in sa.inspection.inspect(entity_type).primary_key], inplace=True)
         return data
 
     def get_data_count(self, entity_type, where=None, limit=None):
