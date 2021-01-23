@@ -167,39 +167,28 @@ class Session(object):
     instances = []
     def save_data(self, entity_type, data):
         columns = {column.name: column for column in sa.inspection.inspect(entity_type).c}
-        pkcolumns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
-        pkcolumn_indexes = {column.name: i for i, column in enumerate(sa.inspection.inspect(entity_type).primary_key)}
-        non_pkcolumns = {name: columns[name] for name in set(columns) - set(pkcolumns)}
+        primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
         instances = []
         for row in data.itertuples():
-            index = row.Index
-            index = [row.Index] if (data.index.nlevels == 1) else row.Index
             instance = self.__session.query(entity_type) \
-                                     .get([index[pkcolumn_indexes[column_name]] for column_name in pkcolumns])
+                                     .get([core.getattr(row, column_name) for column_name in primary_key_columns])
             if(instance is None):
                 instance = entity_type()                   
-                for column_name in pkcolumns:
-                    core.setattr(instance, column_name, index[pkcolumn_indexes[column_name]])
-                for column_name in non_pkcolumns:
+                for column_name in columns:
                     core.setattr(instance, column_name, core.getattr(row, column_name))
                 instances.append(instance)
             else:
-                for column_name in pkcolumns:
-                    core.setattr(instance, column_name, index[pkcolumn_indexes[column_name]])
-                for column_name in non_pkcolumns:
+                for column_name in columns:
                     core.setattr(instance, column_name, core.getattr(row, column_name))
         self.__session.bulk_save_objects(instances)
                   
     def remove_data(self, entity_type, data):
         columns = {column.name: column for column in sa.inspection.inspect(entity_type).c}
-        pkcolumns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
-        pkcolumn_indexes = {column.name: i for i, column in enumerate(sa.inspection.inspect(entity_type).primary_key)}
-        non_pkcolumns = {name: columns[name] for name in set(columns) - set(pkcolumns)}
+        primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity_type).primary_key}
+        instances = []
         for row in data.itertuples():
-            index = row.Index
-            index = [row.Index] if (data.index.nlevels == 1) else row.Index
             instance = self.__session.query(entity_type) \
-                                     .get([index[pkcolumn_indexes[column_name]] for column_name in pkcolumns])
+                                     .get([core.getattr(row, column_name) for column_name in primary_key_columns])
             if(instance is None):
                 pass
             else:
@@ -216,7 +205,6 @@ class Session(object):
         instances = query.all()
         data = pd.DataFrame.from_records(data=[instance.__dict__ for instance in instances], 
                                          columns=[column.name for column in sa.inspection.inspect(entity_type).c])
-        data.set_index([column.name for column in sa.inspection.inspect(entity_type).primary_key], inplace=True)
         return data
 
     def get_data_count(self, entity_type, where=None, limit=None):
