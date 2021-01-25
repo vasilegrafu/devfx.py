@@ -9,8 +9,8 @@ from ..controllers import GranularityCtrl
 """------------------------------------------------------------------------------------------------
 """
 class CandlestickCtrl(object):
-    def __init__(self, dbsession):
-        self.__dbsession = dbsession
+    def __init__(self, session):
+        self.__session = session
 
     """----------------------------------------------------------------
     """
@@ -19,7 +19,7 @@ class CandlestickCtrl(object):
         if(existing_instance is not None):
             existing_instance.copy_from(instance)
         else:
-            self.__dbsession.add(instance)
+            self.__session.add(instance)
 
     def saveAll(self, instances):
         not_existing_instances = []
@@ -34,18 +34,18 @@ class CandlestickCtrl(object):
                 existing_instance_found.copy_from(instance)
             else:
                 not_existing_instances.append(instance)
-        self.__dbsession.add_all(not_existing_instances)
+        self.__session.add_all(not_existing_instances)
 
     """----------------------------------------------------------------
     """
     def deleteById(self, id):
-        self.__dbsession.delete(self.getById(id))
+        self.__session.delete(self.getById(id))
 
 
     """----------------------------------------------------------------
     """
     def getById(self, id, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .filter(Candlestick.id == id) \
                     .one_or_none()
         return result
@@ -53,7 +53,7 @@ class CandlestickCtrl(object):
     """----------------------------------------------------------------
     """
     def getByKey(self, key, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .filter((Candlestick.instrument_id == key[0])
                             & (Candlestick.granularity_id == key[1])
                             & (Candlestick.datetime == key[2])) \
@@ -65,7 +65,7 @@ class CandlestickCtrl(object):
         n = 250
         key_segments = [keys[i * n:(i + 1) * n] for i in range((len(keys) + n - 1) // n )]
         for key_segment in key_segments:
-            query = self.__dbsession.query(*projection)
+            query = self.__session.query(*projection)
             and_conditions = []
             for key in key_segment:
                 and_condition = sa.and_(Candlestick.instrument_id == key[0],
@@ -82,7 +82,7 @@ class CandlestickCtrl(object):
     """----------------------------------------------------------------
     """
     def getByDatetime(self, instrument_id, granularity_id, datetime, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .filter((Candlestick.instrument_id == instrument_id)
                             & (Candlestick.granularity_id == granularity_id)
                             & (Candlestick.datetime == datetime)) \
@@ -92,7 +92,7 @@ class CandlestickCtrl(object):
     """----------------------------------------------------------------
     """
     def getLatest(self, instrument_id, granularity_id, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .filter((Candlestick.instrument_id == instrument_id) 
                             & (Candlestick.granularity_id == granularity_id)) \
                     .order_by(Candlestick.datetime.desc()) \
@@ -103,7 +103,7 @@ class CandlestickCtrl(object):
     """----------------------------------------------------------------
     """
     def getFirst(self, instrument_id, granularity_id, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .filter((Candlestick.instrument_id == instrument_id) 
                             & (Candlestick.granularity_id == granularity_id)) \
                     .order_by(Candlestick.datetime.asc()) \
@@ -114,7 +114,7 @@ class CandlestickCtrl(object):
     """----------------------------------------------------------------
     """
     def getAll(self, projection=(Candlestick, )):
-        result = self.__dbsession.query(*projection) \
+        result = self.__session.query(*projection) \
                     .to_list()
         return result
 
@@ -122,17 +122,17 @@ class CandlestickCtrl(object):
     """------------------------------------------------------------------------------------------------
     """
     class __querier(object):
-        def __init__(self, dbsession):
-            self.__dbsession = dbsession
+        def __init__(self, session):
+            self.__session = session
 
        
         """----------------------------------------------------------------
         """
         def getAllInInterval(self, instrument_code, granularity_code, interval=None, projection=(Candlestick, )):
-            instrument_id = InstrumentCtrl(self.__dbsession).getByCode(code=instrument_code).id
-            granularity_id = GranularityCtrl(self.__dbsession).getByCode(code=granularity_code).id
+            instrument_id = InstrumentCtrl(self.__session).getByCode(code=instrument_code).id
+            granularity_id = GranularityCtrl(self.__session).getByCode(code=granularity_code).id
 
-            query = self.__dbsession.query(*projection) \
+            query = self.__session.query(*projection) \
                         .join(Candlestick.instrument) \
                         .join(Candlestick.granularity) \
             
@@ -176,4 +176,4 @@ class CandlestickCtrl(object):
     """
     @property
     def querier(self):
-        return CandlestickCtrl.__querier(self.__dbsession)
+        return CandlestickCtrl.__querier(self.__session)
