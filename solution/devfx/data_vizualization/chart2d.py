@@ -203,68 +203,73 @@ class Chart2d(Chart):
 
         """----------------------------------------------------------------
         """
-        def __set_axes_properties(self, datetimes, eliminate_gaps):
+        def __set_axes_labels(self, datetimes, datetime_format, eliminate_gaps):
+            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
             if (eliminate_gaps is False):
-                self.__chart.axes.set_xticklabels([mpl.dates.num2date(xtick).strftime('%Y-%m-%d\n%H:%M:%S') for xtick in self.__chart.axes.get_xticks()])
+                self.__chart.axes.set_xticklabels([mpl.dates.num2date(xtick).strftime(datetime_format) for xtick in self.__chart.axes.get_xticks()])
             else:
                 nxticks = 5
                 if(nxticks >= len(datetimes)):
                     nxticks = len(datetimes)
                 self.__chart.axes.set_xticks([int(round(i)) for i in np.linspace(0, len(datetimes)-1, nxticks)])
-                self.__chart.axes.set_xticklabels([datetimes[xtick].astype(dt.datetime).strftime('%Y-%m-%d\n%H:%M:%S') for xtick in self.__chart.axes.get_xticks()])
+                self.__chart.axes.set_xticklabels([datetimes[xtick].astype(dt.datetime).strftime(datetime_format) for xtick in self.__chart.axes.get_xticks()])
 
         """----------------------------------------------------------------
         """
-        def candlesticks(self, data, eliminate_gaps=True, colorup='g', colordown='r', alpha=0.75):
-            if(core.is_typeof(data, tuple) and len(data) == 5):
-                (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
-            elif(core.is_typeof(data, list) and len(data) == 5):
-                (datetimes, opens, highs, lows, closes) = (data[0], data[1], data[2], data[3], data[4])
-            elif(core.is_typeof(data, pd.DataFrame)):
-                (datetimes, opens, highs, lows, closes) = (data.index.values, data.iloc[:, 0].values, data.iloc[:, 1].values, data.iloc[:, 2].values, data.iloc[:, 3].values)
+        def candlesticks(self, data, 
+                               eliminate_gaps=True, 
+                               datetime_format='%Y-%m-%d\n%H:%M:%S',
+                               *args, **kwargs):  
+            if(core.is_typeof(data, pd.DataFrame)):
+                datetimes = data.index.values
             else:
-                raise excs.ArgumentError()
-            
-            if(len(datetimes) is None):
-                raise excs.ArgumentError()
-            if(len(datetimes) <= 1):
                 raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
+           
+            mplf.plot(data=data, 
+                      show_nontrading=not eliminate_gaps, 
+                      ax=self.__chart.axes, 
+                      type='candle',
+                      datetime_format=datetime_format,
+                      *args, **kwargs)
 
-            datetimes = np.asarray(datetimes, dtype='datetime64[us]')
-            if(datetimes[0] > datetimes[1]):
-                datetimes = datetimes[::-1]
-                opens = opens[::-1]
-                highs = highs[::-1]
-                lows = lows[::-1]
-                closes = closes[::-1]
-            quotes = np.asarray((opens, highs, lows, closes)).T
-
-            if(eliminate_gaps is False):
-                mplf.candlestick_ohlc(self.__chart.axes,
-                                      quotes=[(mpl.dates.date2num(datetime.astype(dt.datetime)), *quote) for datetime, quote in zip(datetimes, quotes)],
-                                      width=(1.0/1.25)*(min(np.diff(datetimes)))/np.timedelta64(1, 'D'),
-                                      colorup=colorup, colordown=colordown, alpha=alpha)
-            else:
-                mplf.candlestick_ohlc(self.__chart.axes,
-                                      quotes=[(i, *_) for i, _ in enumerate(quotes)],
-                                      width=1.0/1.25,
-                                      colorup=colorup, colordown=colordown, alpha=alpha)
-
-            self.__set_axes_properties(datetimes, eliminate_gaps)
+            datetimes = np.asarray(data.index.values, dtype='datetime64[us]')
+            self.__set_axes_labels(datetimes, datetime_format, eliminate_gaps)
 
             self.__chart._do_post_draw()
 
+        """----------------------------------------------------------------
+        """
+        def ohlc(self, data, 
+                       eliminate_gaps=True, 
+                       datetime_format='%Y-%m-%d\n%H:%M:%S',
+                       *args, **kwargs):     
+            if(core.is_typeof(data, pd.DataFrame)):
+                datetimes = data.index.values
+            else:
+                raise excs.ArgumentError()
+
+            self.__chart._do_prior_draw()
+           
+            mplf.plot(data=data, 
+                      show_nontrading=not eliminate_gaps, 
+                      ax=self.__chart.axes, 
+                      type='ohlc',
+                      datetime_format=datetime_format,
+                      *args, **kwargs)
+
+            self.__set_axes_labels(datetimes, datetime_format, eliminate_gaps)
+
+            self.__chart._do_post_draw()
 
         """----------------------------------------------------------------
         """
-        def plot(self, data, eliminate_gaps=True, *args, **kwargs):
-            if(core.is_typeof(data, tuple) and len(data) == 2):
-                (datetimes, values) = (data[0], data[1])
-            elif(core.is_typeof(data, list) and len(data) == 2):
-                (datetimes, values) = (data[0], data[1])
-            elif(core.is_typeof(data, pd.DataFrame)):
+        def plot(self, data, 
+                       eliminate_gaps=True, 
+                       datetime_format='%Y-%m-%d\n%H:%M:%S',
+                       *args, **kwargs): 
+            if(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
@@ -289,18 +294,17 @@ class Chart2d(Chart):
             else:
                 self.__chart.plot([i for i, _ in enumerate(values)], values, *args, **kwargs)
 
-            self.__set_axes_properties(datetimes, eliminate_gaps)
+            self.__set_axes_labels(datetimes, datetime_format, eliminate_gaps)
 
             self.__chart._do_post_draw()
 
         """----------------------------------------------------------------
         """
-        def bar(self, data, eliminate_gaps=True, *args, **kwargs):
-            if(core.is_typeof(data, tuple) and len(data) == 2):
-                (datetimes, values) = (data[0], data[1])
-            elif(core.is_typeof(data, list) and len(data) == 2):
-                (datetimes, values) = (data[0], data[1])
-            elif(core.is_typeof(data, pd.DataFrame)):
+        def bar(self, data, 
+                      eliminate_gaps=True, 
+                      datetime_format='%Y-%m-%d\n%H:%M:%S',
+                      *args, **kwargs): 
+            if(core.is_typeof(data, pd.DataFrame)):
                 (datetimes, values) = (data.index.values, data.iloc[:, 0].values)
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
@@ -325,9 +329,11 @@ class Chart2d(Chart):
             else:
                 self.__chart.bar([i for i, _ in enumerate(values)], values, width=1.0/1.25, *args, **kwargs)
 
-            self.__set_axes_properties(datetimes, eliminate_gaps)
+            self.__set_axes_labels(datetimes, datetime_format, eliminate_gaps)
 
             self.__chart._do_post_draw()
+
+
 
     @property
     def timeseries(self):

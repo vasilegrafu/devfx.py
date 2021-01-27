@@ -207,15 +207,16 @@ class Session(object):
             else:
                 self.__session.delete(instance)
 
-    def query_data(self, *entities):
-        return Session.__QueryData(entities=entities, session=self.__session)
+    def query_data(self, columns, index=None):
+        return Session.__QueryData(columns=columns, index=index, session=self.__session)
 
     class __QueryData(object):
-        def __init__(self, entities, session):
-            self.__entities = entities
+        def __init__(self, columns, index, session):
+            self.__columns = columns if (core.is_iterable(columns)) else [columns]
+            self.__index = index
             self.__session = session
 
-            self.__query = self.__session.query(*entities)
+            self.__query = self.__session.query(*self.__columns)
             
         def filter(self, criterion):
             self.__query = self.__query.filter(criterion)
@@ -234,16 +235,20 @@ class Session(object):
             return count
 
         def __get_data(self, instances):
-            if(len(self.__entities) == 0):
-                raise excs.NotSupportedError()
-            elif(len(self.__entities) == 1):
+            if(core.is_instance(self.__columns[0], sa.ext.declarative.api.DeclarativeMeta)):
                 data = pd.DataFrame.from_records(data=[instance.__dict__ for instance in instances], 
-                                                 columns=[column.name for column in sa.inspection.inspect(*self.__entities).c])
+                                                 columns=[column.name for column in sa.inspection.inspect(*self.__columns).c])
+                if(self.__index is not None):
+                    data.set_index([column.name for column in self.__index], inplace=True)
+                return data
+            elif(core.is_instance(self.__columns[0], sa.orm.attributes.InstrumentedAttribute)):
+                data = pd.DataFrame.from_records(data=[instance for instance in instances], 
+                                                 columns=[column.name for column in self.__columns])
+                if(self.__index is not None):
+                    data.set_index([column.name for column in self.__index], inplace=True)
                 return data
             else:
-                data = pd.DataFrame.from_records(data=[instance for instance in instances], 
-                                                 columns=[column.name for column in self.__entities])
-                return data
+                raise excs.NotSupportedError()
 
         def all(self):
             instances = self.__query.all()
