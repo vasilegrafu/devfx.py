@@ -219,6 +219,8 @@ class Chart2d(Chart):
         def candlesticks(self, data, 
                                eliminate_gaps=True, 
                                datetime_format='%Y-%m-%d\n%H:%M:%S',
+                               color_up='green',
+                               color_down='red',
                                *args, **kwargs):  
             if(core.is_typeof(data, pd.DataFrame)):
                 datetimes = data.index.values
@@ -232,6 +234,7 @@ class Chart2d(Chart):
                       ax=self.__chart.axes, 
                       type='candle',
                       datetime_format=datetime_format,
+                      style=mplf.make_mpf_style(marketcolors=mplf.make_marketcolors(up=color_up, down=color_down)),
                       *args, **kwargs)
 
             datetimes = np.asarray(data.index.values, dtype='datetime64[us]')
