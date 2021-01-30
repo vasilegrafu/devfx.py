@@ -93,7 +93,7 @@ class Figure(object):
     """
     def show(self, block=True):
         mpl.pyplot.figure(self.__figure.number)
-        mpl.pyplot.tight_layout(pad=1)
+        mpl.pyplot.tight_layout(pad=0.25)
         mpl.pyplot.show(block=block)
         mpl.pyplot.pause(0.001)
 
