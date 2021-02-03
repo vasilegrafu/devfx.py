@@ -177,31 +177,93 @@ class Session(object):
 
     """----------------------------------------------------------------
     """
-    instances = []
+    # def save_data(self, entity, data):
+    #     columns = {column.name: column for column in sa.inspection.inspect(entity).c}
+    #     primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity).primary_key}
+    #     instances = []
+    #     for row in data.itertuples():
+    #         instance = self.__session.query(entity) \
+    #                                  .get([core.getattr(row, column_name) for column_name in primary_key_columns])
+    #         if(instance is None):
+    #             instance = entity()                   
+    #             for column_name in columns:
+    #                 core.setattr(instance, column_name, core.getattr(row, column_name))
+    #             instances.append(instance)
+    #         else:
+    #             for column_name in columns:
+    #                 core.setattr(instance, column_name, core.getattr(row, column_name))
+    #     self.__session.bulk_save_objects(instances)
+
+    # def save_data(self, entity, data):
+    #     columns = [column for column in sa.inspection.inspect(entity).c]
+    #     primary_key_columns = [column for column in sa.inspection.inspect(entity).primary_key]
+    #     instances = []
+    #     data_chunk_size = 100
+    #     data_chunks = [data[i:i+data_chunk_size].copy() for i in range(0, data.shape[0], data_chunk_size)]
+    #     for data_chunk in data_chunks:
+    #         data_chunk['pk_tuple'] = data_chunk[[column.name for column in primary_key_columns]].apply(tuple, axis=1)
+
+    #         instances_from_db = self.__session.query(entity) \
+    #                                           .filter(sa.or_(*[sa.and_(*[column == core.getattr(data_chunk_row, column.name) for column in primary_key_columns]) for data_chunk_row in data_chunk.itertuples()])) \
+    #                                           .all()  
+    #         instances_from_db = {tuple([core.getattr(instance, column.name) for column in primary_key_columns]): instance for instance in instances_from_db}
+            
+    #         for data_chunk_row in data_chunk.itertuples(index=None, name=None):
+    #             pk_tuple = data_chunk_row[data_chunk.columns.get_loc('pk_tuple')]
+    #             if(pk_tuple not in instances_from_db):
+    #                 instance = entity()   
+    #             else:
+    #                 instance = instances_from_db[pk_tuple]
+    #             for column in columns:
+    #                 core.setattr(instance, column.name, data_chunk_row[data_chunk.columns.get_loc(column.name)])
+    #             instances.append(instance)
+    #     self.__session.bulk_save_objects(instances)
+    
     def save_data(self, entity, data):
-        columns = {column.name: column for column in sa.inspection.inspect(entity).c}
-        primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity).primary_key}
+        primary_key_columns = [column for column in sa.inspection.inspect(entity).primary_key]
         instances = []
-        for row in data.itertuples():
-            instance = self.__session.query(entity) \
-                                     .get([core.getattr(row, column_name) for column_name in primary_key_columns])
-            if(instance is None):
-                instance = entity()                   
-                for column_name in columns:
-                    core.setattr(instance, column_name, core.getattr(row, column_name))
-                instances.append(instance)
+        data_chunk_size = 100
+        data_chunks = [data[i:i+data_chunk_size].copy() for i in range(0, data.shape[0], data_chunk_size)]
+        for data_chunk in data_chunks:
+            data_chunk.set_index([column.name for column in primary_key_columns], inplace=True)
+            if(len(primary_key_columns) == 1):
+                instances_from_db = self.__session.query(entity) \
+                                                  .filter(sa.or_(*[primary_key_columns[0] == data_chunk_row[0] for data_chunk_row in data_chunk.itertuples()])) \
+                                                  .all() 
+                instances_from_db = {core.getattr(instance, primary_key_columns[0].name): instance for instance in instances_from_db} 
+            elif(len(primary_key_columns) > 1):
+                instances_from_db = self.__session.query(entity) \
+                                                  .filter(sa.or_(*[sa.and_(*[column == data_chunk_row[0][i] for i, column in enumerate(primary_key_columns)]) for data_chunk_row in data_chunk.itertuples()])) \
+                                                  .all()  
+                instances_from_db = {tuple([core.getattr(instance, column.name) for column in primary_key_columns]): instance for instance in instances_from_db}
             else:
-                for column_name in columns:
-                    core.setattr(instance, column_name, core.getattr(row, column_name))
+                raise excs.NotSupportedError()                             
+            
+            for data_chunk_row in data_chunk.itertuples():
+                if(data_chunk_row[0] not in instances_from_db):
+                    instance = entity() 
+                    if(len(data_chunk.index.names) == 1):
+                        core.setattr(instance, data_chunk.index.names[0], data_chunk_row[0])
+                    elif(len(data_chunk.index.names) > 1):
+                        for (i, _) in enumerate(data_chunk.index.names):
+                            core.setattr(instance, data_chunk.index.names[i], data_chunk_row[0][i])
+                    else:
+                        raise excs.NotSupportedError()  
+                else:
+                    instance = instances_from_db[data_chunk_row[0]]
+
+                for (i, column) in enumerate(data_chunk.columns.to_list()):
+                    core.setattr(instance, column, core.getattr(data_chunk_row, column))
+                instances.append(instance)
+                
         self.__session.bulk_save_objects(instances)
-                  
+
     def remove_data(self, entity, data):
-        columns = {column.name: column for column in sa.inspection.inspect(entity).c}
-        primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity).primary_key}
+        primary_key_columns = [column for column in sa.inspection.inspect(entity).primary_key]
         instances = []
-        for row in data.itertuples():
+        for data_row in data.itertuples():
             instance = self.__session.query(entity) \
-                                     .get([core.getattr(row, column_name) for column_name in primary_key_columns])
+                                     .get([core.getattr(data_row, column.name) for column in primary_key_columns])
             if(instance is None):
                 pass
             else:
