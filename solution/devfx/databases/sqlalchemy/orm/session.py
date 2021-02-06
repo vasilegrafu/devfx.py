@@ -9,10 +9,10 @@ import devfx.diagnostics as dgn
 """------------------------------------------------------------------------------------------------
 """
 class Session(object):
-    def __init__(self, url, echo=False, autoflush=False, autocommit=False, expire_on_commit=True, isolation_level=None):
+    def __init__(self, database_url, echo=False, autoflush=False, autocommit=False, expire_on_commit=True, isolation_level=None):
         """
 
-        :param url:
+        :param database_url:
         :param echo:
         :param autoflush:
         :param autocommit:
@@ -20,7 +20,7 @@ class Session(object):
         :param isolation_level: Possible values: None, "SERIALIZABLE", "REPEATABLE_READ", "READ_COMMITTED", "READ_UNCOMMITTED" and "AUTOCOMMIT"
         """
 
-        self.__url = url
+        self.__database_url = database_url
         self.__echo = echo
         self.__autoflush = autoflush
         self.__autocommit = autocommit
@@ -53,8 +53,8 @@ class Session(object):
     """----------------------------------------------------------------
     """
     @property
-    def url(self):
-        return self.__url
+    def database_url(self):
+        return self.__database_url
 
     @property
     def echo(self):
@@ -81,9 +81,9 @@ class Session(object):
     def open(self):
         if(self.__session is None):
             if(self.__isolation_level is None):
-                engine = sa.create_engine(self.__url, echo=self.__echo)
+                engine = sa.create_engine(self.__database_url, echo=self.__echo)
             else:
-                engine = sa.create_engine(self.__url, echo=self.__echo, isolation_level=self.__isolation_level)
+                engine = sa.create_engine(self.__database_url, echo=self.__echo, isolation_level=self.__isolation_level)
             Session = sa.orm.sessionmaker(bind=engine, autoflush=self.__autoflush, autocommit=self.__autocommit, expire_on_commit=self.__expire_on_commit)
             self.__session = Session()
 
