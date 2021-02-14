@@ -1,9 +1,9 @@
 import random as rnd
 import numpy as np
 import devfx.exceptions as excs
-from .policy import Policy
+from .tabular_policy import TabularPolicy
 
-class ESarsaPolicy(Policy):
+class ESarsaPolicy(TabularPolicy):
     def __init__(self, discount_factor, learning_rate):
         super().__init__(discount_factor=discount_factor)
 

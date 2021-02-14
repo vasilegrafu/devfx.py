@@ -2,8 +2,9 @@ import devfx.exceptions as excs
 import devfx.core as core
 
 class Action(object):
-    def __init__(self, value):
+    def __init__(self, value, duration):
         self.__set_value(value=value)
+        self.__set_duration(duration=duration)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -13,6 +14,17 @@ class Action(object):
     @property
     def value(self):
         return self.__value
+
+    
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_duration(self, duration):
+        self.__duration = duration
+
+    @property
+    def duration(self):
+        return self.__duration
+
 
     """------------------------------------------------------------------------------------------------
     """
@@ -26,8 +38,8 @@ class Action(object):
             return False
         if(not core.is_instance(action, Action)):
             raise excs.ArgumentError()
-        return action.value == self.value
+        return (action.value == self.value) and (action.duration == self.duration)
 
     def __hash__(self):
-        return hash(self.value)
+        return hash((self.value, self.duration))
     
