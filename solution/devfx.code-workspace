@@ -11,9 +11,9 @@
 			"**/__pycache__": true
 		},
 	
-		"python.linting.pylintEnabled": true,
+		"python.linting.pylintEnabled": false,
 
-		"python.pythonPath": "i:\\Installations\\WinPython64-3.8.3.0.dot\\WPy64-3830\\python-3.8.3.amd64\\python.exe",
+		"python.defaultInterpreterPath": "i:\\Installations\\WinPython64-3.8.3.0.dot\\WPy64-3830\\python-3.8.3.amd64\\python.exe",
 		"terminal.integrated.env.windows": {
 			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}"
 		},
