@@ -150,11 +150,4 @@ class Environment(object):
     def _get_random_action(self, agent, state):
         raise excps.NotImplementedError()
 
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def on_action_done(self, agent, state, action, next_state_and_reward):
-        self._on_action_done(agent=agent, state=state, action=action, next_state_and_reward=next_state_and_reward)
-
-    def _on_action_done(self, agent, state, action, next_state_and_reward):
-        pass
 

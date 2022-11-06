@@ -1,5 +1,4 @@
 from .policy import *
-from .mpolicy import *
 
 from .tabular_policy import *
 from .qlearning_policy import *

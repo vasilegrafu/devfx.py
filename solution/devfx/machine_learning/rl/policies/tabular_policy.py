@@ -1,4 +1,4 @@
-import pickle as pkl
+import pickle as pckl
 import numpy as np
 import random as rnd
 import devfx.exceptions as excps
@@ -85,7 +85,7 @@ class TabularPolicy(Policy):
         if(not self.has_actions(state=state)):
              return (None, None)
 
-        action = max(self._get_model()[state], key=lambda action: self.get_value(state=state, action=action))
+        action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
         value = self.get_value(state=state, action=action)
         return (action, value)
 

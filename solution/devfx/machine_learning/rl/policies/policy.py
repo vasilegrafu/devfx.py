@@ -1,4 +1,4 @@
-import pickle as pkl
+import pickle as pckl
 import devfx.exceptions as excps
 from ..state_kind import StateKind
 
@@ -39,7 +39,7 @@ class Policy(object):
 
 
     def copy_model_from(self, policy):
-        model = pkl.loads(pkl.dumps(policy._get_model(), protocol=pkl.HIGHEST_PROTOCOL))
+        model = pckl.loads(pckl.dumps(policy._get_model(), protocol=pckl.HIGHEST_PROTOCOL))
         self._set_model(model=model)
 
     def copy_model_to(self, policy):
@@ -77,7 +77,7 @@ class Policy(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def copy(self):
-        return pkl.loads(pkl.dumps(self, protocol=pkl.HIGHEST_PROTOCOL))
+        return pckl.loads(pckl.dumps(self, protocol=pckl.HIGHEST_PROTOCOL))
 
 
 

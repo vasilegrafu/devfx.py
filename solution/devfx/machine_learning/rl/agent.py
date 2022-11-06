@@ -131,8 +131,6 @@ class Agent(object):
 
         self.learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
 
-        environment.on_action_done(self, state, action, next_state_and_reward)
-
         return (state, action, next_state_and_reward)
 
     def do_random_action(self):

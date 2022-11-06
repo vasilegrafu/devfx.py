@@ -17,7 +17,6 @@ class GridEnvironment(ml.rl.Environment):
 
         self.__shape = (10, 10)
         self.__cells = {}
-        self.__agent_kind_policies = {}
 
     """------------------------------------------------------------------------------------------------
     """
@@ -28,19 +27,6 @@ class GridEnvironment(ml.rl.Environment):
     @property
     def cells(self):
         return self.__cells
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def set_agent_kind_policy(self, agent_kind, policy):
-        self.__agent_kind_policies[agent_kind] = policy
-        for agent in self.get_agents_like(kind=agent_kind):
-            agent.set_policy(policy=policy)
-
-    def get_agent_kind_policy(self, agent_kind):
-        return self.__agent_kind_policies[agent_kind]
-
-    def get_agent_kind_policies(self):
-        return self.__agent_kind_policies
 
     """------------------------------------------------------------------------------------------------
     """
@@ -60,19 +46,17 @@ class GridEnvironment(ml.rl.Environment):
     """
     def _setup(self, iteration_randomness=None):
         if(not self.exists_agent(id=1)):
-            self.set_agent_kind_policy(agent_kind=GridAgentKind.CHASER, policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1))
             self.add_agent(GridAgent(id=1, name='Wolf', kind=GridAgentKind.CHASER, 
                                      environment=self,
-                                     policy=self.get_agent_kind_policy(GridAgentKind.CHASER), 
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1), 
                                      iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
         else:
             self.__setup_positional_state(self.get_agent(id=1))
 
-        if(not self.exists_agent(id=2)):      
-            self.set_agent_kind_policy(agent_kind=GridAgentKind.CHASED, policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1))       
+        if(not self.exists_agent(id=2)):       
             self.add_agent(GridAgent(id=2, name='Rabbit', kind=GridAgentKind.CHASED, 
                                      environment=self,
-                                     policy=self.get_agent_kind_policy(GridAgentKind.CHASED), 
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1), 
                                      iteration_randomness= 0.0 if iteration_randomness is None else iteration_randomness))
         else:
             self.__setup_positional_state(self.get_agent(id=2))
@@ -153,10 +137,5 @@ class GridEnvironment(ml.rl.Environment):
         action = rnd.choice(actions)
         return action
 
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def _on_action_done(self, agent, state, action, next_state_and_reward):
-        pass
- 
 
 

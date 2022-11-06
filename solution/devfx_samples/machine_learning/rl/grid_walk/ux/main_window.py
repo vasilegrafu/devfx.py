@@ -9,7 +9,6 @@ import devfx.ux.windows.wx as ux
 from ..logic.grid_environment import GridEnvironment
 from ..logic.grid_actions import GridActions
 from ..logic.grid_agent_kind import GridAgentKind
-from ..logic.trainer import Trainer
 
 class MainWindow(ux.Window):
     def __init__(self, **kwargs):
@@ -23,9 +22,16 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __init_model(self):
+        self.grid_environment_for_training = GridEnvironment()
+        self.grid_environment_for_training.create()
+        self.grid_environment_for_training.setup(iteration_randomness=1.0)
+
         self.grid_environment = GridEnvironment()
         self.grid_environment.create()
         self.grid_environment.setup()
+        
+        for grid_agent in self.grid_environment.get_agents():
+            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.get_id()))
 
     """------------------------------------------------------------------------------------------------
     """
@@ -178,10 +184,10 @@ class MainWindow(ux.Window):
         self.training_is_running = True
 
         def _():
-            trainer = Trainer() 
             N = 0
             while self.training_is_running:
-                n = trainer.learn(self.grid_environment.get_agent_kind_policies())
+                n = 100
+                self.grid_environment_for_training.do_iterations(n)
                 N += n
                 self.train_count_text.Label = str(N)
         thread = pc.Thread(fn=_)
