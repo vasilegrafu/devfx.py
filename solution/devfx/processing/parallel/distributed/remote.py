@@ -1,6 +1,6 @@
 import ray
 import inspect
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 
 """------------------------------------------------------------------------------------------------
 """
@@ -48,7 +48,7 @@ def remote(entity, *args, **kwargs):
         return RemoteFunction(fn=entity)
     if(inspect.isclass(entity)):
         return RemoteClass(cls=entity)
-    raise excs.ArgumentError()
+    raise excps.ArgumentError()
 
 """------------------------------------------------------------------------------------------------
 """

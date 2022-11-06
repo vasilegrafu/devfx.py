@@ -1,6 +1,6 @@
 import itertools
 import time
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 import devfx.machine_learning as ml
 import devfx.processing.concurrent as pc
@@ -134,7 +134,7 @@ class MainWindow(ux.Window):
                 r = min(cell_width/5, cell_height/5)
                 cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
             else:
-                raise excs.ApplicationError()
+                raise excps.ApplicationError()
     
     """------------------------------------------------------------------------------------------------
     """

@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 
 class Reward(object):
@@ -25,7 +25,7 @@ class Reward(object):
         if(reward is None):
             return False
         if(not core.is_instance(reward, Reward)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return reward.value == self.value
 
     def __hash__(self):

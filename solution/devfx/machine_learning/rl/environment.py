@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 from .agent import Agent
 from .state_kind import StateKind
@@ -14,26 +14,26 @@ class Environment(object):
         self._create(*args, **kwargs)
 
     def _create(self, *args, **kwargs):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     
     def setup(self, *args, **kwargs):
         return self._setup(*args, **kwargs)
 
     def _setup(self, *args, **kwargs):
-        raise excs.NotImplementedError()     
+        raise excps.NotImplementedError()     
 
     def destroy(self, *args, **kwargs):
         self._destroy(*args, **kwargs)
 
     def _destroy(self, *args, **kwargs):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def add_agent(self, agent):
         if(agent.get_id() in self.__agents_container):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
         self.__agents_container[agent.get_id()] = agent
         self.on_added_agent(agent)
 
@@ -41,12 +41,12 @@ class Environment(object):
         self._on_added_agent(agent=agent)
         
     def _on_added_agent(self, agent):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
 
     def remove_agent(self, agent):
         if(agent.get_id() not in self.__agents_container):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
         self.__agents_container.pop(agent.get_id())
         self.on_removed_agent(agent)
 
@@ -54,7 +54,7 @@ class Environment(object):
         self._on_removed_agent(agent=agent)
         
     def _on_removed_agent(self, agent):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
 
     def get_agents(self):
@@ -79,7 +79,7 @@ class Environment(object):
 
     def get_agent(self, id):
         if(id not in self.__agents_container):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
         agent = self.__agents_container[id]
         return agent
 
@@ -114,13 +114,13 @@ class Environment(object):
     def get_next_state_and_reward(self, agent, state, action):
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
         
         next_state_and_reward = self._get_next_state_and_reward(agent=agent, state=state, action=action)
         return next_state_and_reward
         
     def _get_next_state_and_reward(self, agent, state, action):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
 
     def get_next_state(self, agent, state, action):
@@ -142,13 +142,13 @@ class Environment(object):
     def get_random_action(self, agent, state):
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
 
         action = self._get_random_action(agent=agent, state=state)
         return action
 
     def _get_random_action(self, agent, state):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 

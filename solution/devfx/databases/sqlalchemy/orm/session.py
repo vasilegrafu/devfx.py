@@ -3,7 +3,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 import sqlalchemy.inspection
 import devfx.core as core
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.diagnostics as dgn
 
 """------------------------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ class Session(object):
                                                   .all()  
                 instances_from_db = {tuple([core.getattr(instance, column.name) for column in primary_key_columns]): instance for instance in instances_from_db}
             else:
-                raise excs.NotSupportedError()                             
+                raise excps.NotSupportedError()                             
             
             for data_chunk_row in data_chunk.itertuples():
                 if(data_chunk_row[0] not in instances_from_db):
@@ -248,7 +248,7 @@ class Session(object):
                         for (i, _) in enumerate(data_chunk.index.names):
                             core.setattr(instance, data_chunk.index.names[i], data_chunk_row[0][i])
                     else:
-                        raise excs.NotSupportedError()  
+                        raise excps.NotSupportedError()  
                 else:
                     instance = instances_from_db[data_chunk_row[0]]
 
@@ -310,7 +310,7 @@ class Session(object):
                     data.set_index([column.name for column in self.__index], inplace=True)
                 return data
             else:
-                raise excs.NotSupportedError()
+                raise excps.NotSupportedError()
 
         def all(self):
             instances = self.__query.all()

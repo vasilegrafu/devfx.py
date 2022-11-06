@@ -1,6 +1,6 @@
 import itertools
 import time
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 import devfx.machine_learning as ml
 import devfx.processing.concurrent as pc
@@ -124,7 +124,7 @@ class MainWindow(ux.Window):
             elif(cell_content[0] is ml.rl.StateKind.TERMINAL and cell_content[1] < 0):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
             else:
-                raise excs.NotSupportedError()
+                raise excps.NotSupportedError()
 
         # draw rewards
         for (cell_index, cell_content) in self.grid_environment.cells.items():
@@ -168,7 +168,7 @@ class MainWindow(ux.Window):
                 #     y = (cell_index[0] - 2)*cell_height + cell_height/2
                 #     cgc.DrawText(text=text, x=x, y=y, colour=ux.GRAY)
                 else:
-                    raise excs.NotImplementedError()
+                    raise excps.NotImplementedError()
     
     """------------------------------------------------------------------------------------------------
     """

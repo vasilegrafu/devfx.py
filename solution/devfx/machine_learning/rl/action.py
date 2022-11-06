@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 
 class Action(object):
@@ -37,7 +37,7 @@ class Action(object):
         if(action is None):
             return False
         if(not core.is_instance(action, Action)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return (action.value == self.value) and (action.duration == self.duration)
 
     def __hash__(self):

@@ -1,7 +1,7 @@
 import pickle as pkl
 import numpy as np
 import random as rnd
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 
 from .policy import Policy
 
@@ -75,7 +75,7 @@ class TabularPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, state, action, next_state_and_reward):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 from .. import series
 from . import validation
@@ -17,7 +17,7 @@ def columns_count(data):
 @validation.validate_args_is_mseries('data')
 def rows_count(data):
     if(columns_count(data) == 0):
-        raise excs.ArgumentError()
+        raise excps.ArgumentError()
     return len(data[0])
 
 @validation.validate_args_is_mseries('data')
@@ -45,6 +45,6 @@ def split(data, delimeter):
     elif(core.is_typeof(delimeter, float)):
         return [get(data, slice(None, int(delimeter*rows_count(data)))), get(data, slice(int(delimeter*rows_count(data)), None))]
     else:
-        raise excs.NotSupportedError()
+        raise excps.NotSupportedError()
 
 

@@ -2,7 +2,7 @@ import numpy as np
 import random as rnd
 import itertools as it
 import devfx.core as core
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.machine_learning as ml
 
 from .grid_actions import GridActions
@@ -104,7 +104,7 @@ class GridEnvironment(ml.rl.Environment):
         elif(action == GridActions.Down):
             agent_next_cell_index = (agent_cell_index[0]+1, agent_cell_index[1])
         else:
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
 
         if(self.cells[agent_next_cell_index][0] is ml.rl.StateKind.UNDEFINED):
             next_state = state

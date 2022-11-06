@@ -1,7 +1,7 @@
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 from .figure import Figure as Figure
 from .chart import Chart
 

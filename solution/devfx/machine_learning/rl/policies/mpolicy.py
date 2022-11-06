@@ -1,5 +1,5 @@
 import pickle as pkl
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 from ..state_kind import StateKind
 
 class MPolicy(object):

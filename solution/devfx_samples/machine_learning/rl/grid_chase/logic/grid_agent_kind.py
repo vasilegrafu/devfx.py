@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.machine_learning as ml
 
 """========================================================================================================

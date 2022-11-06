@@ -1,5 +1,5 @@
 import h5py as hdf5
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 from .dataset_adapter import DatasetAdapter
 from .attributes_adapter import AttributesAdapter
@@ -15,12 +15,12 @@ class GroupAdapter(object):
 
     def is_group(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return core.is_typeof(self.__group[path], hdf5.Group)
 
     def is_dataset(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return core.is_typeof(self.__group[path], hdf5.Dataset)
 
     """----------------------------------------------------------------
@@ -33,13 +33,13 @@ class GroupAdapter(object):
 
     def get(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         if(self.is_group(path)):
             return GroupAdapter(self.__group[path])
         elif(self.is_dataset(path)):
             return DatasetAdapter(self.__group[path])
         else:
-            raise excs.NotSupportedError()
+            raise excps.NotSupportedError()
 
     def __getitem__(self, path):
         return self.get(path)
@@ -62,9 +62,9 @@ class GroupAdapter(object):
 
     def get_group(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         if (not self.is_group(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return self.get(path)
 
     def get_or_create_group(self, path):
@@ -75,9 +75,9 @@ class GroupAdapter(object):
 
     def remove_group(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         if (not self.is_group(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         self.remove(path)
 
     """----------------------------------------------------------------
@@ -94,9 +94,9 @@ class GroupAdapter(object):
 
     def get_dataset(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         if (not self.is_dataset(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return self.get(path)
 
     def get_or_create_dataset(self, path, shape=None, max_shape=None, dtype=None, initial_data=None):
@@ -107,9 +107,9 @@ class GroupAdapter(object):
 
     def remove_dataset(self, path):
         if(not self.exists(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         if (not self.is_dataset(path)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         self.remove(path)
 
     """----------------------------------------------------------------
@@ -132,5 +132,5 @@ class GroupAdapter(object):
                 elif(isinstance(item, hdf5.Dataset)):
                     yield path
                 else:
-                    raise excs.NotSupportedError()
+                    raise excps.NotSupportedError()
         return [_ for _ in paths_iterator(depth=1, group=self.__group, root=root)]

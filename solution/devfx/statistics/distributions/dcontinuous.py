@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 import devfx.math as math
 from .distribution import distribution
@@ -23,42 +23,42 @@ class dcontinuous(distribution):
         return self._cpdf(x)
         
     def _cpdf(self, x):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
         
     def icpdf(self, p):
         return self._icpdf(p)
         
     def _icpdf(self, p):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
     def pdf(self, x):
         if(core.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
-                raise excs.ArgumentOutOfRangeError()
+                raise excps.ArgumentOutOfRangeError()
             return self._pdf(x)
         else:
             if ((x < self.a) or (x > self.b)):
-                raise excs.ArgumentOutOfRangeError()
+                raise excps.ArgumentOutOfRangeError()
             return self._pdf(x)
 
     def _pdf(self, x):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """    
     def _mean(self):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
        
     def _var(self):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
        
     def _skew(self):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
         
     def _kurtosis(self):
-        raise excs.NotImplementedError()
+        raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

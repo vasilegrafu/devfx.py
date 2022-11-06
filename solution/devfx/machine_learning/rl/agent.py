@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 from .state_kind import StateKind
 
@@ -120,7 +120,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
 
         next_state_and_reward = environment.get_next_state_and_reward(agent=self, state=state, action=action)
         if(next_state_and_reward is None):
@@ -141,7 +141,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
 
         action = environment.get_random_action(agent=self, state=state)
         (state, action, next_state_and_reward) = self.do_action(action=action)
@@ -152,7 +152,7 @@ class Agent(object):
 
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excs.ApplicationError()
+            raise excps.ApplicationError()
 
         (action, value) = self.get_policy().get_optimal_action(state=state)
         if(action is None):
@@ -183,7 +183,7 @@ class Agent(object):
         elif(self.is_in_terminal_state()):
             pass
         else:
-            raise excs.NotSupportedError()
+            raise excps.NotSupportedError()
   
 
 

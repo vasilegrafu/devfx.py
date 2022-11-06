@@ -1,6 +1,6 @@
 import random as rnd
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 from .tabular_policy import TabularPolicy
 
 class ESarsaPolicy(TabularPolicy):

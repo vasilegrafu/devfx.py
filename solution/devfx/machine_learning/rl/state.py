@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 import devfx.core as core
 
 class State(object):
@@ -35,7 +35,7 @@ class State(object):
         if(state is None):
             return False
         if(not core.is_instance(state, State)):
-            raise excs.ArgumentError()
+            raise excps.ArgumentError()
         return state.value == self.value and state.kind == self.kind
 
     def __hash__(self):

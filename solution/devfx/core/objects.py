@@ -1,5 +1,5 @@
 import builtins as bt
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 
 """------------------------------------------------------------------------------------------------
 """

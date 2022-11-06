@@ -1,6 +1,6 @@
 import datetime
 import contextlib
-import devfx.exceptions as excs
+import devfx.exceptions as excps
 
 
 class Stopwatch(object):
@@ -12,7 +12,7 @@ class Stopwatch(object):
        
     def start(self):
         if(self.__running == True):
-            raise excs.OperationError()
+            raise excps.OperationError()
 
         self.__running = True
         self.__start = datetime.datetime.utcnow()
@@ -23,7 +23,7 @@ class Stopwatch(object):
 
     def stop(self):
         if(self.__running == False):
-            raise excs.OperationError()
+            raise excps.OperationError()
 
         self.__running = False
         self.__elapsed = self.__elapsed + (datetime.datetime.utcnow() - self.__start)
