@@ -1,9 +1,13 @@
+import numpy as np
+import devfx.exceptions as excps
 import devfx.machine_learning as ml
+
 
 """========================================================================================================
 """
-class GridActions(object):
-    Left = ml.rl.Action('Left')
-    Right = ml.rl.Action('Right')
-    Up = ml.rl.Action('Up')
-    Down = ml.rl.Action('Down')
+class GridAgentMoveActions(ml.rl.DiscreteActions):
+    def __init__(self):
+        super().__init__(name='Move', values=['Left', 'Right', 'Up', 'Down'])
+
+
+    

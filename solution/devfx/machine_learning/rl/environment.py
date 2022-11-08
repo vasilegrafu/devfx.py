@@ -141,27 +141,10 @@ class Environment(object):
         
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_available_actions(self, agent):
-        is_terminal_state = agent.get_state().kind == StateKind.TERMINAL
-        if(is_terminal_state):
-            return None
-
-        actions = self._get_available_actions(agent=agent)
-        return actions
-
-    def _get_available_actions(self, agent):
-        raise excps.NotImplementedError()
-
-
     def get_random_action(self, agent):
         return self._get_random_action(agent=agent)
 
     def _get_random_action(self, agent):
-        actions = self.get_available_actions(agent=agent)
-        if(actions is None):
-            return None
-        
-        action = rnd.choice(actions)
-        return action
+        raise excps.NotImplementedError()
 
 

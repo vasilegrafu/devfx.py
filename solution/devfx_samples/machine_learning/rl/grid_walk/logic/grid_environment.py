@@ -5,7 +5,7 @@ import devfx.core as core
 import devfx.exceptions as excps
 import devfx.machine_learning as ml
 
-from .grid_actions import GridActions
+from .grid_actions import GridAgentMoveActions
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 
@@ -84,13 +84,13 @@ class GridEnvironment(ml.rl.Environment):
     def _get_next_state_and_reward(self, agent, action):
         state = agent.get_state()
         agent_cell_index = state.value
-        if(action == GridActions.Left):
+        if(action == ml.rl.Action('Move', 'Left')):
             agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]-1)
-        elif(action == GridActions.Right):
+        elif(action == ml.rl.Action('Move', 'Right')):
             agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]+1)
-        elif(action == GridActions.Up):
+        elif(action == ml.rl.Action('Move', 'Up')):
             agent_next_cell_index = (agent_cell_index[0]-1, agent_cell_index[1])
-        elif(action == GridActions.Down):
+        elif(action == ml.rl.Action('Move', 'Down')):
             agent_next_cell_index = (agent_cell_index[0]+1, agent_cell_index[1])
         else:
             raise excps.ApplicationError()
@@ -106,9 +106,9 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_available_actions(self, agent):
-        actions = [GridActions.Left, GridActions.Right, GridActions.Up, GridActions.Down]
-        return actions
+    def _get_random_action(self, agent):
+        action = GridAgentMoveActions().get_random()
+        return action
 
 
 

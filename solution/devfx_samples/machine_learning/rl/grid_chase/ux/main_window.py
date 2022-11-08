@@ -110,25 +110,25 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # cell size
-        cell_width = cgc.GetSize()[0]/(self.grid_environment.shape[0] - 2)
-        cell_height = cgc.GetSize()[1]/(self.grid_environment.shape[1] - 2)
+        cell_width = cgc.GetSize()[0]/self.grid_environment.shape[0]
+        cell_height = cgc.GetSize()[1]/self.grid_environment.shape[1]
 
         # draw grid
         for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 2)*cell_width 
-            y = (cell_index[0] - 2)*cell_height
+            x = (cell_index[1] - 1)*cell_width 
+            y = (cell_index[0] - 1)*cell_height
             w = cell_width
             h = cell_height
             if(cell_content is None):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.BLACK_BRUSH)
+                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
             else:
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
             cell_index = agent.get_state().value[0]
-            x = (cell_index[1] - 2)*cell_width + cell_width/2
-            y = (cell_index[0] - 2)*cell_height + cell_height/2
+            x = (cell_index[1] - 1)*cell_width + cell_width/2
+            y = (cell_index[0] - 1)*cell_height + cell_height/2
             agent_kind = agent.get_kind()
             if(agent_kind == GridAgentKind.CHASER):
                 r = min(cell_width/4, cell_height/4)

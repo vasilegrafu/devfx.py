@@ -1,9 +1,23 @@
+import random as rnd
 import devfx.exceptions as excps
 import devfx.core as core
 
+"""================================================================================================
+"""
 class Action(object):
-    def __init__(self, value):
+    def __init__(self, name, value):
+        self.__set_name(name=name)
         self.__set_value(value=value)
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_name(self, name):
+        self.__name = name
+
+    @property
+    def name(self):
+        return self.__name
+
 
     """------------------------------------------------------------------------------------------------
     """
@@ -18,7 +32,7 @@ class Action(object):
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.value)
+        return '(' + str(self.name) + ', ' + str(self.value) + ')'
 
     """------------------------------------------------------------------------------------------------
     """
@@ -27,8 +41,76 @@ class Action(object):
             return False
         if(not core.is_instance(action, Action)):
             raise excps.ArgumentError()
-        return action.value == self.value
+        return action.name == self.name and action.value == self.value
 
     def __hash__(self):
-        return hash(self.value)
+        return hash((self.name, self.value))
+    
+
+"""================================================================================================
+"""
+class DiscreteActions(object):
+    def __init__(self, name, values):
+        self.__set_name(name=name)
+        self.__set_values(values=values)
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_name(self, name):
+        self.__name = name
+
+    @property
+    def name(self):
+        return self.__name
+
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_values(self, values):
+        self.__values = values
+
+    @property
+    def values(self):
+        return self.__values
+
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def get_random(self):
+        action = Action(name=self.name, value=rnd.choice(self.values))
+        return action
+
+
+"""================================================================================================
+"""
+class ContinousActions(object):
+    def __init__(self, name, values):
+        self.__set_name(name=name)
+        self.__set_values(values=values)
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_name(self, name):
+        self.__name = name
+
+    @property
+    def name(self):
+        return self.__name
+
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_values(self, values):
+        self.__values = values
+
+    @property
+    def values(self):
+        return self.__values
+
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def get_random(self):
+        action = Action(name=self.name, value=rnd.uniform(self.values))
+        return action
     

@@ -7,8 +7,6 @@ import devfx.processing.concurrent as pc
 import devfx.ux.windows.wx as ux
 
 from ..logic.grid_environment import GridEnvironment
-from ..logic.grid_actions import GridActions
-from ..logic.grid_agent_kind import GridAgentKind
 
 class MainWindow(ux.Window):
     def __init__(self, **kwargs):
@@ -112,17 +110,17 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # cell size
-        cell_width = cgc.GetSize()[0]/(self.grid_environment.shape[0] - 2)
-        cell_height = cgc.GetSize()[1]/(self.grid_environment.shape[1] - 2)
+        cell_width = cgc.GetSize()[0]/self.grid_environment.shape[0]
+        cell_height = cgc.GetSize()[1]/self.grid_environment.shape[1]
 
         # draw grid
         for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 2)*cell_width 
-            y = (cell_index[0] - 2)*cell_height
+            x = (cell_index[1] - 1)*cell_width 
+            y = (cell_index[0] - 1)*cell_height
             w = cell_width
             h = cell_height
             if(cell_content[0] is ml.rl.StateKind.UNDEFINED):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.BLACK_BRUSH)
+                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
             elif(cell_content[0] is ml.rl.StateKind.NON_TERMINAL):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
             elif(cell_content[0] is ml.rl.StateKind.TERMINAL and cell_content[1] >= 0):
@@ -134,15 +132,15 @@ class MainWindow(ux.Window):
 
         # draw rewards
         for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 2)*cell_width + cell_width
-            y = (cell_index[0] - 2)*cell_height
-            cgc.DrawText(text=f'{cell_content[1]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT))
+            x = (cell_index[1] - 1)*cell_width + cell_width
+            y = (cell_index[0] - 1)*cell_height
+            cgc.DrawText(text=f'{cell_content[1]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
             cell_index = agent.get_state().value
-            x = (cell_index[1] - 2)*cell_width + cell_width/2
-            y = (cell_index[0] - 2)*cell_height + cell_height/2
+            x = (cell_index[1] - 1)*cell_width + cell_width/2
+            y = (cell_index[0] - 1)*cell_height + cell_height/2
             r = min(cell_width/4, cell_height/4)
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
@@ -153,26 +151,22 @@ class MainWindow(ux.Window):
             for action in policy.get_actions(state):
                 text = f'{policy.get_value(state, action):.2f}'
                 cell_index = state.value
-                if(action == GridActions.Left):
-                    x = (cell_index[1] - 2)*cell_width
-                    y = (cell_index[0] - 2)*cell_height + cell_height/2
+                if(action == ml.rl.Action('Move', 'Left')):
+                    x = (cell_index[1] - 1)*cell_width
+                    y = (cell_index[0] - 1)*cell_height + cell_height/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
-                elif(action == GridActions.Right):
-                    x = (cell_index[1] - 2)*cell_width + cell_width
-                    y = (cell_index[0] - 2)*cell_height + cell_height/2
+                elif(action == ml.rl.Action('Move', 'Right')):
+                    x = (cell_index[1] - 1)*cell_width + cell_width
+                    y = (cell_index[0] - 1)*cell_height + cell_height/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
-                elif(action == GridActions.Up):
-                    x = (cell_index[1] - 2)*cell_width + cell_width/2
-                    y = (cell_index[0] - 2)*cell_height
+                elif(action == ml.rl.Action('Move', 'Up')):
+                    x = (cell_index[1] - 1)*cell_width + cell_width/2
+                    y = (cell_index[0] - 1)*cell_height
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
-                elif(action == GridActions.Down):
-                    x = (cell_index[1] - 2)*cell_width + cell_width/2
-                    y = (cell_index[0] - 2)*cell_height + cell_height
+                elif(action == ml.rl.Action('Move', 'Down')):
+                    x = (cell_index[1] - 1)*cell_width + cell_width/2
+                    y = (cell_index[0] - 1)*cell_height + cell_height
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
-                # elif(action == GridActions.Stay):
-                #     x = (cell_index[1] - 2)*cell_width + cell_width/2
-                #     y = (cell_index[0] - 2)*cell_height + cell_height/2
-                #     cgc.DrawText(text=text, x=x, y=y, colour=ux.GRAY)
                 else:
                     raise excps.NotImplementedError()
     
