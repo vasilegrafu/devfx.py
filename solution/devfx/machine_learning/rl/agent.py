@@ -122,7 +122,7 @@ class Agent(object):
         if(is_terminal_state):
             raise excps.ApplicationError()
 
-        next_state_and_reward = environment.get_next_state_and_reward(agent=self, state=state, action=action)
+        next_state_and_reward = environment.get_next_state_and_reward(agent=self, action=action)
         if(next_state_and_reward is None):
             return (state, action, None)
 
@@ -141,7 +141,7 @@ class Agent(object):
         if(is_terminal_state):
             raise excps.ApplicationError()
 
-        action = environment.get_random_action(agent=self, state=state)
+        action = environment.get_random_action(agent=self)
         (state, action, next_state_and_reward) = self.do_action(action=action)
         return (state, action, next_state_and_reward)
  

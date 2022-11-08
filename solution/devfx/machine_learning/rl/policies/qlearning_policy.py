@@ -28,7 +28,8 @@ class QLearningPolicy(TabularPolicy):
             error = next_reward.value - super().get_value(state, action)
         else:
             error = next_reward.value + self.get_discount_factor()*super().get_max_value(next_state) - super().get_value(state, action)
-        super().set_value(state, action, super().get_value(state, action) + self.get_learning_rate()*error)
+        value = super().get_value(state, action) + self.get_learning_rate()*error
+        super().set_value(state, action, value)
 
                     
 

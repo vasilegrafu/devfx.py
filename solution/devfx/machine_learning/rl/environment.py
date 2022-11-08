@@ -1,4 +1,5 @@
 import numpy as np
+import random as rnd
 import devfx.exceptions as excps
 import devfx.core as core
 from .agent import Agent
@@ -22,6 +23,7 @@ class Environment(object):
 
     def _setup(self, *args, **kwargs):
         raise excps.NotImplementedError()     
+
 
     def destroy(self, *args, **kwargs):
         self._destroy(*args, **kwargs)
@@ -93,7 +95,7 @@ class Environment(object):
         self._do_iteration(agents=agents)
 
     def _do_iteration(self, agents=None):
-        if(any([agent.is_in_terminal_state() for agent in self.get_agents()])):
+        if(any(agent.is_in_terminal_state() for agent in self.get_agents())):
             self.setup()
         else:
             if(agents is None):
@@ -111,27 +113,27 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_next_state_and_reward(self, agent, state, action):
-        is_terminal_state = state.kind == StateKind.TERMINAL
+    def get_next_state_and_reward(self, agent, action):
+        is_terminal_state = agent.get_state().kind == StateKind.TERMINAL
         if(is_terminal_state):
             raise excps.ApplicationError()
         
-        next_state_and_reward = self._get_next_state_and_reward(agent=agent, state=state, action=action)
+        next_state_and_reward = self._get_next_state_and_reward(agent=agent, action=action)
         return next_state_and_reward
         
-    def _get_next_state_and_reward(self, agent, state, action):
+    def _get_next_state_and_reward(self, agent, action):
         raise excps.NotImplementedError()
 
 
-    def get_next_state(self, agent, state, action):
-        next_state_and_reward = self.get_next_state_and_reward(agent=agent, state=state, action=action)
+    def get_next_state(self, agent, action):
+        next_state_and_reward = self.get_next_state_and_reward(agent=agent, action=action)
         if(next_state_and_reward is None):
             return None
         (next_state, next_reward) = next_state_and_reward
         return next_state
 
-    def get_next_reward(self, agent, state, action):
-        next_state_and_reward = self.get_next_state_and_reward(agent=agent, state=state, action=action)
+    def get_next_reward(self, agent, action):
+        next_state_and_reward = self.get_next_state_and_reward(agent=agent, action=action)
         if(next_state_and_reward is None):
             return None
         (next_state, next_reward) = next_state_and_reward
@@ -139,15 +141,27 @@ class Environment(object):
         
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_random_action(self, agent, state):
-        is_terminal_state = state.kind == StateKind.TERMINAL
+    def get_available_actions(self, agent):
+        is_terminal_state = agent.get_state().kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excps.ApplicationError()
+            return None
 
-        action = self._get_random_action(agent=agent, state=state)
-        return action
+        actions = self._get_available_actions(agent=agent)
+        return actions
 
-    def _get_random_action(self, agent, state):
+    def _get_available_actions(self, agent):
         raise excps.NotImplementedError()
+
+
+    def get_random_action(self, agent):
+        return self._get_random_action(agent=agent)
+
+    def _get_random_action(self, agent):
+        actions = self.get_available_actions(agent=agent)
+        if(actions is None):
+            return None
+        
+        action = rnd.choice(actions)
+        return action
 
 

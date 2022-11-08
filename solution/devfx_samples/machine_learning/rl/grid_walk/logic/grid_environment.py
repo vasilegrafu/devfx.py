@@ -50,11 +50,15 @@ class GridEnvironment(ml.rl.Environment):
     """
     def _setup(self, iteration_randomness=None):
         if(not self.exists_agent(id=1)):
-            self.add_agent(GridAgent(id=1, name='Johnny Walker 1', kind=GridAgentKind.WALKER, 
+            self.add_agent(GridAgent(id=1, 
+                                     name='Johnny Walker 1', 
+                                     kind=GridAgentKind.WALKER, 
                                      environment=self, 
+                                     state=self.__get_initial_state(),
                                      policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1),
                                      iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
-        self.__setup_positional_state(self.get_agent(id=1))
+        else:
+            self.get_agent(id=1).set_state(self.__get_initial_state())
 
     def _on_added_agent(self, agent):
         pass
@@ -62,12 +66,12 @@ class GridEnvironment(ml.rl.Environment):
     def _on_removed_agent(self, agent):
         pass
 
-    def __setup_positional_state(self, agent):
+    def __get_initial_state(self):
         choosable_cell_indexes = [cell_index for cell_index in self.cells 
                                              if(self.cells[cell_index][0] == ml.rl.StateKind.NON_TERMINAL)]
-        agent_cell_index = rnd.choice(choosable_cell_indexes)
-        state = ml.rl.State(value=agent_cell_index, kind=self.cells[agent_cell_index][0])
-        agent.set_state(state)
+        cell_index = rnd.choice(choosable_cell_indexes)
+        state = ml.rl.State(value=cell_index, kind=self.cells[cell_index][0])
+        return state
 
     """------------------------------------------------------------------------------------------------
     """
@@ -77,7 +81,8 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_next_state_and_reward(self, agent, state, action):
+    def _get_next_state_and_reward(self, agent, action):
+        state = agent.get_state()
         agent_cell_index = state.value
         if(action == GridActions.Left):
             agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]-1)
@@ -91,19 +96,21 @@ class GridEnvironment(ml.rl.Environment):
             raise excps.ApplicationError()
 
         if(self.cells[agent_next_cell_index][0] is ml.rl.StateKind.UNDEFINED):
-            next_state = state
-            next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
-            return (next_state, next_reward)
+            agent_next_state = state
+            agent_next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
+            return (agent_next_state, agent_next_reward)
 
-        next_state = ml.rl.State(value=agent_next_cell_index, kind=self.cells[agent_next_cell_index][0])
-        next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
-        return (next_state, next_reward)
+        agent_next_state = ml.rl.State(value=agent_next_cell_index, kind=self.cells[agent_next_cell_index][0])
+        agent_next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
+        return (agent_next_state, agent_next_reward)
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_random_action(self, agent, state):
+    def _get_available_actions(self, agent):
         actions = [GridActions.Left, GridActions.Right, GridActions.Up, GridActions.Down]
-        action = rnd.choice(actions)
-        return action
+        return actions
+
+
+
 
 
