@@ -3,6 +3,7 @@ import time
 import numpy as np
 import devfx.exceptions as excps
 import devfx.core as core
+import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
 import devfx.processing.concurrent as pc
 import devfx.ux.windows.wx as ux
@@ -56,14 +57,15 @@ class MainWindow(ux.Window):
         self.train_button.OnPress += self.__train_button__OnPress
         self.cancel_training_button = ux.Button(parent=self, label='Cancel training')
         self.cancel_training_button.OnPress += self.__cancel_training_button__OnPress
-        self.train_count_text = ux.Text(parent=self, label='0')
+        self.train_count_text = ux.Text(parent=self, label='0', size=(64, -1))
+        self.train_batch_time_elapsed_text = ux.Text(parent=self, label='0', size=(64, -1))
         self.training_is_running = False
         
         self.do_iteration_button = ux.Button(parent=self, label='Do iteration')
         self.do_iteration_button.OnPress += self.__do_iteration_button__OnPress
         
-        self.do_iterations_speed_label = ux.Text(self, label='Speed:')
-        self.do_iterations_speed_spinbox = ux.FloatSpinBox(self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
+        self.do_iterations_speed_label = ux.Text(parent=self, label='Speed:')
+        self.do_iterations_speed_spinbox = ux.FloatSpinBox(parent=self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
         self.do_iterations_button = ux.Button(parent=self, label='Do iterations')
         self.do_iterations_button.OnPress += self.__do_iterations_button__OnPress
         self.cancel_iterations_button = ux.Button(parent=self, label='Cancel iterations')
@@ -92,11 +94,12 @@ class MainWindow(ux.Window):
         self.agent_iteration_randomness_label.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
         self.agent_iteration_randomness_combobox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
         self.agent_iteration_randomness_spinbox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-
-        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+ 
+        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT)
         self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-        self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-
+        self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        self.train_batch_time_elapsed_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        
         self.do_iteration_button.AddToSizer(self.do_iteration_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
 
         self.do_iterations_speed_label.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
@@ -181,10 +184,12 @@ class MainWindow(ux.Window):
         def _():
             N = 0
             while self.training_is_running:
-                n = 100
+                sw = dgn.Stopwatch().start()
+                n = 1000
                 self.grid_environment_for_training.do_iterations(n)
                 N += n
                 self.train_count_text.Label = str(N)
+                self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)
         thread = pc.Thread(fn=_)
         thread.start()
         

@@ -20,6 +20,8 @@ class GridEnvironment(ml.rl.Environment):
         self.__shape = (8, 8)
         self.__cells = None
 
+        self.__actionGenerator = GridAgentActionGenerator()
+
     """------------------------------------------------------------------------------------------------
     """
     @property
@@ -93,7 +95,7 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_action(self, agent):
-        action = GridAgentActionGenerator().get_random()
+        action = self.__actionGenerator.get_random()
         return action
 
 

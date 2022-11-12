@@ -5,13 +5,15 @@ import devfx.core as core
 
 class comparable(object):
     def __init__(self, value):
-        self.__set_value(value)
+        self.__value = value
+        
+        if(core.is_instance(self.value, np.ndarray)):
+            self.__hash = int(hlib.sha1(self.value.view(np.uint8)).hexdigest(), 16)
+        else:
+            self.__hash = hash(self.value)
 
     """------------------------------------------------------------------------------------------------
     """
-    def __set_value(self, value):
-        self.__value = value
-
     @property
     def value(self):
         return self.__value
@@ -28,10 +30,7 @@ class comparable(object):
             return self.value == comparable.value
 
     def __hash__(self):
-        if(core.is_instance(self.value, np.ndarray)):
-            return int(hlib.sha1(self.value.view(np.uint8)).hexdigest(), 16)
-        else:
-            return hash(self.value)
+        return self.__hash
 
 
 

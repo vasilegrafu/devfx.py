@@ -61,16 +61,16 @@ class Environment(object):
 
 
     def get_agents(self):
-        agents = [agent for (key, agent) in sorted(self.__agents_container.items())]
+        agents = [agent for (_, agent) in self.__agents_container.items()]
         return agents
 
 
     def get_agents_like(self, kind):
-        agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_kind() == kind)]
+        agents = [agent for (_, agent) in self.__agents_container.items() if(agent.get_kind() == kind)]
         return agents
 
     def get_agents_not_like(self, kind):
-        agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_kind() != kind)]
+        agents = [agent for (_, agent) in self.__agents_container.items() if(agent.get_kind() != kind)]
         return agents
 
 
@@ -87,7 +87,7 @@ class Environment(object):
         return agent
 
     def get_other_agents(self, id):
-        agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_id() != id)]
+        agents = [agent for (key, agent) in self.__agents_container.items() if(agent.get_id() != id)]
         return agents
 
     """------------------------------------------------------------------------------------------------
