@@ -113,7 +113,7 @@ class GridEnvironment(ml.rl.Environment):
             return (agent_next_state, agent_next_reward)
 
         agent_kind = agent.get_kind()
-        other_agents = self.get_other_agents(id=agent.get_id())
+        other_agents = self.get_other_kind_.....agents(id=agent.get_id())
         other_agents_cell_indexes = [other_agent.get_state().value[0] for other_agent in other_agents]
         if(agent_kind == GridAgentKind.CHASER):
             if(agent_next_cell_index in other_agents_cell_indexes):

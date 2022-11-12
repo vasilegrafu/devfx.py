@@ -1,3 +1,4 @@
+import numpy as np
 import random as rnd
 import devfx.exceptions as excps
 import devfx.core as core
@@ -39,8 +40,16 @@ class Action(object):
     def __eq__(self, action):
         if(action is None):
             return False
+
         if(not core.is_instance(action, Action)):
             raise excps.ArgumentError()
+
+        if(core.is_typeof(self.value, np.array) or core.is_typeof(action.value, np.array)):
+            if(core.is_typeof(self.value, np.array) and core.is_typeof(action.value, np.array)):
+                return action.name == self.name and self.value.array_equal(action.value)
+            else:
+                raise excps.ArgumentError()      
+
         return action.name == self.name and action.value == self.value
 
     def __hash__(self):
@@ -49,7 +58,7 @@ class Action(object):
 
 """================================================================================================
 """
-class DiscreteActions(object):
+class DiscreteActionValuesGenerator(object):
     def __init__(self, name, values):
         self.__set_name(name=name)
         self.__set_values(values=values)
@@ -77,13 +86,13 @@ class DiscreteActions(object):
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        action = Action(name=self.name, value=rnd.choice(self.values))
-        return action
+        value = rnd.choice(self.values)
+        return value
 
 
 """================================================================================================
 """
-class ContinousActions(object):
+class ContinousActionValuesGenerator(object):
     def __init__(self, name, values):
         self.__set_name(name=name)
         self.__set_values(values=values)
@@ -111,6 +120,6 @@ class ContinousActions(object):
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        action = Action(name=self.name, value=rnd.uniform(self.values))
-        return action
+        value = rnd.uniform(self.values)
+        return value
     

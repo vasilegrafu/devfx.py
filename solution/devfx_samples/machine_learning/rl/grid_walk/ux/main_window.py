@@ -145,30 +145,30 @@ class MainWindow(ux.Window):
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
-        agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
-        policy = agent.get_policy()
-        for state in policy.get_states():
-            for action in policy.get_actions(state):
-                text = f'{policy.get_value(state, action):.2f}'
-                cell_index = state.value
-                if(action == ml.rl.Action('Move', 'Left')):
-                    x = (cell_index[1] - 1)*cell_width
-                    y = (cell_index[0] - 1)*cell_height + cell_height/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
-                elif(action == ml.rl.Action('Move', 'Right')):
-                    x = (cell_index[1] - 1)*cell_width + cell_width
-                    y = (cell_index[0] - 1)*cell_height + cell_height/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
-                elif(action == ml.rl.Action('Move', 'Up')):
-                    x = (cell_index[1] - 1)*cell_width + cell_width/2
-                    y = (cell_index[0] - 1)*cell_height
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
-                elif(action == ml.rl.Action('Move', 'Down')):
-                    x = (cell_index[1] - 1)*cell_width + cell_width/2
-                    y = (cell_index[0] - 1)*cell_height + cell_height
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
-                else:
-                    raise excps.NotImplementedError()
+        # agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
+        # policy = agent.get_policy()
+        # for state in policy.get_states():
+        #     for action in policy.get_actions(state):
+        #         text = f'{policy.get_value(state, action):.2f}'
+        #         cell_index = state.value
+        #         if(action == (ml.rl.Action('Move', 'Left'),)):
+        #             x = (cell_index[1] - 1)*cell_width
+        #             y = (cell_index[0] - 1)*cell_height + cell_height/2
+        #             cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
+        #         elif(action == (ml.rl.Action('Move', 'Right'),)):
+        #             x = (cell_index[1] - 1)*cell_width + cell_width
+        #             y = (cell_index[0] - 1)*cell_height + cell_height/2
+        #             cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
+        #         elif(action == (ml.rl.Action('Move', 'Up'),)):
+        #             x = (cell_index[1] - 1)*cell_width + cell_width/2
+        #             y = (cell_index[0] - 1)*cell_height
+        #             cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
+        #         elif(action == (ml.rl.Action('Move', 'Down'),)):
+        #             x = (cell_index[1] - 1)*cell_width + cell_width/2
+        #             y = (cell_index[0] - 1)*cell_height + cell_height
+        #             cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
+        #         else:
+        #             raise excps.NotImplementedError()
     
     """------------------------------------------------------------------------------------------------
     """
