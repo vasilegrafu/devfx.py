@@ -79,9 +79,9 @@ class GridEnvironment(ml.rl.Environment):
     """
     def _get_next_state_and_reward(self, agent, action):
         agent_state = agent.get_state()
-        agent_next_cell_index = agent_state.value[0] + action.value[0]
+        agent_next_cell_index = agent_state.value + action.value
 
-        if(self.cells[agent_next_cell_index][0] is ml.rl.StateKind.UNDEFINED):
+        if(self.cells[agent_next_cell_index][0] == ml.rl.StateKind.UNDEFINED):
             agent_next_state = agent_state
             agent_next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
             return (agent_next_state, agent_next_reward)

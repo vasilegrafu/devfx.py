@@ -14,3 +14,5 @@ class GridAgentActionGenerator(ml.rl.ActionGenerator):
                                                                     np.array([+1, 0])])     #Down     (row:+1, col: 0) 
                                 ])
 
+    def _get_random(self):
+        return ml.rl.Action(value=self.ranges[0].get_random())

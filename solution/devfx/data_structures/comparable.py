@@ -31,10 +31,8 @@ class comparable(object):
         if(core.is_instance(self.value, np.ndarray)):
             return int(hlib.sha1(self.value.view(np.uint8)).hexdigest(), 16)
         else:
-            try:
-                return hash(self.value)
-            except:
-                pass
+            return hash(self.value)
+
 
 
 

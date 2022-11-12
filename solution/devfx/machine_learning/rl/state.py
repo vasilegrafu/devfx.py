@@ -6,6 +6,7 @@ import devfx.data_structures as ds
 class State(object):
     def __init__(self, value, kind):
         self.__set_value(value=value)
+        self.__set_value_comparable(value=value)
         self.__set_kind(kind=kind)
 
     """------------------------------------------------------------------------------------------------
@@ -16,6 +17,14 @@ class State(object):
     @property
     def value(self):
         return self.__value
+
+
+    def __set_value_comparable(self, value):
+        self.__value_comparable = ds.comparable(self.value)
+
+    @property
+    def value_comparable(self):
+        return self.__value_comparable
 
     """------------------------------------------------------------------------------------------------
     """
@@ -39,8 +48,8 @@ class State(object):
         if(not core.is_instance(state, State)):
             raise excps.ArgumentError()    
 
-        return ds.comparable(self.value) == ds.comparable(state.value) and self.kind == state.kind
+        return self.value_comparable == state.value_comparable and self.kind == state.kind
 
     def __hash__(self):
-        return hash((ds.comparable(self.value), self.kind))
+        return hash((self.value_comparable, self.kind))
 

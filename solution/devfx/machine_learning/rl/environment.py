@@ -113,7 +113,11 @@ class Environment(object):
         return (state, action, (next_state, next_reward))
  
     def do_optimal_action(self, agent):
-        (action, value) = agent.get_policy().get_optimal_action(state=agent.get_state())
+        action_value = agent.get_policy().get_optimal_action(state=agent.get_state())
+        if(action_value is None):
+            state = agent.get_state()
+            return (state, None, (None, None))
+        (action, value) = action_value
         (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
         return (state, action, (next_state, next_reward))
 
@@ -132,9 +136,9 @@ class Environment(object):
                 if(agent.is_in_non_terminal_state()):
                     rv = np.random.uniform(size=1)
                     if(rv <= agent.get_iteration_randomness()):
-                        agent.do_random_action()
+                        self.do_random_action(agent=agent)
                     else:
-                        agent.do_optimal_action()
+                        self.do_optimal_action(agent=agent)
                 elif(agent.is_in_terminal_state()):
                     pass
                 else:

@@ -68,8 +68,8 @@ class Policy(object):
         if(is_terminal_state):
             raise excps.ApplicationError()
 
-        (action, value) =  self._get_optimal_action(state=state)
-        return (action, value)
+        action_value = self._get_optimal_action(state=state)
+        return action_value
 
     def _get_optimal_action(self, state):
         raise excps.NotImplementedError()

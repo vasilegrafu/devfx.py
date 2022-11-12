@@ -9,7 +9,7 @@ import devfx.data_structures as ds
 class Action(object):
     def __init__(self, value):
         self.__set_value(value=value)
-
+        self.__set_value_comparable(value=value)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -20,6 +20,13 @@ class Action(object):
     def value(self):
         return self.__value
 
+
+    def __set_value_comparable(self, value):
+        self.__value_comparable = ds.comparable(self.value)
+
+    @property
+    def value_comparable(self):
+        return self.__value_comparable
 
     """------------------------------------------------------------------------------------------------
     """
@@ -32,9 +39,9 @@ class Action(object):
         if(not core.is_instance(action, Action)):
             raise excps.ArgumentError()  
 
-        return ds.comparable(self.value) == ds.comparable(action.value)
+        return self.value_comparable == action.value_comparable
 
     def __hash__(self):
-        return hash(ds.comparable(self.value))
+        return hash(self.value_comparable)
     
 

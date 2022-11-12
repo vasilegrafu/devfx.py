@@ -81,4 +81,7 @@ class ActionGenerator(object):
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        return Action(value=[r.get_random() for r in self.ranges])
+        return self._get_random()
+
+    def _get_random(self):
+        return Action(value=np.array([r.get_random() for r in self.ranges]))
