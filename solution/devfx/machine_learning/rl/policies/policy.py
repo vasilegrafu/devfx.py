@@ -55,10 +55,10 @@ class Policy(object):
         
     """------------------------------------------------------------------------------------------------
     """ 
-    def learn(self, state, action, next_state_and_reward):
-        self._learn(state=state, action=action, next_state_and_reward=next_state_and_reward)
+    def learn(self, state, action, next_state, next_reward):
+        self._learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
 
-    def _learn(self, state, action, next_state_and_reward):
+    def _learn(self, state, action, next_state, next_reward):
         raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------

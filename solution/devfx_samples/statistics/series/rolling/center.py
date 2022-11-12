@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import devfx.data_containers as dc
+import devfx.data_structures as ds
 import devfx.statistics as stats
 import devfx.data_vizualization as dv
 
@@ -17,7 +17,7 @@ class DataGenerator(object):
         x = np.asarray(x).astype(dtype=np.float32)
         y = np.asarray(y).astype(dtype=np.float32)
 
-        return dc.DataFrame.from_columns([x, y], columns=['x', 'y'])
+        return ds.DataFrame.from_columns([x, y], columns=['x', 'y'])
 
 """------------------------------------------------------------------------------------------------
 """  

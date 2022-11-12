@@ -1,6 +1,7 @@
 import numpy as np
 import devfx.exceptions as excps
 import devfx.core as core
+import devfx.data_structures as ds
 
 class State(object):
     def __init__(self, value, kind):
@@ -25,6 +26,8 @@ class State(object):
     def kind(self):
         return self.__kind
 
+
+
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
@@ -32,23 +35,12 @@ class State(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __eq__(self, state):
-        if(state is None):
-            return False
-
+    def __eq__(self, state):          
         if(not core.is_instance(state, State)):
-            raise excps.ArgumentError()
+            raise excps.ArgumentError()    
 
-        if(core.is_typeof(self.value, np.array) or core.is_typeof(state.value, np.array)):
-            if(core.is_typeof(self.value, np.array) and core.is_typeof(state.value, np.array)):
-                return self.value.array_equal(state.value) and state.kind == self.kind
-            else:
-                raise excps.ArgumentError()        
-
-        return state.value == self.value and state.kind == self.kind
+        return ds.comparable(self.value) == ds.comparable(state.value) and self.kind == state.kind
 
     def __hash__(self):
-        return hash((self.value, self.kind))
+        return hash((ds.comparable(self.value), self.kind))
 
-
-    

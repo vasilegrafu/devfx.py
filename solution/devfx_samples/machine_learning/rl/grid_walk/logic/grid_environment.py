@@ -3,9 +3,11 @@ import random as rnd
 import itertools as it
 import devfx.core as core
 import devfx.exceptions as excps
+import devfx.data_structures as ds
 import devfx.machine_learning as ml
 
-from .grid_actions import GridAgentActionsGenerator
+
+from .grid_agent_action_generator import GridAgentActionGenerator
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 
@@ -16,7 +18,7 @@ class GridEnvironment(ml.rl.Environment):
         super().__init__()
 
         self.__shape = (8, 8)
-        self.__cells = {}
+        self.__cells = None
 
     """------------------------------------------------------------------------------------------------
     """
@@ -31,18 +33,18 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _create(self):
-        cells = {}
+        cells = ds.dict()
         for (ri, ci) in it.product(range(1, self.shape[0]+1), range(1, self.shape[1]+1)):
             if((ri == 1) or (ri == self.shape[0]) or (ci == 1) or (ci == self.shape[1])):
-                (cell_index, cell_content) = ((ri, ci), (ml.rl.StateKind.UNDEFINED, -1.0))
+                (cell_index, cell_content) = (np.array([ri, ci]), np.array([ml.rl.StateKind.UNDEFINED, -1.0]))
             elif((ri, ci) in [(3, 3), (4, 4), (6, 6)]):
-                (cell_index, cell_content) = ((ri, ci), (ml.rl.StateKind.UNDEFINED, -1.0))
+                (cell_index, cell_content) = (np.array([ri, ci]), np.array([ml.rl.StateKind.UNDEFINED, -1.0]))
             elif((ri, ci) in [(2, 7)]):
-                (cell_index, cell_content) = ((ri, ci), (ml.rl.StateKind.TERMINAL, +1.0))
+                (cell_index, cell_content) = (np.array([ri, ci]), np.array([ml.rl.StateKind.TERMINAL, +1.0]))
             elif((ri, ci) in [(3, 7)]):
-                (cell_index, cell_content) = ((ri, ci), (ml.rl.StateKind.TERMINAL, -1.0))
+                (cell_index, cell_content) = (np.array([ri, ci]), np.array([ml.rl.StateKind.TERMINAL, -1.0]))
             else:
-                (cell_index, cell_content) = ((ri, ci), (ml.rl.StateKind.NON_TERMINAL, 0.0))
+                (cell_index, cell_content) = (np.array([ri, ci]), np.array([ml.rl.StateKind.NON_TERMINAL, 0.0]))
             cells[cell_index] = cell_content
         self.__cells = cells
 
@@ -75,19 +77,12 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _destroy(self):
-        for agent in self.get_agents():                
-            self.remove_agent(agent)
-
-    """------------------------------------------------------------------------------------------------
-    """
     def _get_next_state_and_reward(self, agent, action):
-        state = agent.get_state()
-        agent_cell_index = state.value
-        agent_next_cell_index = agent_cell_index + action.value
+        agent_state = agent.get_state()
+        agent_next_cell_index = agent_state.value[0] + action.value[0]
 
         if(self.cells[agent_next_cell_index][0] is ml.rl.StateKind.UNDEFINED):
-            agent_next_state = state
+            agent_next_state = agent_state
             agent_next_reward = ml.rl.Reward(value=self.cells[agent_next_cell_index][1])
             return (agent_next_state, agent_next_reward)
 
@@ -98,7 +93,7 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_action(self, agent):
-        action = ml.rl.Action(name=,)
+        action = GridAgentActionGenerator().get_random()
         return action
 
 

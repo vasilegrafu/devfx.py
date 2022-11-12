@@ -1,5 +1,3 @@
-import random as rnd
-import numpy as np
 import devfx.exceptions as excps
 from .tabular_policy import TabularPolicy
 
@@ -19,11 +17,10 @@ class QLearningPolicy(TabularPolicy):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _learn(self, state, action, next_state_and_reward):
+    def _learn(self, state, action, next_state, next_reward):
         if(not super().has_value(state, action)):
             super().set_value(state, action, 0.0)
 
-        (next_state, next_reward) = next_state_and_reward
         if(not super().has_state(next_state)):
             error = next_reward.value - super().get_value(state, action)
         else:

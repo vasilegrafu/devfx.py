@@ -1,4 +1,3 @@
-import numpy as np
 import devfx.exceptions as excps
 from .policy import Policy
 
@@ -16,7 +15,7 @@ class AproximatePolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, next_state_and_reward):
+    def _learn(self, state, action, next_state, next_reward):
         raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------

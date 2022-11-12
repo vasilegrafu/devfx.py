@@ -29,7 +29,8 @@ class Environment(object):
         self._destroy(*args, **kwargs)
 
     def _destroy(self, *args, **kwargs):
-        raise excps.NotImplementedError()
+        for agent in self.get_agents():                
+            self.remove_agent(agent)
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -88,7 +89,34 @@ class Environment(object):
     def get_other_agents(self, id):
         agents = [agent for (key, agent) in sorted(self.__agents_container.items()) if(agent.get_id() != id)]
         return agents
-           
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def do_action(self, agent, action):   
+        state = agent.get_state()
+
+        is_terminal_state = state.kind == StateKind.TERMINAL
+        if(is_terminal_state):
+            raise excps.ApplicationError()
+
+        (next_state, next_reward) = self.get_next_state_and_reward(agent=agent, action=action)
+
+        agent.set_state(state=next_state)
+
+        agent.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+
+        return (state, action, (next_state, next_reward))
+
+    def do_random_action(self, agent):
+        action = self.get_random_action(agent=self)
+        (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
+        return (state, action, (next_state, next_reward))
+ 
+    def do_optimal_action(self, agent):
+        (action, value) = agent.get_policy().get_optimal_action(state=agent.get_state())
+        (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
+        return (state, action, (next_state, next_reward))
+
     """------------------------------------------------------------------------------------------------
     """ 
     def do_iteration(self, agents=None):
@@ -101,7 +129,16 @@ class Environment(object):
             if(agents is None):
                 agents = self.get_agents()
             for agent in agents:
-                agent.do_iteration()
+                if(agent.is_in_non_terminal_state()):
+                    rv = np.random.uniform(size=1)
+                    if(rv <= agent.get_iteration_randomness()):
+                        agent.do_random_action()
+                    else:
+                        agent.do_optimal_action()
+                elif(agent.is_in_terminal_state()):
+                    pass
+                else:
+                    raise excps.NotSupportedError()
 
 
     def do_iterations(self, n, agents=None):

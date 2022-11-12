@@ -1,7 +1,5 @@
-import pickle as pckl
-import numpy as np
-import random as rnd
 import devfx.exceptions as excps
+import devfx.data_structures as ds
 
 from .policy import Policy
 
@@ -9,7 +7,7 @@ class TabularPolicy(Policy):
     def __init__(self, discount_factor):
         super().__init__(discount_factor=discount_factor)
 
-        self.__model = {}
+        self.__model = ds.dict()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -49,7 +47,7 @@ class TabularPolicy(Policy):
 
     def set_value(self, state, action, value):
         if(state not in self.__model):
-            self.__model[state] = {}
+            self.__model[state] = ds.dict()
         self.__model[state][action] = value
 
     def get_value(self, state, action):
@@ -74,16 +72,16 @@ class TabularPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, next_state_and_reward):
+    def _learn(self, state, action, next_state, next_reward):
         raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_optimal_action(self, state):
         if(not self.has_state(state=state)):
-             return (None, None)
+             raise excps.ApplicationError()
         if(not self.has_actions(state=state)):
-             return (None, None)
+             raise excps.ApplicationError()
 
         action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
         value = self.get_value(state=state, action=action)

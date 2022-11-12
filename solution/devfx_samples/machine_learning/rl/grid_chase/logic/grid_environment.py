@@ -87,12 +87,6 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _destroy(self):
-        for agent in self.get_agents():                
-            self.remove_agent(agent)
-
-    """------------------------------------------------------------------------------------------------
-    """
     def _get_next_state_and_reward(self, agent, action):  
         agent_state = agent.get_state()     
         agent_cell_index = agent_state.value[0]

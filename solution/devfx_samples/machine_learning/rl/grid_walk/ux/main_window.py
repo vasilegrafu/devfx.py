@@ -119,13 +119,13 @@ class MainWindow(ux.Window):
             y = (cell_index[0] - 1)*cell_height
             w = cell_width
             h = cell_height
-            if(cell_content[0] is ml.rl.StateKind.UNDEFINED):
+            if(cell_content[0] == ml.rl.StateKind.UNDEFINED):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
-            elif(cell_content[0] is ml.rl.StateKind.NON_TERMINAL):
+            elif(cell_content[0] == ml.rl.StateKind.NON_TERMINAL):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
-            elif(cell_content[0] is ml.rl.StateKind.TERMINAL and cell_content[1] >= 0):
+            elif(cell_content[0] == ml.rl.StateKind.TERMINAL and cell_content[1] >= 0):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GREEN_BRUSH)
-            elif(cell_content[0] is ml.rl.StateKind.TERMINAL and cell_content[1] < 0):
+            elif(cell_content[0] == ml.rl.StateKind.TERMINAL and cell_content[1] < 0):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
             else:
                 raise excps.NotSupportedError()
