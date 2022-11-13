@@ -2,36 +2,41 @@ import numpy as np
 import random as rnd
 import devfx.exceptions as excps
 import devfx.core as core
-import devfx.data_structures as ds
+from .data import Data
 
 """================================================================================================
 """
 class Action(object):
-    def __init__(self, value):
-        self.__set_value(value=value)
-        self.__set_value_comparable(value=value)
+    def __init__(self, name, object, *args, **kwargs):
+        self.__set_name(name=name)
+        self.__set_data(data=Data(object, *args, **kwargs))
 
     """------------------------------------------------------------------------------------------------
     """
-    def __set_value(self, value):
-        self.__value = value
+    def __set_name(self, name):
+        self.__name = name
+
+    @property
+    def name(self):
+        return self.__name
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __set_data(self, data):
+        self.__data = data
+
+    @property
+    def data(self):
+        return self.__data
 
     @property
     def value(self):
-        return self.__value
-
-
-    def __set_value_comparable(self, value):
-        self.__value_comparable = ds.comparable(self.value)
-
-    @property
-    def value_comparable(self):
-        return self.__value_comparable
+        return self.data.value
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.value)
+        return str(self.data)
 
     """------------------------------------------------------------------------------------------------
     """
@@ -39,9 +44,15 @@ class Action(object):
         if(not core.is_instance(action, Action)):
             raise excps.ArgumentError()  
 
-        return self.value_comparable == action.value_comparable
+        return self.name == action.name and self.data == action.data
 
     def __hash__(self):
-        return hash(self.value_comparable)
+        return hash(self.data)
     
+    """------------------------------------------------------------------------------------------------
+    """
+    def __setitem__(self, key, value):
+        self.data[key] = value
 
+    def __getitem__(self, key):
+        return self.data[key]

@@ -78,9 +78,9 @@ class TabularPolicy(Policy):
     """
     def _get_optimal_action(self, state):
         if(not self.has_state(state=state)):
-             return None
+             return (None, None)
         if(not self.has_actions(state=state)):
-             return None
+             return (None, None)
 
         action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
         value = self.get_value(state=state, action=action)

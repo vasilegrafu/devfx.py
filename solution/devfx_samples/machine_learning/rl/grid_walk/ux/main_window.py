@@ -142,7 +142,7 @@ class MainWindow(ux.Window):
 
         # draw agents
         for agent in self.grid_environment.get_agents():
-            cell_index = agent.get_state().value
+            cell_index = agent.get_state().data
             x = (cell_index[1] - 1)*cell_width + cell_width/2
             y = (cell_index[0] - 1)*cell_height + cell_height/2
             r = min(cell_width/4, cell_height/4)
@@ -154,20 +154,20 @@ class MainWindow(ux.Window):
         for state in policy.get_states():
             for action in policy.get_actions(state):
                 text = f'{policy.get_value(state, action):.2f}'
-                cell_index = state.value
-                if(np.array_equal(action.value, np.array([ 0,-1]))):
+                cell_index = state.data
+                if(action.name == 'LEFT'):
                     x = (cell_index[1] - 1)*cell_width
                     y = (cell_index[0] - 1)*cell_height + cell_height/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
-                elif(np.array_equal(action.value, np.array([ 0,+1]))):
+                elif(action.name == 'RIGHT'):
                     x = (cell_index[1] - 1)*cell_width + cell_width
                     y = (cell_index[0] - 1)*cell_height + cell_height/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
-                elif(np.array_equal(action.value, np.array([-1, 0]))):
+                elif(action.name == 'UP'):
                     x = (cell_index[1] - 1)*cell_width + cell_width/2
                     y = (cell_index[0] - 1)*cell_height
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
-                elif(np.array_equal(action.value, np.array([+1, 0]))):
+                elif(action.name == 'DOWN'):
                     x = (cell_index[1] - 1)*cell_width + cell_width/2
                     y = (cell_index[0] - 1)*cell_height + cell_height
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)

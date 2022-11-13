@@ -100,7 +100,6 @@ class Environment(object):
             raise excps.ApplicationError()
 
         (next_state, next_reward) = self.get_next_state_and_reward(agent=agent, action=action)
-
         agent.set_state(state=next_state)
 
         agent.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
@@ -109,15 +108,17 @@ class Environment(object):
 
     def do_random_action(self, agent):
         action = self.get_random_action(agent=self)
+        if(action is None):
+            state = agent.get_state()
+            return (state, None, (None, None))
         (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
         return (state, action, (next_state, next_reward))
  
     def do_optimal_action(self, agent):
-        action_value = agent.get_policy().get_optimal_action(state=agent.get_state())
-        if(action_value is None):
+        (action, value) = agent.get_policy().get_optimal_action(state=agent.get_state())
+        if(action is None):
             state = agent.get_state()
             return (state, None, (None, None))
-        (action, value) = action_value
         (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
         return (state, action, (next_state, next_reward))
 

@@ -84,4 +84,4 @@ class ActionGenerator(object):
         return self._get_random()
 
     def _get_random(self):
-        return Action(value=np.array([r.get_random() for r in self.ranges]))
+        raise excps.NotImplementedError()
