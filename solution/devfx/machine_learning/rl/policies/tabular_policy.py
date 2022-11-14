@@ -18,6 +18,15 @@ class TabularPolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """
+    @property
+    def iter(self):
+        for state in self.__model:
+            for action in  self.__model[state]:
+                value = self.__model[state][action]    
+                yield (state, action, value)
+
+    """------------------------------------------------------------------------------------------------
+    """
     def get_states_count(self):
         return len(self.__model)
 
@@ -85,6 +94,6 @@ class TabularPolicy(Policy):
         action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
         value = self.get_value(state=state, action=action)
         return (action, value)
-
+                
 
 

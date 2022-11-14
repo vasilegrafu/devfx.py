@@ -64,7 +64,7 @@ class GridEnvironment(ml.rl.Environment):
                                      kind=GridAgentKind.WALKER, 
                                      environment=self, 
                                      state=self.__get_initial_state(),
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1),
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
                                      iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
         else:
             self.get_agent(id=1).set_state(self.__get_initial_state())
@@ -85,7 +85,7 @@ class GridEnvironment(ml.rl.Environment):
         return state
 
     def _get_next_state_and_reward(self, agent, action):
-        ci = np.argwhere(agent.get_state().value[:,:,2] == 1)[0]
+        ci = np.argwhere(agent.get_state()[:,:,2] == 1)[0]
         next_ci = ci + action.value
         if(self.scene[next_ci[0], next_ci[1], 0] == ml.rl.StateKind.UNDEFINED):
             next_state = agent.get_state()

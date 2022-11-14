@@ -125,18 +125,13 @@ class MainWindow(ux.Window):
 
         # draw grid
         for ci in np.ndindex(layer_shape):
-            (x, y) = (ci[1]*cw, ci[0]*ch)
-            (w, h) = (cw, ch)
-            if(state_kind_layer[ci] == ml.rl.StateKind.UNDEFINED):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
-            elif(state_kind_layer[ci] == ml.rl.StateKind.NON_TERMINAL):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
-            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] >= 0):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GREEN_BRUSH)
-            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] < 0):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
-            else:
-                raise excps.NotSupportedError()
+            (x, y, w, h) = (ci[1]*cw, ci[0]*ch, cw, ch)
+            if(state_kind_layer[ci] == ml.rl.StateKind.UNDEFINED):                              brush=ux.GRAY_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.NON_TERMINAL):                         brush=ux.WHITE_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] >= 0):   brush=ux.GREEN_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] < 0):    brush=ux.RED_BRUSH
+            else:                                                                               raise excps.NotSupportedError()
+            cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=brush)
 
         # draw rewards
         for ci in np.ndindex(layer_shape):
@@ -146,35 +141,19 @@ class MainWindow(ux.Window):
         # draw agents
         for agent in self.grid_environment.get_agents():
             ci = np.argwhere(agent.get_state().value[:,:,2] == 1)[0]
-            (x, y) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2)
-            r = min(cw/4, ch/4)
+            (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
         agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
-        policy = agent.get_policy()
-        for state in policy.get_states():
-            for action in policy.get_actions(state):
-                text = f'{policy.get_value(state, action):.2f}'
-                ci = np.argwhere(state.value[:,:,2] == 1)[0]
-                if(action.name == 'LEFT'):
-                    x = ci[1]*cw
-                    y = ci[0]*ch + ch/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
-                elif(action.name == 'RIGHT'):
-                    x = ci[1]*cw + cw
-                    y = ci[0]*ch + ch/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
-                elif(action.name == 'UP'):
-                    x = ci[1]*cw + cw/2
-                    y = ci[0]*ch
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
-                elif(action.name == 'DOWN'):
-                    x = ci[1]*cw + cw/2
-                    y = ci[0]*ch + ch
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
-                else:
-                    raise excps.NotImplementedError()
+        for (state, action, value) in agent.get_policy().iter:
+            ci = np.argwhere(state[:,:,2] == 1)[0]
+            if(action.name == 'LEFT'):      (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
+            elif(action.name == 'RIGHT'):   (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)
+            elif(action.name == 'UP'):      (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch, ux.TOP) 
+            elif(action.name == 'DOWN'):    (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch + ch, ux.BOTTOM)
+            else:                           raise excps.NotImplementedError()
+            cgc.DrawText(text=f'{value:.2f}', x=x, y=y, offx=4, offy=0, anchor=anchor, colour=ux.GRAY)
     
     """------------------------------------------------------------------------------------------------
     """
