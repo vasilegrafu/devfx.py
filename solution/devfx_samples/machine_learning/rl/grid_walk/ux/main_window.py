@@ -114,38 +114,38 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # cell size
-        cell_width = cgc.GetSize()[0]/self.grid_environment.shape[0]
-        cell_height = cgc.GetSize()[1]/self.grid_environment.shape[1]
+        cw = cgc.GetSize()[0]/self.grid_environment.shape[0]
+        ch = cgc.GetSize()[1]/self.grid_environment.shape[1]
 
         # draw grid
-        for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 1)*cell_width 
-            y = (cell_index[0] - 1)*cell_height
-            w = cell_width
-            h = cell_height
-            if(cell_content[0] == ml.rl.StateKind.UNDEFINED):
+        for (ci, cc) in self.grid_environment.cells.items():
+            x = (ci[1] - 1)*cw 
+            y = (ci[0] - 1)*ch
+            w = cw
+            h = ch
+            if(cc[0] == ml.rl.StateKind.UNDEFINED):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
-            elif(cell_content[0] == ml.rl.StateKind.NON_TERMINAL):
+            elif(cc[0] == ml.rl.StateKind.NON_TERMINAL):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
-            elif(cell_content[0] == ml.rl.StateKind.TERMINAL and cell_content[1] >= 0):
+            elif(cc[0] == ml.rl.StateKind.TERMINAL and cc[1] >= 0):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GREEN_BRUSH)
-            elif(cell_content[0] == ml.rl.StateKind.TERMINAL and cell_content[1] < 0):
+            elif(cc[0] == ml.rl.StateKind.TERMINAL and cc[1] < 0):
                 cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
             else:
                 raise excps.NotSupportedError()
 
         # draw rewards
-        for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 1)*cell_width + cell_width
-            y = (cell_index[0] - 1)*cell_height
-            cgc.DrawText(text=f'{cell_content[1]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
+        for (ci, cc) in self.grid_environment.cells.items():
+            x = (ci[1] - 1)*cw + cw
+            y = (ci[0] - 1)*ch
+            cgc.DrawText(text=f'{cc[1]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
-            cell_index = agent.get_state().data
-            x = (cell_index[1] - 1)*cell_width + cell_width/2
-            y = (cell_index[0] - 1)*cell_height + cell_height/2
-            r = min(cell_width/4, cell_height/4)
+            ci = agent.get_state().value
+            x = (ci[1] - 1)*cw + cw/2
+            y = (ci[0] - 1)*ch + ch/2
+            r = min(cw/4, ch/4)
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
@@ -154,22 +154,22 @@ class MainWindow(ux.Window):
         for state in policy.get_states():
             for action in policy.get_actions(state):
                 text = f'{policy.get_value(state, action):.2f}'
-                cell_index = state.data
+                ci = state.value
                 if(action.name == 'LEFT'):
-                    x = (cell_index[1] - 1)*cell_width
-                    y = (cell_index[0] - 1)*cell_height + cell_height/2
+                    x = (ci[1] - 1)*cw
+                    y = (ci[0] - 1)*ch + ch/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
                 elif(action.name == 'RIGHT'):
-                    x = (cell_index[1] - 1)*cell_width + cell_width
-                    y = (cell_index[0] - 1)*cell_height + cell_height/2
+                    x = (ci[1] - 1)*cw + cw
+                    y = (ci[0] - 1)*ch + ch/2
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
                 elif(action.name == 'UP'):
-                    x = (cell_index[1] - 1)*cell_width + cell_width/2
-                    y = (cell_index[0] - 1)*cell_height
+                    x = (ci[1] - 1)*cw + cw/2
+                    y = (ci[0] - 1)*ch
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
                 elif(action.name == 'DOWN'):
-                    x = (cell_index[1] - 1)*cell_width + cell_width/2
-                    y = (cell_index[0] - 1)*cell_height + cell_height
+                    x = (ci[1] - 1)*cw + cw/2
+                    y = (ci[0] - 1)*ch + ch
                     cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
                 else:
                     raise excps.NotImplementedError()

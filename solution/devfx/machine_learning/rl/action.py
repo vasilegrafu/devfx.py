@@ -7,9 +7,9 @@ from .data import Data
 """================================================================================================
 """
 class Action(object):
-    def __init__(self, name, object, *args, **kwargs):
+    def __init__(self, name, value, *args, **kwargs):
         self.__set_name(name=name)
-        self.__set_data(data=Data(object, *args, **kwargs))
+        self.__set_data(data=Data(value, *args, **kwargs))
 
     """------------------------------------------------------------------------------------------------
     """
@@ -25,13 +25,12 @@ class Action(object):
     def __set_data(self, data):
         self.__data = data
 
-    @property
-    def data(self):
+    def __get_data(self):
         return self.__data
 
     @property
     def value(self):
-        return self.data.value
+        return self.__get_data().value
 
     """------------------------------------------------------------------------------------------------
     """
@@ -44,15 +43,15 @@ class Action(object):
         if(not core.is_instance(action, Action)):
             raise excps.ArgumentError()  
 
-        return self.name == action.name and self.data == action.data
+        return self.name == action.name and self.__get_data() == action.__get_data()
 
     def __hash__(self):
-        return hash(self.data)
+        return hash(self.__get_data())
     
     """------------------------------------------------------------------------------------------------
     """
     def __setitem__(self, key, value):
-        self.data[key] = value
+        self.__get_data()[key] = value
 
     def __getitem__(self, key):
-        return self.data[key]
+        return self.__get_data()[key]

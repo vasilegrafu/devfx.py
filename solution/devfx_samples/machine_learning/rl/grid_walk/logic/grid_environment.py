@@ -35,18 +35,18 @@ class GridEnvironment(ml.rl.Environment):
     """
     def _create(self):
         cells = {}
-        for (ri, ci) in it.product(range(1, self.shape[0]+1), range(1, self.shape[1]+1)):
-            if((ri == 1) or (ri == self.shape[0]) or (ci == 1) or (ci == self.shape[1])):
-                (cell_index, cell_content) = (ml.rl.Data([ri, ci]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
-            elif((ri, ci) in [(3, 3), (4, 4), (6, 6)]):
-                (cell_index, cell_content) = (ml.rl.Data([ri, ci]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
-            elif((ri, ci) in [(2, 7)]):
-                (cell_index, cell_content) = (ml.rl.Data([ri, ci]), ml.rl.Data([ml.rl.StateKind.TERMINAL, +1.0]))
-            elif((ri, ci) in [(3, 7)]):
-                (cell_index, cell_content) = (ml.rl.Data([ri, ci]), ml.rl.Data([ml.rl.StateKind.TERMINAL, -1.0]))
+        for (r, c) in it.product(range(1, self.shape[0]+1), range(1, self.shape[1]+1)):
+            if((r == 1) or (r == self.shape[0]) or (c == 1) or (c == self.shape[1])):
+                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
+            elif((r, c) in [(3, 3), (4, 4), (6, 6)]):
+                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
+            elif((r, c) in [(2, 7)]):
+                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.TERMINAL, +1.0]))
+            elif((r, c) in [(3, 7)]):
+                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.TERMINAL, -1.0]))
             else:
-                (cell_index, cell_content) = (ml.rl.Data([ri, ci]), ml.rl.Data([ml.rl.StateKind.NON_TERMINAL, 0.0]))
-            cells[cell_index] = cell_content
+                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.NON_TERMINAL, 0.0]))
+            cells[ci] = cc
         self.__cells = cells
 
     """------------------------------------------------------------------------------------------------
@@ -69,24 +69,22 @@ class GridEnvironment(ml.rl.Environment):
     def _on_removed_agent(self, agent):
         pass
 
-    def __get_initial_state(self):
-        choosable_cell_indexes = [cell_index for cell_index in self.cells 
-                                             if(self.cells[cell_index][0] == ml.rl.StateKind.NON_TERMINAL)]
-        cell_index = rnd.choice(choosable_cell_indexes)
-        state = ml.rl.State(self.cells[cell_index][0], cell_index)
-        return state
-
     """------------------------------------------------------------------------------------------------
     """
+    def __get_initial_state(self):
+        ci = rnd.choice([ci for ci in self.cells if(self.cells[ci][0] == ml.rl.StateKind.NON_TERMINAL)])
+        state = ml.rl.State(self.cells[ci][0], ci)
+        return state
+
     def _get_next_state_and_reward(self, agent, action):
-        agent_state = agent.get_state()
-        agent_next_cell_index = ml.rl.Data(agent_state.value + action.value)
-        if(self.cells[agent_next_cell_index][0] == ml.rl.StateKind.UNDEFINED):
-            agent_next_state = agent_state
+        state = agent.get_state()
+        next_ci = ml.rl.Data(state.value + action.value)
+        if(self.cells[next_ci][0] == ml.rl.StateKind.UNDEFINED):
+            next_state = state
         else:
-            agent_next_state = ml.rl.State(self.cells[agent_next_cell_index][0], agent_next_cell_index)
-        agent_next_reward = ml.rl.Reward(self.cells[agent_next_cell_index][1])
-        return (agent_next_state, agent_next_reward)
+            next_state = ml.rl.State(self.cells[next_ci][0], next_ci)
+        next_reward = ml.rl.Reward(self.cells[next_ci][1])
+        return (next_state, next_reward)
 
     """------------------------------------------------------------------------------------------------
     """

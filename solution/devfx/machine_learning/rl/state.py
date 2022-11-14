@@ -4,10 +4,9 @@ import devfx.core as core
 from .data import Data
 
 class State(object):
-    def __init__(self, kind, object, *args, **kwargs):
+    def __init__(self, kind, value, *args, **kwargs):
         self.__set_kind(kind=kind)
-        self.__set_data(data=Data(object, *args, **kwargs))
-
+        self.__set_data(data=Data(value, *args, **kwargs))
 
     """------------------------------------------------------------------------------------------------
     """
@@ -24,18 +23,17 @@ class State(object):
     def __set_data(self, data):
         self.__data = data
 
-    @property
-    def data(self):
+    def __get_data(self):
         return self.__data
 
     @property
     def value(self):
-        return self.data.value
+        return self.__get_data().value
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return '(' + str(self.kind) + ', ' + str(self.data) + ')'
+        return '(' + str(self.kind) + ', ' + str(self.__get_data()) + ')'
 
     """------------------------------------------------------------------------------------------------
     """
@@ -43,15 +41,15 @@ class State(object):
         if(not core.is_instance(state, State)):
             raise excps.ArgumentError()    
 
-        return self.kind == state.kind and self.data == state.data
+        return self.kind == state.kind and self.__get_data() == state.__get_data()
 
     def __hash__(self):
-        return hash((self.kind, self.data))
+        return hash((self.kind, self.__get_data()))
 
     """------------------------------------------------------------------------------------------------
     """
     def __setitem__(self, key, value):
-        self.data[key] = value
+        self.__get_data()[key] = value
 
     def __getitem__(self, key):
-        return self.data[key]
+        return self.__get_data()[key]

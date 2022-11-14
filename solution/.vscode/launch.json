@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "grid_walk_v2",
+            "type": "python",
+            "request": "launch",
+            "program": "D:\\Dev.Work\\devfx.py\\solution\\devfx_samples\\machine_learning\\rl\\grid_walk_v2\\ux\\main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

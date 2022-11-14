@@ -15,47 +15,45 @@ class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
-        self.__shape = (8, 8)
-        self.__env = np.zeros(shape=[*self.__shape, 3])
+        self.__set_scene(scene=np.zeros(shape=[8, 8, 3]))
 
         self.__actionGenerator = GridAgentActionGenerator()
 
     """------------------------------------------------------------------------------------------------
     """
-    @property
-    def shape(self):  
-        return self.__shape
+    def __set_scene(self, scene):
+        self.__scene = scene
 
     @property
-    def model(self):
-        return self.__model
+    def scene(self):
+        return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
     def _create(self):
         # state kind
-        self.env[:,:,0] = ml.rl.StateKind.UNDEFINED
-        self.env[1:-1,1:-1,0] = ml.rl.StateKind.NON_TERMINAL
-        self.env[2,2,0] = ml.rl.StateKind.UNDEFINED
-        self.env[3,3,0] = ml.rl.StateKind.UNDEFINED
-        self.env[5,5,0] = ml.rl.StateKind.UNDEFINED
-        self.env[1,6,0] = ml.rl.StateKind.TERMINAL
-        self.env[2,6,0] = ml.rl.StateKind.TERMINAL
-        #print(self.env[:,:,0])
+        self.scene[:,:,0] = ml.rl.StateKind.UNDEFINED
+        self.scene[1:-1,1:-1,0] = ml.rl.StateKind.NON_TERMINAL
+        self.scene[2,2,0] = ml.rl.StateKind.UNDEFINED
+        self.scene[3,3,0] = ml.rl.StateKind.UNDEFINED
+        self.scene[5,5,0] = ml.rl.StateKind.UNDEFINED
+        self.scene[1,6,0] = ml.rl.StateKind.TERMINAL
+        self.scene[2,6,0] = ml.rl.StateKind.TERMINAL
+        #print(self.scene[:,:,0])
 
         # reward
-        self.env[:,:,1] = -1
-        self.env[1:-1,1:-1,1] = 0
-        self.env[2,2,1] = -1
-        self.env[3,3,1] = -1
-        self.env[5,5,1] = -1
-        self.env[1,6,1] = +1
-        self.env[2,6,1] = -1
-        #print(self.env[:,:,1])
+        self.scene[:,:,1] = -1
+        self.scene[1:-1,1:-1,1] = 0
+        self.scene[2,2,1] = -1
+        self.scene[3,3,1] = -1
+        self.scene[5,5,1] = -1
+        self.scene[1,6,1] = +1
+        self.scene[2,6,1] = -1
+        #print(self.scene[:,:,1])
 
         # agent
-        self.env[:,:,2] = 0
-        #print(self.env[:,:,2])
+        self.scene[:,:,2] = 0
+        #print(self.scene[:,:,2])
 
     """------------------------------------------------------------------------------------------------
     """
@@ -77,27 +75,26 @@ class GridEnvironment(ml.rl.Environment):
     def _on_removed_agent(self, agent):
         pass
 
-    def __get_initial_state(self):
-        env = self.env.copy()
-        ci = rnd.choice(np.argwhere(env[:,:,0] == ml.rl.StateKind.NON_TERMINAL))
-        env[ci[0], ci[1], 2] = +1
-        state = ml.rl.State(env[ci[0], ci[1], 0], env)
-        return state
-
     """------------------------------------------------------------------------------------------------
     """
+    def __get_initial_state(self):
+        scene = self.scene.copy()
+        ci = rnd.choice(np.argwhere(scene[:,:,0] == ml.rl.StateKind.NON_TERMINAL))
+        scene[ci[0], ci[1], 2] = +1
+        state = ml.rl.State(scene[ci[0], ci[1], 0], scene)
+        return state
+
     def _get_next_state_and_reward(self, agent, action):
-        agent_state = agent.get_state()
-        agent_ci = np.argwhere(agent_state[:,:,2] == 1)[0]
-        agent_next_ci = agent_ci + action.value
-        if(self.env[agent_next_ci[0], agent_next_ci[1], 0] == ml.rl.StateKind.UNDEFINED):
-            agent_next_state = agent_state
+        ci = np.argwhere(agent.get_state().value[:,:,2] == 1)[0]
+        next_ci = ci + action.value
+        if(self.scene[next_ci[0], next_ci[1], 0] == ml.rl.StateKind.UNDEFINED):
+            next_state = agent.get_state()
         else:
-            env = self.env.copy()
-            env[agent_next_ci[0], agent_next_ci[1], 2] = +1
-            agent_next_state = ml.rl.State(env[agent_next_ci[0], agent_next_ci[1], 0], env)
-        agent_next_reward = ml.rl.Reward(env[agent_next_ci[0], agent_next_ci[1], 1])
-        return (agent_next_state, agent_next_reward)
+            scene = self.scene.copy()
+            scene[next_ci[0], next_ci[1], 2] = +1
+            next_state = ml.rl.State(scene[next_ci[0], next_ci[1], 0], scene)
+        next_reward = ml.rl.Reward(self.scene[next_ci[0], next_ci[1], 1])
+        return (next_state, next_reward)
 
     """------------------------------------------------------------------------------------------------
     """

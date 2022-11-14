@@ -37,7 +37,7 @@ class Data(object):
         if(not core.is_instance(data, Data)):
             raise excps.ArgumentError()  
 
-        return all(self.value == data.value)
+        return (self.value == data.value).all()
 
     def __hash__(self):
         return self.__hash
