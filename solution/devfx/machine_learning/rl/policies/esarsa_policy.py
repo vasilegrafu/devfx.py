@@ -17,14 +17,14 @@ class ESarsaPolicy(TabularPolicy):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _learn(self, state, action, next_state, next_reward):
+    def _learn(self, state, action, reward, next_state):
         if(not super().has_value(state, action)):
             super().set_value(state, action, 0.0)
 
         if(not super().has_state(next_state)):
-            error = next_reward.value - super().get_value(state, action)
+            error = reward.value - super().get_value(state, action)
         else:
-            error = next_reward.value + self.get_discount_factor()*super().get_avg_value(next_state) - super().get_value(state, action)
+            error = reward.value + self.get_discount_factor()*super().get_avg_value(next_state) - super().get_value(state, action)
         super().set_value(state, action, super().get_value(state, action) + self.get_learning_rate()*error)
 
 

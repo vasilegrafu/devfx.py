@@ -99,28 +99,28 @@ class Environment(object):
         if(is_terminal_state):
             raise excps.ApplicationError()
 
-        (next_state, next_reward) = self.get_next_state_and_reward(agent=agent, action=action)
+        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
         agent.set_state(state=next_state)
 
-        agent.learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+        agent.learn(state=state, action=action, reward=reward, next_state=next_state)
 
-        return (state, action, (next_state, next_reward))
+        return (state, action, (reward, next_state))
 
     def do_random_action(self, agent):
         action = self.get_random_action(agent=self)
         if(action is None):
             state = agent.get_state()
             return (state, None, (None, None))
-        (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
-        return (state, action, (next_state, next_reward))
+        (state, action, (reward, next_state)) = self.do_action(agent=agent, action=action)
+        return (state, action, (reward, next_state))
  
     def do_optimal_action(self, agent):
         (action, value) = agent.get_policy().get_optimal_action(state=agent.get_state())
         if(action is None):
             state = agent.get_state()
             return (state, None, (None, None))
-        (state, action, (next_state, next_reward)) = self.do_action(agent=agent, action=action)
-        return (state, action, (next_state, next_reward))
+        (state, action, (reward, next_state)) = self.do_action(agent=agent, action=action)
+        return (state, action, (reward, next_state))
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -155,31 +155,25 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_next_state_and_reward(self, agent, action):
+    def get_reward_and_next_state(self, agent, action):
         is_terminal_state = agent.get_state().kind == StateKind.TERMINAL
         if(is_terminal_state):
             raise excps.ApplicationError()
         
-        next_state_and_reward = self._get_next_state_and_reward(agent=agent, action=action)
-        return next_state_and_reward
+        (reward, next_state) = self._get_reward_and_next_state(agent=agent, action=action)
+        return (reward, next_state)
         
-    def _get_next_state_and_reward(self, agent, action):
+    def _get_reward_and_next_state(self, agent, action):
         raise excps.NotImplementedError()
 
 
     def get_next_state(self, agent, action):
-        next_state_and_reward = self.get_next_state_and_reward(agent=agent, action=action)
-        if(next_state_and_reward is None):
-            return None
-        (next_state, next_reward) = next_state_and_reward
+        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
         return next_state
 
-    def get_next_reward(self, agent, action):
-        next_state_and_reward = self.get_next_state_and_reward(agent=agent, action=action)
-        if(next_state_and_reward is None):
-            return None
-        (next_state, next_reward) = next_state_and_reward
-        return next_reward
+    def get_reward(self, agent, action):
+        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
+        return reward
         
     """------------------------------------------------------------------------------------------------
     """ 

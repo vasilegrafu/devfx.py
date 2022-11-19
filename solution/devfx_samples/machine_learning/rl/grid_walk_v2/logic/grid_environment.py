@@ -84,7 +84,7 @@ class GridEnvironment(ml.rl.Environment):
         state = ml.rl.State(scene[ci[0], ci[1], 0], scene)
         return state
 
-    def _get_next_state_and_reward(self, agent, action):
+    def _get_reward_and_next_state(self, agent, action):
         ci = np.argwhere(agent.get_state()[:,:,2] == 1)[0]
         next_ci = ci + action.value
         if(self.scene[next_ci[0], next_ci[1], 0] == ml.rl.StateKind.UNDEFINED):
@@ -93,8 +93,8 @@ class GridEnvironment(ml.rl.Environment):
             scene = self.scene.copy()
             scene[next_ci[0], next_ci[1], 2] = +1
             next_state = ml.rl.State(scene[next_ci[0], next_ci[1], 0], scene)
-        next_reward = ml.rl.Reward(self.scene[next_ci[0], next_ci[1], 1])
-        return (next_state, next_reward)
+        reward = ml.rl.Reward(self.scene[next_ci[0], next_ci[1], 1])
+        return (reward, next_state)
 
     """------------------------------------------------------------------------------------------------
     """

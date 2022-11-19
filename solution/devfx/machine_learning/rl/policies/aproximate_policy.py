@@ -15,7 +15,7 @@ class AproximatePolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, next_state, next_reward):
+    def _learn(self, state, action, reward, next_state):
         raise excps.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------

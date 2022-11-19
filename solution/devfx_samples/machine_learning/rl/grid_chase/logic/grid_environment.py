@@ -87,7 +87,7 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_next_state_and_reward(self, agent, action):  
+    def _get_reward_and_next_state(self, agent, action):  
         agent_state = agent.get_state()     
         agent_cell_index = agent_state.value[0]
         if(action == GridActions.Left):
@@ -103,8 +103,8 @@ class GridEnvironment(ml.rl.Environment):
 
         if(self.cells[agent_next_cell_index] is None):
             agent_next_state = agent_state
-            agent_next_reward = ml.rl.Reward(value=-1.0)
-            return (agent_next_state, agent_next_reward)
+            agent_reward = ml.rl.Reward(value=-1.0)
+            return (agent_next_state, agent_reward)
 
         agent_kind = agent.get_kind()
         other_agents = self.get_other_kind_.....agents(id=agent.get_id())
@@ -112,20 +112,20 @@ class GridEnvironment(ml.rl.Environment):
         if(agent_kind == GridAgentKind.CHASER):
             if(agent_next_cell_index in other_agents_cell_indexes):
                 agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                agent_next_reward = ml.rl.Reward(value=+1.0)
+                agent_reward = ml.rl.Reward(value=+1.0)
             else:
                 agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                agent_next_reward = ml.rl.Reward(value=-1.0)
+                agent_reward = ml.rl.Reward(value=-1.0)
         elif(agent_kind == GridAgentKind.CHASED):
             if(agent_next_cell_index in other_agents_cell_indexes):
                 agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                agent_next_reward = ml.rl.Reward(value=-1.0)
+                agent_reward = ml.rl.Reward(value=-1.0)
             else:
                 agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                agent_next_reward = ml.rl.Reward(value=+1.0)
+                agent_reward = ml.rl.Reward(value=+1.0)
         else:
             raise excps.ApplicationError()
-        return (agent_next_state, agent_next_reward)
+        return (agent_next_state, agent_reward)
 
     """------------------------------------------------------------------------------------------------
     """

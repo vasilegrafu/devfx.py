@@ -109,25 +109,25 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def learn(self, state, action, next_state, next_reward):
-        self.get_policy().learn(state=state, action=action, next_state=next_state, next_reward=next_reward)
+    def learn(self, state, action, reward, next_state):
+        self.get_policy().learn(state=state, action=action, reward=reward, next_state=next_state)
 
     """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self, action):
         environment = self.get_environment()
-        (state, action, (next_state, next_reward)) = environment.do_action(agent=self, action=action)
-        return (state, action, (next_state, next_reward))
+        (state, action, (reward, next_state)) = environment.do_action(agent=self, action=action)
+        return (state, action, (reward, next_state))
 
     def do_random_action(self):
         environment = self.get_environment()
-        (state, action, (next_state, next_reward)) = environment.do_random_action(agent=self)
-        return (state, action, (next_state, next_reward))
+        (state, action, (reward, next_state)) = environment.do_random_action(agent=self)
+        return (state, action, (reward, next_state))
  
     def do_optimal_action(self):
         environment = self.get_environment()
-        (state, action, (next_state, next_reward)) = environment.do_optimal_action(agent=self)
-        return (state, action, (next_state, next_reward))
+        (state, action, (reward, next_state)) = environment.do_optimal_action(agent=self)
+        return (state, action, (reward, next_state))
 
     """------------------------------------------------------------------------------------------------
     """
