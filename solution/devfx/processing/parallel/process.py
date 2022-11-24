@@ -1,6 +1,6 @@
 import multiprocessing
 import time
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 
 class Process(multiprocessing.Process):
@@ -40,7 +40,7 @@ class Process(multiprocessing.Process):
             process_result = Process._Result(value=fn_result)
         except Exception as exception:
             process_result = Process._Result(value=exception)
-            excps.ErrorInfo.print()
+            ex.ErrorInfo.print()
         finally:
             self.__is_started_event.clear()
             self.__queue.put(process_result)
@@ -59,7 +59,7 @@ class Process(multiprocessing.Process):
         if(self.__result is None):
             self.__result = self.__queue.get()
         if(core.is_typeof(self.__result.value, Exception)):
-            raise excps.ApplicationError(inner=self.__result.value)
+            raise ex.ApplicationError(inner=self.__result.value)
         else:
             return self.__result.value
 
@@ -84,7 +84,7 @@ class Process(multiprocessing.Process):
         if(self.__result is None):
             self.__result = self.__queue.get()
         if(core.is_typeof(self.__result.value, Exception)):
-            raise excps.ApplicationError(inner=self.__result.value)
+            raise ex.ApplicationError(inner=self.__result.value)
         else:
             pass
 

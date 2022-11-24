@@ -1,6 +1,6 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .data import Data
 
@@ -16,9 +16,12 @@ class Action(object):
     def __set_name(self, name):
         self.__name = name
 
+    def __get_name(self):
+        return self.__name
+
     @property
     def name(self):
-        return self.__name
+        return self.__get_name()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -35,23 +38,23 @@ class Action(object):
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.data)
+        return '(' + str(self.__get_name()) + ', ' + str(self.__get_data()) + ')'   
 
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, action):
         if(not core.is_instance(action, Action)):
-            raise excps.ArgumentError()  
+            raise ex.ArgumentError()  
 
-        return self.name == action.name and self.__get_data() == action.__get_data()
+        return (self.__get_name() == action.__get_name()) and (self.__get_data() == action.__get_data())
 
     def __hash__(self):
         return hash(self.__get_data())
     
     """------------------------------------------------------------------------------------------------
     """
-    def __setitem__(self, key, value):
-        self.__get_data()[key] = value
+    def __setitem__(self, key, item):
+        self.__get_data()[key] = item
 
     def __getitem__(self, key):
         return self.__get_data()[key]

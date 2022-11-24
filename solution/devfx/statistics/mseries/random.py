@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .. import series
 from . import ops
@@ -16,5 +16,5 @@ def sample(data, size=None):
 @validation.validate_args_is_mseries('data')
 def choose_one(data):
     if(ops.rows_count(data) == 0):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     return [_[0] for _ in sample(data, size=1)]

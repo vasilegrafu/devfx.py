@@ -1,5 +1,5 @@
 import pickle as pckl
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 from ..state_kind import StateKind
 
 class Policy(object):
@@ -9,10 +9,10 @@ class Policy(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def _set_model(self, model):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     def _get_model(self):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
 
     def share_model_from(self, policy):
@@ -59,20 +59,20 @@ class Policy(object):
         self._learn(state=state, action=action, reward=reward, next_state=next_state)
 
     def _learn(self, state, action, reward, next_state):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def get_optimal_action(self, state):
         is_terminal_state = state.kind == StateKind.TERMINAL
         if(is_terminal_state):
-            raise excps.ApplicationError()
+            raise ex.ApplicationError()
 
         action_value = self._get_optimal_action(state=state)
         return action_value
 
     def _get_optimal_action(self, state):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 

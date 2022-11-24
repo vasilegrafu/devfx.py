@@ -1,4 +1,4 @@
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 from .tabular_policy import TabularPolicy
 
 class ESarsaPolicy(TabularPolicy):

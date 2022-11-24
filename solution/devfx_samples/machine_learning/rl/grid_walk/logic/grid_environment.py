@@ -2,9 +2,8 @@ import numpy as np
 import random as rnd
 import itertools as it
 import devfx.core as core
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.machine_learning as ml
-
 
 from .grid_agent_action_generator import GridAgentActionGenerator
 from .grid_agent_kind import GridAgentKind
@@ -16,38 +15,45 @@ class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
-        self.__shape = (8, 8)
-        self.__cells = None
+        self.__set_scene(scene=np.zeros(shape=(3, 8, 8), dtype=np.int8))
 
         self.__actionGenerator = GridAgentActionGenerator()
 
     """------------------------------------------------------------------------------------------------
     """
-    @property
-    def shape(self):  
-        return self.__shape
+    def __set_scene(self, scene):
+        self.__scene = scene
 
     @property
-    def cells(self):
-        return self.__cells
+    def scene(self):
+        return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
     def _create(self):
-        cells = {}
-        for (r, c) in it.product(range(1, self.shape[0]+1), range(1, self.shape[1]+1)):
-            if((r == 1) or (r == self.shape[0]) or (c == 1) or (c == self.shape[1])):
-                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
-            elif((r, c) in [(3, 3), (4, 4), (6, 6)]):
-                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.UNDEFINED, -1.0]))
-            elif((r, c) in [(2, 7)]):
-                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.TERMINAL, +1.0]))
-            elif((r, c) in [(3, 7)]):
-                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.TERMINAL, -1.0]))
-            else:
-                (ci, cc) = (ml.rl.Data([r, c]), ml.rl.Data([ml.rl.StateKind.NON_TERMINAL, 0.0]))
-            cells[ci] = cc
-        self.__cells = cells
+        # state kind
+        self.scene[0,:,:] = ml.rl.StateKind.UNDEFINED
+        self.scene[0,1:-1,1:-1] = ml.rl.StateKind.NON_TERMINAL
+        self.scene[0,2,2] = ml.rl.StateKind.UNDEFINED
+        self.scene[0,3,3] = ml.rl.StateKind.UNDEFINED
+        self.scene[0,5,5] = ml.rl.StateKind.UNDEFINED
+        self.scene[0,1,6] = ml.rl.StateKind.TERMINAL
+        self.scene[0,2,6] = ml.rl.StateKind.TERMINAL
+        # print(self.scene[0,:,:])
+
+        # reward
+        self.scene[1,:,:] = -1
+        self.scene[1,1:-1,1:-1] = 0
+        self.scene[1,2,2] = -1
+        self.scene[1,3,3] = -1
+        self.scene[1,5,5] = -1
+        self.scene[1,1,6] = +1
+        self.scene[1,2,6] = -1
+        # print(self.scene[1,:,:])
+
+        # agent
+        self.scene[2,:,:] = 0
+        # print(self.scene[2,:,:])
 
     """------------------------------------------------------------------------------------------------
     """
@@ -58,7 +64,7 @@ class GridEnvironment(ml.rl.Environment):
                                      kind=GridAgentKind.WALKER, 
                                      environment=self, 
                                      state=self.__get_initial_state(),
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1),
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
                                      iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
         else:
             self.get_agent(id=1).set_state(self.__get_initial_state())
@@ -72,18 +78,22 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def __get_initial_state(self):
-        ci = rnd.choice([ci for ci in self.cells if(self.cells[ci][0] == ml.rl.StateKind.NON_TERMINAL)])
-        state = ml.rl.State(self.cells[ci][0], ci)
+        scene = self.scene.copy()
+        ci = rnd.choice(np.argwhere(scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL))
+        scene[2, ci[0], ci[1]] = +1
+        state = ml.rl.State(scene[0, ci[0], ci[1]], scene)
         return state
 
     def _get_reward_and_next_state(self, agent, action):
-        state = agent.get_state()
-        next_ci = ml.rl.Data(state.value + action.value)
-        if(self.cells[next_ci][0] == ml.rl.StateKind.UNDEFINED):
-            next_state = state
+        ci = np.argwhere(agent.state[2,:,:] == 1)[0]
+        next_ci = ci + action.value
+        if(self.scene[0, next_ci[0], next_ci[1]] == ml.rl.StateKind.UNDEFINED):
+            next_state = agent.state
         else:
-            next_state = ml.rl.State(self.cells[next_ci][0], next_ci)
-        reward = ml.rl.Reward(self.cells[next_ci][1])
+            scene = self.scene.copy()
+            scene[2, next_ci[0], next_ci[1]] = +1
+            next_state = ml.rl.State(scene[0, next_ci[0], next_ci[1]], scene)
+        reward = ml.rl.Reward(self.scene[1, next_ci[0], next_ci[1]].item())
         return (reward, next_state)
 
     """------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .. import variables
 from .model import Model
@@ -16,20 +16,20 @@ def __exists_variable(model, name):
 
 def __set_variable(model, name, variable):
     if(not core.is_instance(variable, tf.Variable)):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     core.setattr(obj=model, name=name, value=variable)
 
 def __get_variable(model, name):
     if(not __exists_variable(model=model, name=name)):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     variable = core.getattr(obj=model, name=name)
     if(not core.is_instance(variable, tf.Variable)):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     return variable
 
 def __remove_variable(model, name):
     if(not __exists_variable(model=model, name=name)):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     core.delattr(obj=model, name=name)
 
 """------------------------------------------------------------------------------------------------
@@ -46,14 +46,14 @@ def get_variable(name, model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return __get_variable(model=model, name=name)
 
 def get_or_create_variable(name, shape=None, dtype=None, initializer=None, trainable=True, model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     if(__exists_variable(model=model, name=name)):
         variable = __get_variable(model=model, name=name)
         return variable
@@ -69,21 +69,21 @@ def set_variable(name, variable, model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return __set_variable(model=model, name=name, variable=variable)
 
 def exists_variable(name, model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return __exists_variable(model=model, name=name)
 
 def remove_variable(name, model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return __remove_variable(model=model, name=name)
 
 
@@ -93,13 +93,13 @@ def get_all_variables(model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return model.variables
 
 def get_trainable_variables(model=None):
     if(model is None):
         model = Model.current_model()
     if(model is None):
-        raise excps.ApplicationError()
+        raise ex.ApplicationError()
     return model.trainable_variables
     

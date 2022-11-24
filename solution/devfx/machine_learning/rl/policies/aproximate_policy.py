@@ -1,4 +1,4 @@
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 from .policy import Policy
 
 class AproximatePolicy(Policy):
@@ -8,18 +8,18 @@ class AproximatePolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """
     def _set_model(self, model):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     def _get_model(self):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, state, action, reward, next_state):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_optimal_action(self, state):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 

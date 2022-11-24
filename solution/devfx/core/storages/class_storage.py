@@ -1,4 +1,4 @@
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 
 class ClassStorage(object):
     @staticmethod
@@ -33,7 +33,7 @@ class ClassStorage(object):
             if(source_fn is not None):
                 cls.__storage__[key] = source_fn()
             else:
-                raise excps.ApplicationError()
+                raise ex.ApplicationError()
         else:
             if(refresh_condition_fn is not None):
                 if(refresh_condition_fn(cls.__storage__[key])):

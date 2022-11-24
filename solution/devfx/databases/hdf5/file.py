@@ -1,5 +1,5 @@
 import h5py as hdf5
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 from .group_adapter import GroupAdapter
 
 class File(GroupAdapter):

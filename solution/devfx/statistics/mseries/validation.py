@@ -1,6 +1,6 @@
 import inspect as insp
 import functools as fnt
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .. import series
 
@@ -27,7 +27,7 @@ def is_mseries(data):
 """
 def validate_is_mseries(data):
     if(not is_mseries(data)):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
 
 def validate_args_is_mseries(*arg_names):
     def _(fn):

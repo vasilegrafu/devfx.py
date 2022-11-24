@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from . import validation
 
@@ -36,4 +36,4 @@ def split(data, delimeter):
     elif(core.is_typeof(delimeter, float)):
         return [get(data, slice(None, int(delimeter*count(data)))), get(data, slice(int(delimeter*count(data)), None))]
     else:
-        raise excps.NotSupportedError()
+        raise ex.NotSupportedError()

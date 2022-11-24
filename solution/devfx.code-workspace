@@ -13,7 +13,7 @@
 	
 		"python.linting.pylintEnabled": false,
 
-		"python.defaultInterpreterPath": "i:\\Installations\\WinPython64-3.8.3.0.dot\\WPy64-3830\\python-3.8.3.amd64\\python.exe",
+		"python.defaultInterpreterPath": "i:\\Installations\\Winpython64-3.10.8.0.dot\\WPy64-31080\\python-3.10.8.amd64\\python.exe",
 		"terminal.integrated.env.windows": {
 			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}"
 		},

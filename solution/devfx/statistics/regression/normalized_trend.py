@@ -1,15 +1,15 @@
 import numpy as np
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 
 """------------------------------------------------------------------------------------------------
 """
 def normalized_trend(x, y, n_max=None):
     if(len(x) < 2):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     if(len(y) < 2):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     if (not (len(x) == len(y))):
-        raise excps.ArgumentError()
+        raise ex.ArgumentError()
     if(n_max is None):
         n_max = len(x)
 

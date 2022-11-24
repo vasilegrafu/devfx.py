@@ -1,4 +1,4 @@
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 
 from .policy import Policy
 
@@ -81,7 +81,7 @@ class TabularPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, state, action, reward, next_state):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

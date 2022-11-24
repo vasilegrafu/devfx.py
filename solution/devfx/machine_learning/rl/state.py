@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .data import Data
 
@@ -13,10 +13,12 @@ class State(object):
     def __set_kind(self, kind):
         self.__kind = kind
 
-    @property
-    def kind(self):
+    def __get_kind(self):
         return self.__kind
 
+    @property
+    def kind(self):
+        return self.__get_kind()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -25,31 +27,37 @@ class State(object):
 
     def __get_data(self):
         return self.__data
-
+    
+    @property
+    def data(self):
+        return self.__get_data()
+    
+    """------------------------------------------------------------------------------------------------
+    """
     @property
     def value(self):
         return self.__get_data().value
-
+    
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return '(' + str(self.kind) + ', ' + str(self.__get_data()) + ')'
-
+        return '(' + str(self.__get_kind()) + ', ' + str(self.__get_data()) + ')'
+    
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, state):          
         if(not core.is_instance(state, State)):
-            raise excps.ArgumentError()    
+            raise ex.ArgumentError()    
 
-        return self.kind == state.kind and self.__get_data() == state.__get_data()
+        return (self.__get_kind() == state.__get_kind()) and (self.__get_data() == state.__get_data())
 
     def __hash__(self):
-        return hash((self.kind, self.__get_data()))
-
+        return hash((self.__get_kind(), self.__get_data()))
+    
     """------------------------------------------------------------------------------------------------
     """
-    def __setitem__(self, key, value):
-        self.__get_data()[key] = value
+    def __setitem__(self, key, item):
+        self.__get_data()[key] = item
 
     def __getitem__(self, key):
         return self.__get_data()[key]

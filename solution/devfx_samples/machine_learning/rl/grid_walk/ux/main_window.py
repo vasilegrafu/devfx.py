@@ -1,7 +1,7 @@
 import itertools
 import time
 import numpy as np
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
@@ -31,7 +31,7 @@ class MainWindow(ux.Window):
         self.grid_environment.setup()
         
         for grid_agent in self.grid_environment.get_agents():
-            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.get_id()))
+            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.id))
 
     """------------------------------------------------------------------------------------------------
     """
@@ -40,7 +40,7 @@ class MainWindow(ux.Window):
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
         self.agent_iteration_randomness_label = ux.Text(self, label='Randomness:') 
-        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.get_id()) + '|' + agent.get_name() for agent in self.grid_environment.get_agents()])
+        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.id) + '|' + agent.name for agent in self.grid_environment.get_agents()])
         self.agent_iteration_randomness_combobox.SetSelection(0)
         def agent_iteration_randomness_combobox__OnItemSelected(sender, event_args): 
             self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
@@ -113,66 +113,47 @@ class MainWindow(ux.Window):
     def __grid_canvas__OnDraw(self, sender, event_args):
         cgc = event_args.CGC
 
+        # scene
+        scene_shape = self.grid_environment.scene.shape
+        layer_shape = (scene_shape[1], scene_shape[2])
+        state_kind_layer = self.grid_environment.scene[0,:,:]
+        reward_layer = self.grid_environment.scene[1,:,:]
+        agent_layer = self.grid_environment.scene[2,:,:]
+
         # cell size
-        cw = cgc.GetSize()[0]/self.grid_environment.shape[0]
-        ch = cgc.GetSize()[1]/self.grid_environment.shape[1]
+        (cw, ch) = (cgc.GetSize()[0]/layer_shape[0], cgc.GetSize()[1]/layer_shape[1])
 
         # draw grid
-        for (ci, cc) in self.grid_environment.cells.items():
-            x = (ci[1] - 1)*cw 
-            y = (ci[0] - 1)*ch
-            w = cw
-            h = ch
-            if(cc[0] == ml.rl.StateKind.UNDEFINED):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
-            elif(cc[0] == ml.rl.StateKind.NON_TERMINAL):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
-            elif(cc[0] == ml.rl.StateKind.TERMINAL and cc[1] >= 0):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GREEN_BRUSH)
-            elif(cc[0] == ml.rl.StateKind.TERMINAL and cc[1] < 0):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
-            else:
-                raise excps.NotSupportedError()
+        for ci in np.ndindex(layer_shape):
+            (x, y, w, h) = (ci[1]*cw, ci[0]*ch, cw, ch)
+            if(state_kind_layer[ci] == ml.rl.StateKind.UNDEFINED):                              brush=ux.GRAY_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.NON_TERMINAL):                         brush=ux.WHITE_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] >= 0):   brush=ux.GREEN_BRUSH
+            elif(state_kind_layer[ci] == ml.rl.StateKind.TERMINAL and reward_layer[ci] < 0):    brush=ux.RED_BRUSH
+            else:                                                                               raise ex.NotSupportedError()
+            cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=brush)
 
         # draw rewards
-        for (ci, cc) in self.grid_environment.cells.items():
-            x = (ci[1] - 1)*cw + cw
-            y = (ci[0] - 1)*ch
-            cgc.DrawText(text=f'{cc[1]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
+        for ci in np.ndindex(layer_shape):
+            (x, y) = (ci[1]*cw + cw, ci[0]*ch)
+            cgc.DrawText(text=f'{reward_layer[ci]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
-            ci = agent.get_state().value
-            x = (ci[1] - 1)*cw + cw/2
-            y = (ci[0] - 1)*ch + ch/2
-            r = min(cw/4, ch/4)
+            ci = np.argwhere(agent.state.value[2,:,:] == 1)[0]
+            (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
         agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
-        policy = agent.get_policy()
-        for state in policy.get_states():
-            for action in policy.get_actions(state):
-                text = f'{policy.get_value(state, action):.2f}'
-                ci = state.value
-                if(action.name == 'LEFT'):
-                    x = (ci[1] - 1)*cw
-                    y = (ci[0] - 1)*ch + ch/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.LEFT, colour=ux.GRAY)
-                elif(action.name == 'RIGHT'):
-                    x = (ci[1] - 1)*cw + cw
-                    y = (ci[0] - 1)*ch + ch/2
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.RIGHT, colour=ux.GRAY)
-                elif(action.name == 'UP'):
-                    x = (ci[1] - 1)*cw + cw/2
-                    y = (ci[0] - 1)*ch
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.TOP, colour=ux.GRAY)
-                elif(action.name == 'DOWN'):
-                    x = (ci[1] - 1)*cw + cw/2
-                    y = (ci[0] - 1)*ch + ch
-                    cgc.DrawText(text=text, x=x, y=y, offx=4, offy=0, anchor=ux.BOTTOM, colour=ux.GRAY)
-                else:
-                    raise excps.NotImplementedError()
+        for (state, action, value) in agent.policy.iter:
+            ci = np.argwhere(state[2,:,:] == 1)[0]
+            if(action.name == 'LEFT'):      (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
+            elif(action.name == 'RIGHT'):   (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)
+            elif(action.name == 'UP'):      (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch, ux.TOP) 
+            elif(action.name == 'DOWN'):    (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch + ch, ux.BOTTOM)
+            else:                           raise ex.NotImplementedError()
+            cgc.DrawText(text=f'{value:.2f}', x=x, y=y, offx=4, offy=0, anchor=anchor, colour=ux.GRAY)
     
     """------------------------------------------------------------------------------------------------
     """

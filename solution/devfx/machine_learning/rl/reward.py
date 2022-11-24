@@ -1,4 +1,4 @@
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 
 class Reward(object):
@@ -10,23 +10,26 @@ class Reward(object):
     def __set_value(self, value):
         self.__value = value
 
+    def __get_value(self):
+        return self.__value
+
     @property
     def value(self):
-        return self.__value
+        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.value)
+        return str(self.__get_value())
 
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, reward):
         if(not core.is_instance(reward, Reward)):
-            raise excps.ArgumentError()
+            raise ex.ArgumentError()
 
-        return self.value == reward.value
+        return self.__get_value() == reward.__get_value()
 
     def __hash__(self):
-        return hash(self.value)
+        return hash(self.__get_value())
     

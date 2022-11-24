@@ -1,6 +1,6 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 from .action import Action
 
@@ -16,25 +16,29 @@ class Range(object):
     def __set_name(self, name):
         self.__name = name
 
-    @property
-    def name(self):
+    def __get_name(self):
         return self.__name
 
+    @property
+    def name(self):
+        return self.__get_name()
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_value(self, value):
         self.__value = value
 
-    @property
-    def value(self):
+    def __get_value(self):
         return self.__value
 
+    @property
+    def value(self):
+        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        raise excps.NotImplementedError()
+        raise ex.NotImplementedError()
 
 """================================================================================================
 """
@@ -45,8 +49,8 @@ class DiscreteRange(Range):
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        value = rnd.choice(self.value)
-        return value
+        random_value = rnd.choice(self.value)
+        return random_value
 
 
 """================================================================================================
@@ -58,8 +62,8 @@ class ContinousRange(Range):
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
-        value = rnd.uniform(self.value)
-        return value
+        random_value = rnd.uniform(self.value)
+        return random_value
     
 
 """================================================================================================
@@ -73,10 +77,12 @@ class ActionGenerator(object):
     def __set_ranges(self, ranges):
         self.__ranges = ranges
 
-    @property
-    def ranges(self):
+    def __get_ranges(self):
         return self.__ranges
 
+    @property
+    def ranges(self):
+        return self.__get_ranges()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -84,4 +90,4 @@ class ActionGenerator(object):
         return self._get_random()
 
     def _get_random(self):
-        raise excps.NotImplementedError()
+        return Action(name='unknown', value=[range.get_random() for range in self.__get_ranges()])

@@ -1,7 +1,7 @@
 import numpy as np
 import hashlib as hlib
 import random as rnd
-import devfx.exceptions as excps
+import devfx.exceptions as ex
 import devfx.core as core
 
 """================================================================================================
@@ -22,30 +22,33 @@ class Data(object):
     def __set_value(self, value):
         self.__value = value
 
+    def __get_value(self):
+        return self.__value
+
     @property
     def value(self):
-        return self.__value
+        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.value)
+        return str(self.__get_value())
 
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, data):
         if(not core.is_instance(data, Data)):
-            raise excps.ArgumentError()  
+            raise ex.ArgumentError()  
 
-        return (self.value == data.value).all()
-
+        return np.equal(self.__get_value(), data.__get_value()).all()
+    
     def __hash__(self):
         return self.__hash
 
     """------------------------------------------------------------------------------------------------
     """
-    def __setitem__(self, key, value):
-        self.value[key] = value
+    def __setitem__(self, key, item):
+        self.__get_value()[key] = item
 
     def __getitem__(self, key):
-        return self.value[key]
+        return self.__get_value()[key]
