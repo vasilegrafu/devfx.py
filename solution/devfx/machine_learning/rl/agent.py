@@ -167,10 +167,10 @@ class Agent(object):
 
     @property
     def iteration_randomness(self):
-        return self.__get_iteration_randomness()
+        return self.get_iteration_randomness()
     
     @iteration_randomness.setter
     def iteration_randomness(self, iteration_randomness):
-        return self.__set_iteration_randomness(iteration_randomness=iteration_randomness)
+        return self.set_iteration_randomness(iteration_randomness=iteration_randomness)
 
    

@@ -30,7 +30,7 @@ class MainWindow(ux.Window):
         self.grid_environment.setup()
         
         for grid_agent in self.grid_environment.get_agents():
-            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.get_id()))
+            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.id))
         
     """------------------------------------------------------------------------------------------------
     """
@@ -39,7 +39,7 @@ class MainWindow(ux.Window):
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
         self.agent_iteration_randomness_label = ux.Text(self, label='Randomness:') 
-        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.get_id()) + '|' + agent.get_name() for agent in self.grid_environment.get_agents()])
+        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.id) + '|' + agent.get_name() for agent in self.grid_environment.get_agents()])
         self.agent_iteration_randomness_combobox.SetSelection(0)
         def agent_iteration_randomness_combobox__OnItemSelected(sender, event_args): 
             self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())

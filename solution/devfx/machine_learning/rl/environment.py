@@ -48,9 +48,9 @@ class Environment(object):
 
 
     def remove_agent(self, agent):
-        if(agent.get_id() not in self.__agents_container):
+        if(agent.id not in self.__agents_container):
             raise ex.ApplicationError()
-        self.__agents_container.pop(agent.get_id())
+        self.__agents_container.pop(agent.id)
         self.on_removed_agent(agent)
 
     def on_removed_agent(self, agent):
@@ -87,7 +87,7 @@ class Environment(object):
         return agent
 
     def get_other_agents(self, id):
-        agents = [agent for (key, agent) in self.__agents_container.items() if(agent.get_id() != id)]
+        agents = [agent for (key, agent) in self.__agents_container.items() if(agent.id != id)]
         return agents
 
     """------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ class Environment(object):
             for agent in agents:
                 if(agent.is_in_non_terminal_state()):
                     rv = np.random.uniform(size=1)
-                    if(rv <= agent.get_iteration_randomness()):
+                    if(rv <= agent.iteration_randomness):
                         self.do_random_action(agent=agent)
                     else:
                         self.do_optimal_action(agent=agent)

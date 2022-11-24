@@ -36,6 +36,7 @@ class GridEnvironment(ml.rl.Environment):
         self.scene[0,1:-1,1:-1] = ml.rl.StateKind.NON_TERMINAL
         self.scene[0,2,2] = ml.rl.StateKind.UNDEFINED
         self.scene[0,3,3] = ml.rl.StateKind.UNDEFINED
+        self.scene[0,4,4] = ml.rl.StateKind.UNDEFINED
         self.scene[0,5,5] = ml.rl.StateKind.UNDEFINED
         self.scene[0,1,6] = ml.rl.StateKind.TERMINAL
         self.scene[0,2,6] = ml.rl.StateKind.TERMINAL
@@ -46,6 +47,7 @@ class GridEnvironment(ml.rl.Environment):
         self.scene[1,1:-1,1:-1] = 0
         self.scene[1,2,2] = -1
         self.scene[1,3,3] = -1
+        self.scene[1,4,4] = -1
         self.scene[1,5,5] = -1
         self.scene[1,1,6] = +1
         self.scene[1,2,6] = -1
@@ -62,9 +64,9 @@ class GridEnvironment(ml.rl.Environment):
             self.add_agent(GridAgent(id=1, 
                                      name='Johnny Walker 1', 
                                      kind=GridAgentKind.WALKER, 
+                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
                                      environment=self, 
                                      state=self.__get_initial_state(),
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
                                      iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
         else:
             self.get_agent(id=1).set_state(self.__get_initial_state())
