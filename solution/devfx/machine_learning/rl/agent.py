@@ -4,14 +4,15 @@ import devfx.core as core
 from .state_kind import StateKind
 
 class Agent(object):
-    def __init__(self, id, name, kind, policy, environment, state=None, iteration_randomness=0.0):
+    def __init__(self, id, name, kind, environment, state=None, policy=None):
         self.__set_id(id=id)
         self.__set_name(name=name)
         self.__set_kind(kind=kind)
-        self.__set_policy(policy=policy)
         self.__set_environment(environment=environment)
         self.set_state(state=state)
-        self.set_iteration_randomness(iteration_randomness=iteration_randomness)
+        self.set_policy(policy=policy)
+
+        self.__set_transitions_log(transitions_log=[])
 
     """------------------------------------------------------------------------------------------------
     """
@@ -90,87 +91,73 @@ class Agent(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __set_policy(self, policy):
+    def set_policy(self, policy):
         self.__policy = policy
 
-    def __get_policy(self):
+    def get_policy(self):
         return self.__policy
     
     @property
     def policy(self):
-        return self.__get_policy()
+        return self.get_policy()
+    
+    @policy.setter
+    def policy(self, policy):
+        return self.set_policy(policy=policy)
     
 
     def share_policy_from(self, agent):
-        policy = agent.__get_policy()
-        self.__set_policy(policy=policy)
+        policy = agent.get_policy()
+        self.set_policy(policy=policy)
 
     def share_policy_to(self, agent):
-        policy = self.__get_policy()
-        agent.__set_policy(policy=policy)
+        agent.share_policy_from(agent=self)
 
 
     def switch_policy_with(self, agent):
-        policy = agent.__get_policy()
-        agent.__set_policy(policy=self.__get_policy())
-        self.__set_policy(policy=policy)
+        policy = agent.get_policy()
+        agent.set_policy(policy=self.get_policy())
+        self.set_policy(policy=policy)
         
 
     def transfer_policy_from(self, agent):
-        policy = agent.__get_policy()
-        agent.__set_policy(policy=None)
-        self.__set_policy(policy=policy)
+        policy = agent.get_policy()
+        agent.set_policy(policy=None)
+        self.set_policy(policy=policy)
 
     def transfer_policy_to(self, agent):
-        policy = self.__get_policy()
-        self.__set_policy(policy=None)
-        agent.__set_policy(policy=policy)
-
-
-    def copy_policy_from(self, agent):
-        policy = agent.__get_policy().copy()
-        self.__set_policy(policy=policy)
-
-    def copy_policy_to(self, agent):
-        policy = self.__get_policy().copy()
-        agent.__set_policy(policy=policy)
+        agent.transfer_policy_from(agent=self)
 
     """------------------------------------------------------------------------------------------------
     """
     def learn(self, state, action, reward, next_state):
-        self.__get_policy().learn(state=state, action=action, reward=reward, next_state=next_state)
+        policy = self.get_policy()
+        policy.learn(state=state, action=action, reward=reward, next_state=next_state)
+
+    def learn_transitions_log(self, transitions_log):
+        policy = self.get_policy()
+        for (state, action, reward, next_state) in transitions_log:
+            policy.learn(state=state, action=action, reward=reward, next_state=next_state)
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_action(self, action):
+    def do_action(self, action=None):
         environment = self.__get_environment()
         (state, action, (reward, next_state)) = environment.do_action(agent=self, action=action)
         return (state, action, (reward, next_state))
-
-    def do_random_action(self):
+   
+    def do_transition(self, action, reward, next_state):
         environment = self.__get_environment()
-        (state, action, (reward, next_state)) = environment.do_random_action(agent=self)
-        return (state, action, (reward, next_state))
- 
-    def do_optimal_action(self):
-        environment = self.__get_environment()
-        (state, action, (reward, next_state)) = environment.do_optimal_action(agent=self)
-        return (state, action, (reward, next_state))
+        environment.do_transition(agent=self, action=action, reward=reward, next_state=next_state)
 
     """------------------------------------------------------------------------------------------------
     """
-    def set_iteration_randomness(self, iteration_randomness):
-        self.__iteration_randomness = iteration_randomness
+    def __set_transitions_log(self, transitions_log):
+        self.__transitions_log = transitions_log
 
-    def get_iteration_randomness(self):
-        return self.__iteration_randomness
+    def __get_transitions_log(self):
+        return self.__transitions_log
 
     @property
-    def iteration_randomness(self):
-        return self.get_iteration_randomness()
-    
-    @iteration_randomness.setter
-    def iteration_randomness(self, iteration_randomness):
-        return self.set_iteration_randomness(iteration_randomness=iteration_randomness)
-
-   
+    def transitions_log(self):
+        return self.__get_transitions_log()

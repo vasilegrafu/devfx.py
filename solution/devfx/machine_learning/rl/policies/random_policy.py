@@ -1,22 +1,24 @@
 import devfx.exceptions as ex
 from .policy import Policy
 
-class AproximatePolicy(Policy):
+class RandomPolicy(Policy):
     def __init__(self):
         super().__init__()
 
+        self._set_model(model=None)
+   
     """------------------------------------------------------------------------------------------------
-    """
+    """ 
     def _set_model(self, model):
-        raise ex.NotImplementedError()
+        self.__model = model
 
     def _get_model(self):
-        raise ex.NotImplementedError()
+        return self.__model
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, state, action, reward, next_state):
-        raise ex.NotImplementedError()
+        pass
 
     """------------------------------------------------------------------------------------------------
     """ 

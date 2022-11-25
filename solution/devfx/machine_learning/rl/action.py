@@ -4,8 +4,6 @@ import devfx.exceptions as ex
 import devfx.core as core
 from .data import Data
 
-"""================================================================================================
-"""
 class Action(object):
     def __init__(self, name, value, *args, **kwargs):
         self.__set_name(name=name)
@@ -31,6 +29,12 @@ class Action(object):
     def __get_data(self):
         return self.__data
 
+    @property
+    def data(self):
+        return self.__get_data()
+    
+    """------------------------------------------------------------------------------------------------
+    """
     @property
     def value(self):
         return self.__get_data().value

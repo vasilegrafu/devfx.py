@@ -24,34 +24,17 @@ class MainWindow(ux.Window):
     def __init_model(self):
         self.grid_environment_for_training = GridEnvironment()
         self.grid_environment_for_training.create()
-        self.grid_environment_for_training.setup(iteration_randomness=1.0)
+        self.grid_environment_for_training.setup(training=True)
 
         self.grid_environment = GridEnvironment()
         self.grid_environment.create()
         self.grid_environment.setup()
         
-        for grid_agent in self.grid_environment.get_agents():
-            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.id))
-
     """------------------------------------------------------------------------------------------------
     """
     def __init_widgets(self):
         self.grid_canvas = ux.Canvas(self, size=(64, 64))
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
-
-        self.agent_iteration_randomness_label = ux.Text(self, label='Randomness:') 
-        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.id) + '|' + agent.name for agent in self.grid_environment.get_agents()])
-        self.agent_iteration_randomness_combobox.SetSelection(0)
-        def agent_iteration_randomness_combobox__OnItemSelected(sender, event_args): 
-            self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
-            self.grid_canvas.UpdateDrawing()
-        self.agent_iteration_randomness_combobox.OnItemSelected += agent_iteration_randomness_combobox__OnItemSelected
-        self.agent_iteration_randomness_spinbox = ux.FloatSpinBox(self, min=0.0, max=1.0, initial=0.0, inc=0.05, size=(64, -1))
-        self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
-        def agent_iteration_randomness_spinbox_OnValueChanged(sender, event_args): 
-            self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).set_iteration_randomness(self.agent_iteration_randomness_spinbox.GetValue())
-            self.grid_canvas.UpdateDrawing()
-        self.agent_iteration_randomness_spinbox.OnValueChanged += agent_iteration_randomness_spinbox_OnValueChanged
 
         self.train_button = ux.Button(parent=self, label='Train')
         self.train_button.OnPress += self.__train_button__OnPress
@@ -91,10 +74,6 @@ class MainWindow(ux.Window):
         # 
         self.grid_canvas.AddToSizer(self.grid_sizer, pos=(0, 0), flag=ux.ALIGN_CENTER | ux.SHAPED)
 
-        self.agent_iteration_randomness_label.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
-        self.agent_iteration_randomness_combobox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-        self.agent_iteration_randomness_spinbox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
- 
         self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT)
         self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
         self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
@@ -145,7 +124,7 @@ class MainWindow(ux.Window):
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
-        agent = self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0]))
+        agent = self.grid_environment.get_agent(id=1)
         for (state, action, value) in agent.policy.iter:
             ci = np.argwhere(state[2,:,:] == 1)[0]
             if(action.name == 'LEFT'):      (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
@@ -168,6 +147,11 @@ class MainWindow(ux.Window):
                 sw = dgn.Stopwatch().start()
                 n = 1000
                 self.grid_environment_for_training.do_iterations(n)
+
+                agent_for_training = self.grid_environment_for_training.get_agent(id=1)
+                agent = self.grid_environment.get_agent(id=1)
+                agent.learn_transitions_log(agent_for_training)
+
                 N += n
                 self.train_count_text.Label = str(N)
                 self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)

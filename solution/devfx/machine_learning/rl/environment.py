@@ -92,35 +92,31 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_action(self, agent, action):   
-        state = agent.get_state()
-
-        is_terminal_state = state.kind == StateKind.TERMINAL
+    def do_action(self, agent, action=None):   
+        is_terminal_state = agent.is_in_terminal_state()
         if(is_terminal_state):
             raise ex.ApplicationError()
+        
+        state = agent.get_state()
+        
+        if(action is None):
+            action = agent.policy.get_action(state=state)
+
+        if(action is None):
+            return (state, None, (None, None))
 
         (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
-        agent.set_state(state=next_state)
 
+        self.do_transition(agent=agent, action=action, reward=reward, next_state=next_state)
+
+        return (state, action, (reward, next_state))
+
+    def do_transition(self, agent, action, reward, next_state):
+        state = agent.get_state()
+        agent.set_state(state=next_state)
         agent.learn(state=state, action=action, reward=reward, next_state=next_state)
 
-        return (state, action, (reward, next_state))
-
-    def do_random_action(self, agent):
-        action = self.get_random_action(agent=agent)
-        if(action is None):
-            state = agent.get_state()
-            return (state, None, (None, None))
-        (state, action, (reward, next_state)) = self.do_action(agent=agent, action=action)
-        return (state, action, (reward, next_state))
- 
-    def do_optimal_action(self, agent):
-        (action, value) = agent.policy.get_optimal_action(state=agent.get_state())
-        if(action is None):
-            state = agent.get_state()
-            return (state, None, (None, None))
-        (state, action, (reward, next_state)) = self.do_action(agent=agent, action=action)
-        return (state, action, (reward, next_state))
+        agent.transitions_log.append((state, action, reward, next_state))
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -135,11 +131,7 @@ class Environment(object):
                 agents = self.get_agents()
             for agent in agents:
                 if(agent.is_in_non_terminal_state()):
-                    rv = np.random.uniform(size=1)
-                    if(rv <= agent.iteration_randomness):
-                        self.do_random_action(agent=agent)
-                    else:
-                        self.do_optimal_action(agent=agent)
+                    self.do_action(agent=agent)
                 elif(agent.is_in_terminal_state()):
                     pass
                 else:
@@ -174,13 +166,6 @@ class Environment(object):
     def get_reward(self, agent, action):
         (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
         return reward
-        
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def get_random_action(self, agent):
-        return self._get_random_action(agent=agent)
 
-    def _get_random_action(self, agent):
-        raise ex.NotImplementedError()
 
 

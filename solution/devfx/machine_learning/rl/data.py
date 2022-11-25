@@ -4,8 +4,6 @@ import random as rnd
 import devfx.exceptions as ex
 import devfx.core as core
 
-"""================================================================================================
-"""
 class Data(object):
     def __init__(self, value, *args, **kwargs):
         if(core.is_instance(value, Data)):

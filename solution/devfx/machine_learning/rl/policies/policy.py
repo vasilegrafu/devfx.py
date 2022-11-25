@@ -1,10 +1,9 @@
 import pickle as pckl
 import devfx.exceptions as ex
-from ..state_kind import StateKind
 
 class Policy(object):
-    def __init__(self, discount_factor):
-        self.__discount_factor = discount_factor
+    def __init__(self):
+        pass
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -13,6 +12,10 @@ class Policy(object):
 
     def _get_model(self):
         raise ex.NotImplementedError()
+    
+    @property
+    def model(self):
+        return self._get_model()
 
 
     def share_model_from(self, policy):
@@ -36,23 +39,7 @@ class Policy(object):
 
     def transfer_model_to(self, policy):
         policy.transfer_model_from(policy=self)
-
-
-    def copy_model_from(self, policy):
-        model = pckl.loads(pckl.dumps(policy._get_model(), protocol=pckl.HIGHEST_PROTOCOL))
-        self._set_model(model=model)
-
-    def copy_model_to(self, policy):
-        policy.copy_model_from(policy=self)
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def get_discount_factor(self):
-        return self.__discount_factor
-
-    def set_discount_factor(self, discount_factor):
-        self.__discount_factor = discount_factor
-        
+       
     """------------------------------------------------------------------------------------------------
     """ 
     def learn(self, state, action, reward, next_state):
@@ -63,21 +50,11 @@ class Policy(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_optimal_action(self, state):
-        is_terminal_state = state.kind == StateKind.TERMINAL
-        if(is_terminal_state):
-            raise ex.ApplicationError()
+    def get_action(self, state):
+        return self._get_action(state=state)
 
-        action_value = self._get_optimal_action(state=state)
-        return action_value
-
-    def _get_optimal_action(self, state):
+    def _get_action(self, state):
         raise ex.NotImplementedError()
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def copy(self):
-        return pckl.loads(pckl.dumps(self, protocol=pckl.HIGHEST_PROTOCOL))
 
 
 

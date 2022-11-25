@@ -1,32 +1,28 @@
 import numpy as np
 import random as rnd
-import itertools as it
-import devfx.core as core
-import devfx.exceptions as ex
 import devfx.machine_learning as ml
 
-from .grid_agent_action_generator import GridAgentActionGenerator
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
+from .grid_agent_random_policy import GridAgentRandomPolicy
 
-"""========================================================================================================
-"""
 class GridEnvironment(ml.rl.Environment):
     def __init__(self):
         super().__init__()
 
         self.__set_scene(scene=np.zeros(shape=(3, 8, 8), dtype=np.int8))
 
-        self.__actionGenerator = GridAgentActionGenerator()
-
     """------------------------------------------------------------------------------------------------
     """
     def __set_scene(self, scene):
         self.__scene = scene
 
+    def __get_scene(self):
+        return self.__scene
+
     @property
     def scene(self):
-        return self.__scene
+        return self.__get_scene()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -59,15 +55,14 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _setup(self, iteration_randomness=None):
+    def _setup(self, training=False):
         if(not self.exists_agent(id=1)):
             self.add_agent(GridAgent(id=1, 
                                      name='Johnny Walker 1', 
                                      kind=GridAgentKind.WALKER, 
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
+                                     policy=GridAgentRandomPolicy() if training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=5e-1),
                                      environment=self, 
-                                     state=self.__get_initial_state(),
-                                     iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
+                                     state=self.__get_initial_state()))
         else:
             self.get_agent(id=1).set_state(self.__get_initial_state())
 
@@ -95,14 +90,10 @@ class GridEnvironment(ml.rl.Environment):
             scene = self.scene.copy()
             scene[2, next_ci[0], next_ci[1]] = +1
             next_state = ml.rl.State(scene[0, next_ci[0], next_ci[1]], scene)
-        reward = ml.rl.Reward(self.scene[1, next_ci[0], next_ci[1]].item())
+        reward = ml.rl.Reward(self.scene[1, next_ci[0], next_ci[1]])
+        if(reward.value == 1):
+            pass
         return (reward, next_state)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _get_random_action(self, agent):
-        action = self.__actionGenerator.get_random()
-        return action
 
 
 
