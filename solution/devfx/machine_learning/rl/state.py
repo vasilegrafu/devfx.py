@@ -1,6 +1,7 @@
 import numpy as np
 import devfx.exceptions as ex
 import devfx.core as core
+from .state_kind import StateKind
 from .data import Data
 
 class State(object):
@@ -15,6 +16,18 @@ class State(object):
 
     def get_kind(self):
         return self.__kind
+    
+    def is_undefined(self):
+        is_undefined = self.get_kind() == StateKind.UNDEFINED
+        return is_undefined
+
+    def is_non_terminal(self):
+        is_non_terminal = self.get_kind() == StateKind.NON_TERMINAL
+        return is_non_terminal
+
+    def is_terminal(self):
+        is_terminal = self.get_kind() == StateKind.TERMINAL
+        return is_terminal
 
     """------------------------------------------------------------------------------------------------
     """

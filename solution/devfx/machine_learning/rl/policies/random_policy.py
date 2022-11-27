@@ -3,12 +3,20 @@ from .policy import Policy
 
 class RandomPolicy(Policy):
     def __init__(self):
-        super().__init__(model=None)
+        super().__init__()
   
     """------------------------------------------------------------------------------------------------
     """ 
+    def _setup_model(self):
+        self.__model = None
+   
+    def _get_model(self):
+        return self.__model
+
+    """------------------------------------------------------------------------------------------------
+    """ 
     def _learn(self, transitions):
-        pass
+        raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 

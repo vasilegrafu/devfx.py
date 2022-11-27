@@ -6,22 +6,26 @@ import devfx.core as core
 
 class Data(object):
     def __init__(self, value, *args, **kwargs):
-        if(core.is_instance(value, Data)):
-            self.__set_value(value=value.value)
-        elif(core.is_instance(value, np.ndarray)):
-            self.__set_value(value=value)
-        else:
-            self.__set_value(value=np.array(value, *args, **kwargs))
-
-        self.__hash = int(hlib.md5(self.get_value().view(np.uint8)).hexdigest(), 16)
+        self.__setup_value(value, *args, **kwargs)
+        self.__setup_hash()
 
     """------------------------------------------------------------------------------------------------
     """
-    def __set_value(self, value):
-        self.__value = value
+    def __setup_value(self, value, *args, **kwargs):
+        if(core.is_instance(value, Data)):
+            self.__value = value.value
+        elif(core.is_instance(value, np.ndarray)):
+            self.__value = value
+        else:
+            self.__value = np.array(value, *args, **kwargs)
 
     def get_value(self):
         return self.__value
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __setup_hash(self):
+        self.__hash = int(hlib.md5(self.get_value().view(np.uint8)).hexdigest(), 16)
 
     """------------------------------------------------------------------------------------------------
     """

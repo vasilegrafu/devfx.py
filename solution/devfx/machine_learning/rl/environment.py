@@ -7,7 +7,7 @@ from .state_kind import StateKind
 
 class Environment(object):
     def __init__(self):
-        self.__agents_container = {}
+        self.__setup_agents_container()
 
     """------------------------------------------------------------------------------------------------
     """    
@@ -33,6 +33,11 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
+    def __setup_agents_container(self):
+        self.__agents_container = {}
+
+    """------------------------------------------------------------------------------------------------
+    """ 
     def add_agents(self, agents):
         for agent in agents:
             if(agent.get_id() in self.__agents_container):
@@ -42,9 +47,6 @@ class Environment(object):
             self.__agents_container[agent.get_id()] = agent
             agent.set_environment(environment=self)
         
-        for agent in agents:
-            agent.set_state(state=self.get_initial_state(agent=agent))
-
         self._on_added_agents(agents=agents)
        
     def _on_added_agents(self, agents):
@@ -62,9 +64,6 @@ class Environment(object):
         for agent in agents: 
             self.__agents_container.pop(agent.get_id())
             agent.set_environment(environment=None)
-        
-        for agent in agents: 
-            agent.set_state(state=None)
 
         self._on_removed_agents(agents=agents)
        
@@ -123,24 +122,17 @@ class Environment(object):
             self.do_iteration(agents=agents)
 
     """------------------------------------------------------------------------------------------------
-    """ 
-    def get_initial_state(self, agent):
-        state = self._get_initial_state(agent=agent)
-        return state
-
-    def _get_initial_state(self, agent):
-        raise ex.NotImplementedError()
-
-    
-    def get_reward_and_next_state(self, agent, action):
+    """    
+    def do_action(self, agent, action):
         is_terminal_state = agent.is_in_terminal_state()
         if(is_terminal_state):
             raise ex.ApplicationError()
         
-        (reward, next_state) = self._get_reward_and_next_state(agent=agent, action=action)
+        (reward, next_state) = self._do_action(agent=agent, action=action)
+
         return (reward, next_state)
         
-    def _get_reward_and_next_state(self, agent, action):
+    def _do_action(self, agent, action):
         raise ex.NotImplementedError()
 
 

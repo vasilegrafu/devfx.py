@@ -45,7 +45,7 @@ class QLearningPolicy(TabularPolicy):
     """------------------------------------------------------------------------------------------------
     """
     def _get_action(self, state):
-        is_terminal_state = state.get_kind() == StateKind.TERMINAL
+        is_terminal_state = state.is_terminal()
         if(is_terminal_state):
             raise ex.ApplicationError()
     

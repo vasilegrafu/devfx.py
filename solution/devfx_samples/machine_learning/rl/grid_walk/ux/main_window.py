@@ -91,44 +91,41 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # scene
-        scene_layer_shape = self.grid_environment.scene_layer_shape
-        state_kind_scene_layer = self.grid_environment.state_kind_scene_layer
-        reward_scene_layer = self.grid_environment.reward_scene_layer
-        agent_scene_layer = self.grid_environment.agent_scene_layer
+        scene = self.grid_environment.get_scene()
 
         # cell size
-        (cw, ch) = (cgc.GetSize()[0]/scene_layer_shape[0], cgc.GetSize()[1]/scene_layer_shape[1])
+        (cw, ch) = (cgc.GetSize()[0]/scene.shape[1:3][0], cgc.GetSize()[1]/scene.shape[1:3][1])
 
         # draw grid
-        for ci in np.ndindex(scene_layer_shape):
+        for ci in np.ndindex(scene.shape[1:3]):
             (x, y, w, h) = (ci[1]*cw, ci[0]*ch, cw, ch)
-            if(state_kind_scene_layer[ci] == ml.rl.StateKind.UNDEFINED):                                    brush=ux.GRAY_BRUSH
-            elif(state_kind_scene_layer[ci] == ml.rl.StateKind.NON_TERMINAL):                               brush=ux.WHITE_BRUSH
-            elif(state_kind_scene_layer[ci] == ml.rl.StateKind.TERMINAL and reward_scene_layer[ci] >= 0):   brush=ux.GREEN_BRUSH
-            elif(state_kind_scene_layer[ci] == ml.rl.StateKind.TERMINAL and reward_scene_layer[ci] < 0):    brush=ux.RED_BRUSH
-            else:                                                                               raise ex.NotSupportedError()
+            if(scene[0, ci[0], ci[1]] == ml.rl.StateKind.UNDEFINED):                                    brush=ux.GRAY_BRUSH
+            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.NON_TERMINAL):                               brush=ux.WHITE_BRUSH
+            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.TERMINAL and scene[1, ci[0], ci[1]] >= 0):   brush=ux.GREEN_BRUSH
+            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.TERMINAL and scene[1, ci[0], ci[1]] < 0):    brush=ux.RED_BRUSH
+            else:                                                                                       raise ex.NotSupportedError()
             cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=brush)
 
         # draw rewards
-        for ci in np.ndindex(scene_layer_shape):
+        for ci in np.ndindex(scene.shape[1:3]):
             (x, y) = (ci[1]*cw + cw, ci[0]*ch)
-            cgc.DrawText(text=f'{reward_scene_layer[ci]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
+            cgc.DrawText(text=f'{scene[1, ci[0], ci[1]]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
-            ci = np.argwhere(agent.get_state().get_value()[2,:,:] == 1)[0]
+            ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
             (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
             cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
         agent = self.grid_environment.get_agent(id=1)
         for (state, action, value) in agent.get_policy().iter:
-            ci = np.argwhere(state[2,:,:] == 1)[0]
-            if(action.get_name() == 'LEFT'):      (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
-            elif(action.get_name() == 'RIGHT'):   (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)
-            elif(action.get_name() == 'UP'):      (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch, ux.TOP) 
-            elif(action.get_name() == 'DOWN'):    (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch + ch, ux.BOTTOM)
-            else:                           raise ex.NotImplementedError()
+            ci = np.argwhere(state[2,:,:] == agent.get_id())[0]
+            if(action.get_name() == 'LEFT'):    (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
+            elif(action.get_name() == 'RIGHT'): (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)
+            elif(action.get_name() == 'UP'):    (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch, ux.TOP) 
+            elif(action.get_name() == 'DOWN'):  (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch + ch, ux.BOTTOM)
+            else:                               raise ex.NotImplementedError()
             cgc.DrawText(text=f'{value:.2f}', x=x, y=y, offx=4, offy=0, anchor=anchor, colour=ux.GRAY)
     
     """------------------------------------------------------------------------------------------------
@@ -147,8 +144,8 @@ class MainWindow(ux.Window):
 
                 agent_for_training = self.grid_environment_for_training.get_agent(id=1)
                 agent = self.grid_environment.get_agent(id=1)
-                agent.get_policy().learn(transitions=agent_for_training.get_policy().get_logged_transitions())
-                agent_for_training.get_policy().clear_logged_transitions()
+                agent.learn(transitions=agent_for_training.get_logged_transitions())
+                agent_for_training.clear_logged_transitions()
 
                 N += n
                 self.train_count_text.Label = str(N)

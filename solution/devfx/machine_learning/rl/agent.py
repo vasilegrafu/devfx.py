@@ -1,14 +1,15 @@
 import numpy as np
 import devfx.exceptions as ex
 import devfx.core as core
-from .state_kind import StateKind
 
 class Agent(object):
     def __init__(self, id, name, kind, policy):
         self.__set_id(id=id)
         self.__set_name(name=name)
         self.__set_kind(kind=kind)
-        self.set_policy(policy=policy)  
+        self.__set_policy(policy=policy)  
+
+        self.__setup_transitions_log()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -35,35 +36,8 @@ class Agent(object):
         return self.__kind
     
     """------------------------------------------------------------------------------------------------
-    """ 
-    def set_environment(self, environment):
-        self.__environment = environment
-                
-    def get_environment(self):
-        return self.__environment
-           
-    """------------------------------------------------------------------------------------------------
     """
-    def set_state(self, state):
-        self.__state = state
-      
-    def get_state(self):
-        return self.__state   
-    
-
-    def is_in_non_terminal_state(self):
-        state = self.get_state()
-        is_in_non_terminal_state = state.get_kind() == StateKind.NON_TERMINAL
-        return is_in_non_terminal_state
-
-    def is_in_terminal_state(self):
-        state = self.get_state()
-        is_in_terminal_state = state.get_kind() == StateKind.TERMINAL
-        return is_in_terminal_state
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def set_policy(self, policy):
+    def __set_policy(self, policy):
         self.__policy = policy
 
     def get_policy(self):
@@ -91,12 +65,44 @@ class Agent(object):
 
     def transfer_policy_to(self, agent):
         agent.transfer_policy_from(agent=self)
-       
+    
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def set_environment(self, environment):
+        self.__environment = environment
+                
+    def get_environment(self):
+        return self.__environment
+           
+    """------------------------------------------------------------------------------------------------
+    """
+    def set_state(self, state):
+        self.__state = state
+      
+    def get_state(self):
+        return self.__state   
+    
+
+    def is_in_undeifned_state(self):
+        state = self.get_state()
+        is_undefined_state = state.is_undefined()
+        return is_undefined_state
+    
+    def is_in_non_terminal_state(self):
+        state = self.get_state()
+        is_non_terminal_state = state.is_non_terminal()
+        return is_non_terminal_state
+
+    def is_in_terminal_state(self):
+        state = self.get_state()
+        is_terminal_state = state.is_terminal()
+        return is_terminal_state
+      
     """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self, action=None):   
-        is_terminal_state = self.is_in_terminal_state()
-        if(is_terminal_state):
+        is_in_terminal_state = self.is_in_terminal_state()
+        if(is_in_terminal_state):
             raise ex.ApplicationError()
 
         state = self.get_state()
@@ -107,12 +113,40 @@ class Agent(object):
         if(action is None):
             return None
 
-        (reward, next_state) = self.get_environment().get_reward_and_next_state(agent=self, action=action)
+        (reward, next_state) = self.get_environment().do_action(agent=self, action=action)
 
         self.set_state(state=next_state)
 
         transition = (state, action, (reward, next_state))
 
-        self.get_policy().log_transition(transition=transition)
+        self.log_transition(transition=transition)
         
         return transition
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def learn(self, transitions):
+        self.get_policy().learn(transitions=transitions)
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def __setup_transitions_log(self):
+        self.__transitions_log = []
+
+    def log_transition(self, transition):
+        self.__transitions_log.append(transition)
+
+    def log_transitions(self, transitions):
+        for transition in transitions:
+            self.log_transition(transition=transition)
+
+    def get_logged_transitions(self, n=None):
+        if(n is None):
+            n = len(self.__transitions_log)
+        return self.__transitions_log[0:n]
+
+    def clear_logged_transitions(self):
+        return self.__transitions_log.clear()
+
+    def learn_from_logged_transitions(self):
+        self.get_policy().learn(transitions=self.__transitions_log)

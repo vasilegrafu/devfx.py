@@ -4,8 +4,16 @@ from .policy import Policy
 
 class TabularPolicy(Policy):
     def __init__(self):
-        super().__init__(model={})
+        super().__init__()
   
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _setup_model(self):
+        self.__model = {}
+   
+    def _get_model(self):
+        return self.__model
+
     """------------------------------------------------------------------------------------------------
     """
     @property

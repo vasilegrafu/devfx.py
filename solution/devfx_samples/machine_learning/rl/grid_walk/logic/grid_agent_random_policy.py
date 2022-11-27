@@ -6,12 +6,20 @@ class GridAgentRandomPolicy(ml.rl.RandomPolicy):
     def __init__(self):
         super().__init__()
 
-        self.__actionGenerator = GridAgentActionGenerator()
+        self.__setup_action_cenerator()
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __setup_action_cenerator(self):
+        self.__action_generator = GridAgentActionGenerator()
+
+    def __get_action_cenerator(self):
+        return self.__action_generator
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_action(self, state):
-        action = self.__actionGenerator.get_random()
+        action = self.__get_action_cenerator().get_random()
         return action
 
         
