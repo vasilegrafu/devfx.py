@@ -14,35 +14,26 @@ class Action(object):
     def __set_name(self, name):
         self.__name = name
 
-    def __get_name(self):
+    def get_name(self):
         return self.__name
-
-    @property
-    def name(self):
-        return self.__get_name()
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_data(self, data):
         self.__data = data
 
-    def __get_data(self):
+    def get_data(self):
         return self.__data
 
-    @property
-    def data(self):
-        return self.__get_data()
-    
     """------------------------------------------------------------------------------------------------
     """
-    @property
-    def value(self):
-        return self.__get_data().value
+    def get_value(self):
+        return self.get_data().get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return '(' + str(self.__get_name()) + ', ' + str(self.__get_data()) + ')'   
+        return '(' + str(self.get_name()) + ', ' + str(self.get_data()) + ')'   
 
     """------------------------------------------------------------------------------------------------
     """
@@ -50,15 +41,15 @@ class Action(object):
         if(not core.is_instance(action, Action)):
             raise ex.ArgumentError()  
 
-        return (self.__get_name() == action.__get_name()) and (self.__get_data() == action.__get_data())
+        return (self.get_name() == action.get_name()) and (self.get_data() == action.get_data())
 
     def __hash__(self):
-        return hash(self.__get_data())
+        return hash(self.get_data())
     
     """------------------------------------------------------------------------------------------------
     """
     def __setitem__(self, key, item):
-        self.__get_data()[key] = item
+        self.get_data()[key] = item
 
     def __getitem__(self, key):
-        return self.__get_data()[key]
+        return self.get_data()[key]

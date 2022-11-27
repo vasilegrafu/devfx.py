@@ -9,4 +9,4 @@ class GridAgentActionGenerator(ml.rl.ActionGenerator):
                                 ])
 
     def _get_random(self):
-        return ml.rl.Action(*self.ranges[0].get_random())
+        return ml.rl.Action(*self.get_ranges()[0].get_random())

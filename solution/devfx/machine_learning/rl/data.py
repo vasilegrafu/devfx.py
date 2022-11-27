@@ -13,24 +13,20 @@ class Data(object):
         else:
             self.__set_value(value=np.array(value, *args, **kwargs))
 
-        self.__hash = int(hlib.md5(self.value.view(np.uint8)).hexdigest(), 16)
+        self.__hash = int(hlib.md5(self.get_value().view(np.uint8)).hexdigest(), 16)
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_value(self, value):
         self.__value = value
 
-    def __get_value(self):
+    def get_value(self):
         return self.__value
-
-    @property
-    def value(self):
-        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.__get_value())
+        return str(self.get_value())
 
     """------------------------------------------------------------------------------------------------
     """
@@ -38,7 +34,7 @@ class Data(object):
         if(not core.is_instance(data, Data)):
             raise ex.ArgumentError()  
 
-        return np.equal(self.__get_value(), data.__get_value()).all()
+        return np.equal(self.get_value(), data.get_value()).all()
     
     def __hash__(self):
         return self.__hash
@@ -46,7 +42,7 @@ class Data(object):
     """------------------------------------------------------------------------------------------------
     """
     def __setitem__(self, key, item):
-        self.__get_value()[key] = item
+        self.get_value()[key] = item
 
     def __getitem__(self, key):
-        return self.__get_value()[key]
+        return self.get_value()[key]

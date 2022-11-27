@@ -13,35 +13,26 @@ class State(object):
     def __set_kind(self, kind):
         self.__kind = kind
 
-    def __get_kind(self):
+    def get_kind(self):
         return self.__kind
-
-    @property
-    def kind(self):
-        return self.__get_kind()
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_data(self, data):
         self.__data = data
 
-    def __get_data(self):
+    def get_data(self):
         return self.__data
-    
-    @property
-    def data(self):
-        return self.__get_data()
     
     """------------------------------------------------------------------------------------------------
     """
-    @property
-    def value(self):
-        return self.__get_data().value
+    def get_value(self):
+        return self.get_data().get_value()
     
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return '(' + str(self.__get_kind()) + ', ' + str(self.__get_data()) + ')'
+        return '(' + str(self.get_kind()) + ', ' + str(self.get_data()) + ')'
     
     """------------------------------------------------------------------------------------------------
     """
@@ -49,15 +40,15 @@ class State(object):
         if(not core.is_instance(state, State)):
             raise ex.ArgumentError()    
 
-        return (self.__get_kind() == state.__get_kind()) and (self.__get_data() == state.__get_data())
+        return (self.get_kind() == state.get_kind()) and (self.get_data() == state.get_data())
 
     def __hash__(self):
-        return hash((self.__get_kind(), self.__get_data()))
+        return hash((self.get_kind(), self.get_data()))
     
     """------------------------------------------------------------------------------------------------
     """
     def __setitem__(self, key, item):
-        self.__get_data()[key] = item
+        self.get_data()[key] = item
 
     def __getitem__(self, key):
-        return self.__get_data()[key]
+        return self.get_data()[key]

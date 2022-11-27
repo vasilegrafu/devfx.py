@@ -3,20 +3,12 @@ from .policy import Policy
 
 class AproximatePolicy(Policy):
     def __init__(self):
-        super().__init__()
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _set_model(self, model):
-        raise ex.NotImplementedError()
-
-    def _get_model(self):
-        raise ex.NotImplementedError()
+        super().__init__(model=None)
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _learn(self, state, action, reward, next_state):
-        raise ex.NotImplementedError()
+    def _learn(self, transitions):
+        pass
 
     """------------------------------------------------------------------------------------------------
     """ 

@@ -10,113 +10,95 @@ class Environment(object):
         self.__agents_container = {}
 
     """------------------------------------------------------------------------------------------------
-    """ 
-    def create(self, *args, **kwargs):
-        self._create(*args, **kwargs)
-
-    def _create(self, *args, **kwargs):
-        raise ex.NotImplementedError()
-
-    
+    """    
     def setup(self, *args, **kwargs):
         return self._setup(*args, **kwargs)
 
     def _setup(self, *args, **kwargs):
-        raise ex.NotImplementedError()     
+        pass   
 
 
-    def destroy(self, *args, **kwargs):
-        self._destroy(*args, **kwargs)
+    def reset(self, *args, **kwargs):
+        return self._reset(*args, **kwargs)
 
-    def _destroy(self, *args, **kwargs):
-        for agent in self.get_agents():                
-            self.remove_agent(agent)
+    def _reset(self, *args, **kwargs):
+        pass 
+    
+
+    def cleanup(self, *args, **kwargs):
+        return self._cleanup(*args, **kwargs)
+
+    def _cleanup(self, *args, **kwargs):
+        pass 
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def add_agent(self, agent):
-        if(agent.id in self.__agents_container):
-            raise ex.ApplicationError()
-        self.__agents_container[agent.id] = agent
-        self.on_added_agent(agent)
-
-    def on_added_agent(self, agent):
-        self._on_added_agent(agent=agent)
+    def add_agents(self, agents):
+        for agent in agents:
+            if(agent.get_id() in self.__agents_container):
+                raise ex.ApplicationError()
+            
+        for agent in agents:
+            self.__agents_container[agent.get_id()] = agent
+            agent.set_environment(environment=self)
         
-    def _on_added_agent(self, agent):
-        raise ex.NotImplementedError()
+        for agent in agents:
+            agent.set_state(state=self.get_initial_state(agent=agent))
+
+        self._on_added_agents(agents=agents)
+       
+    def _on_added_agents(self, agents):
+        pass
 
 
-    def remove_agent(self, agent):
-        if(agent.id not in self.__agents_container):
-            raise ex.ApplicationError()
-        self.__agents_container.pop(agent.id)
-        self.on_removed_agent(agent)
-
-    def on_removed_agent(self, agent):
-        self._on_removed_agent(agent=agent)
+    def remove_agents(self, agents=None):
+        if(agents is None):
+            agents = self.get_agents()
+            
+        for agent in agents:    
+            if(agent.get_id()not in self.__agents_container):
+                raise ex.ApplicationError()
+            
+        for agent in agents: 
+            self.__agents_container.pop(agent.get_id())
+            agent.set_environment(environment=None)
         
-    def _on_removed_agent(self, agent):
-        raise ex.NotImplementedError()
+        for agent in agents: 
+            agent.set_state(state=None)
+
+        self._on_removed_agents(agents=agents)
+       
+    def _on_removed_agents(self, agents):
+        pass
 
 
     def get_agents(self):
-        agents = [agent for (_, agent) in self.__agents_container.items()]
+        agents = [agent for agent in self.__agents_container.values()]
         return agents
-
-
-    def get_agents_like(self, kind):
-        agents = [agent for (_, agent) in self.__agents_container.items() if(agent.kind == kind)]
-        return agents
-
-    def get_agents_not_like(self, kind):
-        agents = [agent for (_, agent) in self.__agents_container.items() if(agent.kind != kind)]
-        return agents
-
+    
 
     def exists_agent(self, id):
-        if(id not in self.__agents_container):
-            return False
-        return True
+        return id in self.__agents_container
 
-
+    
     def get_agent(self, id):
         if(id not in self.__agents_container):
             raise ex.ApplicationError()
         agent = self.__agents_container[id]
         return agent
 
-    def get_other_agents(self, id):
-        agents = [agent for (key, agent) in self.__agents_container.items() if(agent.id != id)]
+    def get_agents_others_than(self, id):
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_id()!= id)]
         return agents
 
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def do_action(self, agent, action=None):   
-        is_terminal_state = agent.is_in_terminal_state()
-        if(is_terminal_state):
-            raise ex.ApplicationError()
-        
-        state = agent.get_state()
-        
-        if(action is None):
-            action = agent.policy.get_action(state=state)
 
-        if(action is None):
-            return (state, None, (None, None))
+    def get_agents_of_kind(self, kind):
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_kind() == kind)]
+        return agents
 
-        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
-
-        self.do_transition(agent=agent, action=action, reward=reward, next_state=next_state)
-
-        return (state, action, (reward, next_state))
-
-    def do_transition(self, agent, action, reward, next_state):
-        state = agent.get_state()
-        agent.set_state(state=next_state)
-        agent.learn(state=state, action=action, reward=reward, next_state=next_state)
-
-        agent.transitions_log.append((state, action, reward, next_state))
+    def get_agents_not_of_kind(self, kind):
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_kind() != kind)]
+        return agents
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -124,19 +106,14 @@ class Environment(object):
         self._do_iteration(agents=agents)
 
     def _do_iteration(self, agents=None):
-        if(any(agent.is_in_terminal_state() for agent in self.get_agents())):
-            self.setup()
+        if(agents is None):
+            agents = self.get_agents()
+    
+        if(any(agent.is_in_terminal_state() for agent in agents)):
+            self.reset()
         else:
-            if(agents is None):
-                agents = self.get_agents()
             for agent in agents:
-                if(agent.is_in_non_terminal_state()):
-                    self.do_action(agent=agent)
-                elif(agent.is_in_terminal_state()):
-                    pass
-                else:
-                    raise ex.NotSupportedError()
-
+                agent.do_action()
 
     def do_iterations(self, n, agents=None):
         self._do_iterations(n=n, agents=agents)
@@ -147,8 +124,16 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
+    def get_initial_state(self, agent):
+        state = self._get_initial_state(agent=agent)
+        return state
+
+    def _get_initial_state(self, agent):
+        raise ex.NotImplementedError()
+
+    
     def get_reward_and_next_state(self, agent, action):
-        is_terminal_state = agent.get_state().kind == StateKind.TERMINAL
+        is_terminal_state = agent.is_in_terminal_state()
         if(is_terminal_state):
             raise ex.ApplicationError()
         
@@ -158,14 +143,6 @@ class Environment(object):
     def _get_reward_and_next_state(self, agent, action):
         raise ex.NotImplementedError()
 
-
-    def get_next_state(self, agent, action):
-        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
-        return next_state
-
-    def get_reward(self, agent, action):
-        (reward, next_state) = self.get_reward_and_next_state(agent=agent, action=action)
-        return reward
 
 
 

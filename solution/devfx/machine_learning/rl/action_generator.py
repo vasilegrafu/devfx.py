@@ -16,28 +16,23 @@ class Range(object):
     def __set_name(self, name):
         self.__name = name
 
-    def __get_name(self):
+    def get_name(self):
         return self.__name
-
-    @property
-    def name(self):
-        return self.__get_name()
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_value(self, value):
         self.__value = value
 
-    def __get_value(self):
+    def get_value(self):
         return self.__value
-
-    @property
-    def value(self):
-        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def get_random(self):
+        return self._get_random()
+
+    def _get_random(self):
         raise ex.NotImplementedError()
 
 """================================================================================================
@@ -48,8 +43,8 @@ class DiscreteRange(Range):
 
     """------------------------------------------------------------------------------------------------
     """
-    def get_random(self):
-        random_value = rnd.choice(self.value)
+    def _get_random(self):
+        random_value = rnd.choice(self.get_value())
         return random_value
 
 
@@ -61,8 +56,8 @@ class ContinousRange(Range):
 
     """------------------------------------------------------------------------------------------------
     """
-    def get_random(self):
-        random_value = rnd.uniform(self.value)
+    def _get_random(self):
+        random_value = rnd.uniform(self.get_value())
         return random_value
     
 
@@ -77,12 +72,8 @@ class ActionGenerator(object):
     def __set_ranges(self, ranges):
         self.__ranges = ranges
 
-    def __get_ranges(self):
+    def get_ranges(self):
         return self.__ranges
-
-    @property
-    def ranges(self):
-        return self.__get_ranges()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -90,4 +81,5 @@ class ActionGenerator(object):
         return self._get_random()
 
     def _get_random(self):
-        return Action(name='unknown', value=[range.get_random() for range in self.__get_ranges()])
+        action = Action(name='unknown', value=[range.get_random() for range in self.get_ranges()])
+        return action

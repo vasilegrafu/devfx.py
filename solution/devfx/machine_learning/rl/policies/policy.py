@@ -2,51 +2,48 @@ import pickle as pckl
 import devfx.exceptions as ex
 
 class Policy(object):
-    def __init__(self):
-        pass
+    def __init__(self, model):
+        self.set_model(model=model)
+
+        self.__transitions_log = []
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _set_model(self, model):
-        raise ex.NotImplementedError()
+    def set_model(self, model):
+        self.__model = model
 
-    def _get_model(self):
-        raise ex.NotImplementedError()
-    
-    @property
-    def model(self):
-        return self._get_model()
+    def get_model(self):
+        return self.__model
 
+    """------------------------------------------------------------------------------------------------
+    """   
+    def log_transition(self, transition):
+        self.__transitions_log.append(transition)
 
-    def share_model_from(self, policy):
-        model = policy._get_model()
-        self._set_model(model=model)
-   
-    def share_model_to(self, policy):
-        policy.share_model_from(policy=self)
+    def log_transitions(self, transitions):
+        for transition in transitions:
+            self.log_transition(transition=transition)
 
+    def get_logged_transitions(self, n=None):
+        if(n is None):
+            n = len(self.__transitions_log)
+        return self.__transitions_log[0:n]
 
-    def switch_model_with(self, policy):
-        model = policy._get_model()
-        policy._set_model(model=self._get_model())
-        self._set_model(model=model)
-
-
-    def transfer_model_from(self, policy):
-        model = policy._get_model()
-        policy._set_model(model=None)
-        self._set_model(model=model)
-
-    def transfer_model_to(self, policy):
-        policy.transfer_model_from(policy=self)
+    def clear_logged_transitions(self):
+        return self.__transitions_log.clear()
        
     """------------------------------------------------------------------------------------------------
     """ 
-    def learn(self, state, action, reward, next_state):
-        self._learn(state=state, action=action, reward=reward, next_state=next_state)
+    def learn(self, transitions):
+        self._learn(transitions=transitions)
 
-    def _learn(self, state, action, reward, next_state):
+    def _learn(self, transitions):
         raise ex.NotImplementedError()
+    
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def learn_from_logged_transitions(self):
+        self.learn(transitions=self.__transitions_log)
 
     """------------------------------------------------------------------------------------------------
     """ 

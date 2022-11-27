@@ -10,17 +10,13 @@ class Reward(object):
     def __set_value(self, value):
         self.__value = value
 
-    def __get_value(self):
+    def get_value(self):
         return self.__value
-
-    @property
-    def value(self):
-        return self.__get_value()
 
     """------------------------------------------------------------------------------------------------
     """
     def __str__(self):
-        return str(self.__get_value())
+        return str(self.get_value())
 
     """------------------------------------------------------------------------------------------------
     """
@@ -28,8 +24,8 @@ class Reward(object):
         if(not core.is_instance(reward, Reward)):
             raise ex.ArgumentError()
 
-        return self.__get_value() == reward.__get_value()
+        return self.get_value() == reward.get_value()
 
     def __hash__(self):
-        return hash(self.__get_value())
+        return hash(self.get_value())
     

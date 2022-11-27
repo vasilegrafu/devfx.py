@@ -4,89 +4,61 @@ import devfx.core as core
 from .state_kind import StateKind
 
 class Agent(object):
-    def __init__(self, id, name, kind, environment, state=None, policy=None):
+    def __init__(self, id, name, kind, policy):
         self.__set_id(id=id)
         self.__set_name(name=name)
         self.__set_kind(kind=kind)
-        self.__set_environment(environment=environment)
-        self.set_state(state=state)
-        self.set_policy(policy=policy)
-
-        self.__set_transitions_log(transitions_log=[])
+        self.set_policy(policy=policy)  
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_id(self, id):
         self.__id = id
 
-    def __get_id(self):
+    def get_id(self):
         return self.__id
     
-    @property
-    def id(self):
-        return self.__get_id()
-
     """------------------------------------------------------------------------------------------------
     """
     def __set_name(self, name):
         self.__name = name
 
-    def __get_name(self):
+    def get_name(self):
         return self.__name
-
-    @property
-    def name(self):
-        return self.__get_name()
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_kind(self, kind):
         self.__kind = kind
 
-    def __get_kind(self):
+    def get_kind(self):
         return self.__kind
     
-    @property
-    def kind(self):
-        return self.__get_kind()
-
     """------------------------------------------------------------------------------------------------
     """ 
-    def __set_environment(self, environment):
+    def set_environment(self, environment):
         self.__environment = environment
                 
-    def __get_environment(self):
+    def get_environment(self):
         return self.__environment
-        
-    @property
-    def environment(self):
-        return self.__get_environment()
-
+           
     """------------------------------------------------------------------------------------------------
     """
     def set_state(self, state):
         self.__state = state
       
     def get_state(self):
-        return self.__state
-       
-    @property
-    def state(self):
-        return self.get_state()
-    
-    @state.setter
-    def state(self, state):
-        return self.set_state(state=state)
+        return self.__state   
     
 
     def is_in_non_terminal_state(self):
         state = self.get_state()
-        is_in_non_terminal_state = state.kind == StateKind.NON_TERMINAL
+        is_in_non_terminal_state = state.get_kind() == StateKind.NON_TERMINAL
         return is_in_non_terminal_state
 
     def is_in_terminal_state(self):
         state = self.get_state()
-        is_in_terminal_state = state.kind == StateKind.TERMINAL
+        is_in_terminal_state = state.get_kind() == StateKind.TERMINAL
         return is_in_terminal_state
 
     """------------------------------------------------------------------------------------------------
@@ -96,15 +68,7 @@ class Agent(object):
 
     def get_policy(self):
         return self.__policy
-    
-    @property
-    def policy(self):
-        return self.get_policy()
-    
-    @policy.setter
-    def policy(self, policy):
-        return self.set_policy(policy=policy)
-    
+       
 
     def share_policy_from(self, agent):
         policy = agent.get_policy()
@@ -127,37 +91,28 @@ class Agent(object):
 
     def transfer_policy_to(self, agent):
         agent.transfer_policy_from(agent=self)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def learn(self, state, action, reward, next_state):
-        policy = self.get_policy()
-        policy.learn(state=state, action=action, reward=reward, next_state=next_state)
-
-    def learn_transitions_log(self, transitions_log):
-        policy = self.get_policy()
-        for (state, action, reward, next_state) in transitions_log:
-            policy.learn(state=state, action=action, reward=reward, next_state=next_state)
-
+       
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_action(self, action=None):
-        environment = self.__get_environment()
-        (state, action, (reward, next_state)) = environment.do_action(agent=self, action=action)
-        return (state, action, (reward, next_state))
-   
-    def do_transition(self, action, reward, next_state):
-        environment = self.__get_environment()
-        environment.do_transition(agent=self, action=action, reward=reward, next_state=next_state)
+    def do_action(self, action=None):   
+        is_terminal_state = self.is_in_terminal_state()
+        if(is_terminal_state):
+            raise ex.ApplicationError()
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def __set_transitions_log(self, transitions_log):
-        self.__transitions_log = transitions_log
+        state = self.get_state()
+        
+        if(action is None):
+            action = self.get_policy().get_action(state=state)
 
-    def __get_transitions_log(self):
-        return self.__transitions_log
+        if(action is None):
+            return None
 
-    @property
-    def transitions_log(self):
-        return self.__get_transitions_log()
+        (reward, next_state) = self.get_environment().get_reward_and_next_state(agent=self, action=action)
+
+        self.set_state(state=next_state)
+
+        transition = (state, action, (reward, next_state))
+
+        self.get_policy().log_transition(transition=transition)
+        
+        return transition
