@@ -12,12 +12,13 @@ class Data(object):
     """------------------------------------------------------------------------------------------------
     """
     def __setup_value(self, value, *args, **kwargs):
-        if(core.is_instance(value, Data)):
-            self.__value = value.value
-        elif(core.is_instance(value, np.ndarray)):
-            self.__value = value
-        else:
-            self.__value = np.array(value, *args, **kwargs)
+        match value:
+            case Data():
+                self.__value = value.value
+            case np.ndarray():
+                self.__value = value
+            case _:
+                self.__value = np.array(value, *args, **kwargs)           
 
     def get_value(self):
         return self.__value
@@ -35,9 +36,6 @@ class Data(object):
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, data):
-        if(not core.is_instance(data, Data)):
-            raise ex.ArgumentError()  
-
         return np.equal(self.get_value(), data.get_value()).all()
     
     def __hash__(self):

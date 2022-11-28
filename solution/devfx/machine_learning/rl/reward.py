@@ -21,9 +21,6 @@ class Reward(object):
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, reward):
-        if(not core.is_instance(reward, Reward)):
-            raise ex.ArgumentError()
-
         return self.get_value() == reward.get_value()
 
     def __hash__(self):

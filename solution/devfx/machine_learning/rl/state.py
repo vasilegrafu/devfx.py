@@ -50,9 +50,6 @@ class State(object):
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, state):          
-        if(not core.is_instance(state, State)):
-            raise ex.ArgumentError()    
-
         return (self.get_kind() == state.get_kind()) and (self.get_data() == state.get_data())
 
     def __hash__(self):

@@ -38,13 +38,10 @@ class Action(object):
     """------------------------------------------------------------------------------------------------
     """
     def __eq__(self, action):
-        if(not core.is_instance(action, Action)):
-            raise ex.ArgumentError()  
-
         return (self.get_name() == action.get_name()) and (self.get_data() == action.get_data())
 
     def __hash__(self):
-        return hash(self.get_data())
+        return hash((self.get_name(), self.get_data()))
     
     """------------------------------------------------------------------------------------------------
     """

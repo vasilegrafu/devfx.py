@@ -128,7 +128,7 @@ class MainWindow(ux.Window):
             N = 0
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
-                n = 100
+                n = 500
                 self.grid_environment_for_training.do_iterations(n, log_transition=True)
                 self.grid_environment.learn_from_logged_transitions(self.grid_environment_for_training)
                 N += n

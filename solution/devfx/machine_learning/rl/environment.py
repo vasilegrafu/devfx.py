@@ -113,6 +113,9 @@ class Environment(object):
         else:
             for agent in agents:
                 agent.do_action(log_transition=log_transition)
+                if(agent.is_in_terminal_state()):
+                    self.reset()
+                    break
 
     def do_iterations(self, n, agents=None, log_transition=False):
         self._do_iterations(n=n, agents=agents, log_transition=log_transition)
@@ -126,7 +129,7 @@ class Environment(object):
     def do_action(self, agent, action):
         is_terminal_state = agent.is_in_terminal_state()
         if(is_terminal_state):
-            raise ex.ApplicationError()
+            return None
         
         (reward, next_state) = self._do_action(agent=agent, action=action)
 

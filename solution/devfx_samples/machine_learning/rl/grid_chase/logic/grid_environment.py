@@ -45,11 +45,11 @@ class GridEnvironment(ml.rl.Environment):
         agent1 = GridAgent(id=1, 
                            name='Wolf', 
                            kind=GridAgentKind.CHASER, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=2e-1))
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         agent2 = GridAgent(id=2, 
                            name='Rabbit', 
                            kind=GridAgentKind.CHASED, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=2e-1))
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         self.add_agents((agent1, agent2))
 
     def _on_added_agents(self, agents):
@@ -102,27 +102,28 @@ class GridEnvironment(ml.rl.Environment):
 
         aci = np.argwhere(  (scene[1,:,:] == 1) 
                           | (scene[2,:,:] == 2))
-        if(len(aci) == 1):
-            if(agent.get_kind() == GridAgentKind.CHASER):   
-                reward = ml.rl.Reward(value=+1)
-                next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
-            elif(agent.get_kind() == GridAgentKind.CHASED): 
-                reward = ml.rl.Reward(value=-1)
-                next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
-            else:                                           
-                raise ex.NotSupportedError()
-        elif(len(aci) > 1):
-            if(agent.get_kind() == GridAgentKind.CHASER):   
-                reward = ml.rl.Reward(value=-1)
-                next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
-            elif(agent.get_kind() == GridAgentKind.CHASED): 
-                reward = ml.rl.Reward(value=+1)
-                next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
-            else:                                           
-                raise ex.NotSupportedError()
-        else:
-            raise ex.NotSupportedError() 
+                          
+        match len(aci):
+            case n if n == 1:
+                match agent.get_kind():
+                    case GridAgentKind.CHASER:   
+                        reward = ml.rl.Reward(value=+1e+3)
+                        next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
+                    case GridAgentKind.CHASED: 
+                        reward = ml.rl.Reward(value=-1e+3)
+                        next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
+            case n if n > 1:
+                match agent.get_kind():
+                    case GridAgentKind.CHASER:   
+                        reward = ml.rl.Reward(value=0)
+                        next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+                    case GridAgentKind.CHASED: 
+                        reward = ml.rl.Reward(value=0)
+                        next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
         
+        for agent in self.get_agents_others_than(id=agent.get_id()):
+            agent.set_state(state=next_state)
+
         return (reward, next_state)
 
 

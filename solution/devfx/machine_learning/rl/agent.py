@@ -103,7 +103,7 @@ class Agent(object):
     def do_action(self, action=None, log_transition=False):   
         is_in_terminal_state = self.is_in_terminal_state()
         if(is_in_terminal_state):
-            raise ex.ApplicationError()
+            return None
 
         state = self.get_state()
         
@@ -113,7 +113,12 @@ class Agent(object):
         if(action is None):
             return None
 
-        (reward, next_state) = self.get_environment().do_action(agent=self, action=action)
+        reward_and_next_state = self.get_environment().do_action(agent=self, action=action)
+        
+        if(reward_and_next_state is None):
+            return None
+
+        (reward, next_state) = reward_and_next_state
 
         self.set_state(state=next_state)
 
