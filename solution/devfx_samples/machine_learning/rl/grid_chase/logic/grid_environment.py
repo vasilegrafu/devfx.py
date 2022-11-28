@@ -1,137 +1,131 @@
 import numpy as np
 import random as rnd
-import itertools as it
-import devfx.core as core
 import devfx.exceptions as ex
 import devfx.machine_learning as ml
 
-from .grid_agent_action_generator import GridAgentActionGenerator
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
+from .grid_agent_random_policy import GridAgentRandomPolicy
 
-"""========================================================================================================
-"""
 class GridEnvironment(ml.rl.Environment):
-    def __init__(self):
+    def __init__(self, training=False):
         super().__init__()
 
-        self.__shape = (10, 10)
-        self.__cells = {}
+        self.__training = training
+        
+    """------------------------------------------------------------------------------------------------
+    """
+    def __setup_scene(self):
+        self.__scene = np.zeros(shape=(3, 10, 10), dtype=np.int8)
+        
+    def __cleanup_scene(self):
+        self.__scene = None
+
+    def get_scene(self):
+        return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
-    @property
-    def shape(self):  
-        return self.__shape
+    def _setup(self):
+        # scene
+        self.__setup_scene()
 
-    @property
-    def cells(self):
-        return self.__cells
+        self.get_scene()[0,:,:] = 1
+        self.get_scene()[0,1:-1,1:-1] = 0
+        self.get_scene()[0,2,2] = 1
+        self.get_scene()[0,3,3] = 1
+        self.get_scene()[0,5,5] = 1
+        self.get_scene()[0,7,7] = 1
+        self.get_scene()[0,3,7] = 1
+
+        self.get_scene()[1,:,:] = 0
+        self.get_scene()[2,:,:] = 0
+        
+        # agents
+        agent1 = GridAgent(id=1, 
+                           name='Wolf', 
+                           kind=GridAgentKind.CHASER, 
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=2e-1))
+        agent2 = GridAgent(id=2, 
+                           name='Rabbit', 
+                           kind=GridAgentKind.CHASED, 
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=2e-1))
+        self.add_agents((agent1, agent2))
+
+    def _on_added_agents(self, agents):
+        self.reset()
 
     """------------------------------------------------------------------------------------------------
     """
-    def _create(self):
-        cells = {}
-        for (ri, ci) in it.product(range(1, self.shape[0]+1), range(1, self.shape[1]+1)):
-            if((ri == 1) or (ri == self.shape[0]) or (ci == 1) or (ci == self.shape[1])):
-                (cell_index, cell_content) = ((ri, ci), None)
-            elif((ri, ci) in [(3, 3), (4, 4), (6, 6), (8, 8), (4, 8)]):
-                (cell_index, cell_content) = ((ri, ci), None)
-            else:
-                (cell_index, cell_content) = ((ri, ci), ' ')
-            cells[cell_index] = cell_content
-        self.__cells = cells
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _setup(self, iteration_randomness=None):
-        if(not self.exists_agent(id=1)):
-            self.add_agent(GridAgent(id=1, name='Wolf', kind=GridAgentKind.CHASER, 
-                                     environment=self,
-                                     state=self.__get_initial_state(),
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1), 
-                                     iteration_randomness= 0.1 if iteration_randomness is None else iteration_randomness))
-        else:
-            self.get_agent(id=1).set_state(self.__get_initial_state())
-
-        if(not self.exists_agent(id=2)):       
-            self.add_agent(GridAgent(id=2, name='Rabbit', kind=GridAgentKind.CHASED, 
-                                     environment=self,
-                                     state=self.__get_initial_state(),
-                                     policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=0.1), 
-                                     iteration_randomness= 0.0 if iteration_randomness is None else iteration_randomness))
-        else:
-            self.get_agent(id=2).set_state(self.__get_initial_state())
-
-    def _on_added_agent(self, agent):
+    def _reset(self):
+        scene = self.get_scene()
+        
         for agent in self.get_agents():
-           agent.set_state(self.__get_contextual_state(agent=agent))
+            scene[agent.get_id(),:,:] = 0
+            choosable_ci = np.argwhere(  (scene[0,:,:] == 0) 
+                                       & (scene[1,:,:] == 0) 
+                                       & (scene[2,:,:] == 0))
+            ci = rnd.choice(choosable_ci)
+            scene[agent.get_id(),ci[0],ci[1]] = agent.get_id()
 
-    def _on_removed_agent(self, agent):
         for agent in self.get_agents():
-           agent.set_state(self.__get_contextual_state(agent=agent))
-
-    def __get_initial_state(self):
-        agents_cell_indexes = [agent.get_state().value[0] for agent in self.get_agents()]
-        choosable_cell_indexes = [cell_index for cell_index in self.cells 
-                                             if((self.cells[cell_index] is not None) and (cell_index not in agents_cell_indexes))]
-        random_cell_index = rnd.choice(choosable_cell_indexes)
-        state = ml.rl.State(value=(random_cell_index,), kind=ml.rl.StateKind.NON_TERMINAL)
-        return state
-
-    def __get_contextual_state(self, agent):
-        other_agents = self.get_other_agents(id=agent.id)
-        other_agents_cell_indexes = [other_agent.get_state().value[0] for other_agent in other_agents]
-        state = ml.rl.State(value=(agent.get_state().value[0], *other_agents_cell_indexes), kind=agent.get_state().kind)
-        return state
+            ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
+            state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+            agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_reward_and_next_state(self, agent, action):  
-        agent_state = agent.get_state()     
-        agent_cell_index = agent_state.value[0]
-        if(action == GridActions.Left):
-            agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]-1)
-        elif(action == GridActions.Right):
-            agent_next_cell_index = (agent_cell_index[0], agent_cell_index[1]+1)
-        elif(action == GridActions.Up):
-            agent_next_cell_index = (agent_cell_index[0]-1, agent_cell_index[1])
-        elif(action == GridActions.Down):
-            agent_next_cell_index = (agent_cell_index[0]+1, agent_cell_index[1])
-        else:
-            raise ex.ApplicationError()
+    def _cleanup(self):
+        self.remove_agents()
+        self.__cleanup_scene()
 
-        if(self.cells[agent_next_cell_index] is None):
-            agent_next_state = agent_state
-            agent_reward = ml.rl.Reward(value=-1.0)
-            return (agent_next_state, agent_reward)
-
-        agent_kind = agent.get_kind()
-        other_agents = self.get_other_kind_.....agents(id=agent.id)
-        other_agents_cell_indexes = [other_agent.get_state().value[0] for other_agent in other_agents]
-        if(agent_kind == GridAgentKind.CHASER):
-            if(agent_next_cell_index in other_agents_cell_indexes):
-                agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                agent_reward = ml.rl.Reward(value=+1.0)
-            else:
-                agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                agent_reward = ml.rl.Reward(value=-1.0)
-        elif(agent_kind == GridAgentKind.CHASED):
-            if(agent_next_cell_index in other_agents_cell_indexes):
-                agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.TERMINAL)
-                agent_reward = ml.rl.Reward(value=-1.0)
-            else:
-                agent_next_state = ml.rl.State(value=(agent_next_cell_index, *other_agents_cell_indexes), kind=ml.rl.StateKind.NON_TERMINAL)
-                agent_reward = ml.rl.Reward(value=+1.0)
-        else:
-            raise ex.ApplicationError()
-        return (agent_next_state, agent_reward)
+    def _on_removed_agents(self, agents):
+        scene = self.get_scene()
+        scene[1,:,:] = 0
+        scene[2,:,:] = 0
 
     """------------------------------------------------------------------------------------------------
     """
-    def _get_available_actions(self, agent):
-        actions = [GridActions.Left, GridActions.Right, GridActions.Up, GridActions.Down]
-        return actions
+    def _do_action(self, agent, action):
+        scene = self.get_scene()
+
+        ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
+        nci = ci + action.get_value()
+
+        if(scene[0,nci[0],nci[1]] == 1):
+            reward = ml.rl.Reward(value=-1)
+            next_state = agent.get_state()
+            return (reward, next_state)
+        
+        scene[agent.get_id(),ci[0],ci[1]] = 0
+        scene[agent.get_id(),nci[0],nci[1]] = agent.get_id()
+
+        aci = np.argwhere(  (scene[1,:,:] == 1) 
+                          | (scene[2,:,:] == 2))
+        if(len(aci) == 1):
+            if(agent.get_kind() == GridAgentKind.CHASER):   
+                reward = ml.rl.Reward(value=+1)
+                next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
+            elif(agent.get_kind() == GridAgentKind.CHASED): 
+                reward = ml.rl.Reward(value=-1)
+                next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
+            else:                                           
+                raise ex.NotSupportedError()
+        elif(len(aci) > 1):
+            if(agent.get_kind() == GridAgentKind.CHASER):   
+                reward = ml.rl.Reward(value=-1)
+                next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+            elif(agent.get_kind() == GridAgentKind.CHASED): 
+                reward = ml.rl.Reward(value=+1)
+                next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+            else:                                           
+                raise ex.NotSupportedError()
+        else:
+            raise ex.NotSupportedError() 
+        
+        return (reward, next_state)
+
+
 
 
 

@@ -1,7 +1,9 @@
 import itertools
 import time
+import numpy as np
 import devfx.exceptions as ex
 import devfx.core as core
+import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
 import devfx.processing.concurrent as pc
 import devfx.ux.windows.wx as ux
@@ -21,16 +23,11 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __init_model(self):
-        self.grid_environment_for_training = GridEnvironment()
-        self.grid_environment_for_training.create()
-        self.grid_environment_for_training.setup(iteration_randomness=1.0)
+        self.grid_environment_for_training = GridEnvironment(training=True)
+        self.grid_environment_for_training.setup()
 
         self.grid_environment = GridEnvironment()
-        self.grid_environment.create()
         self.grid_environment.setup()
-        
-        for grid_agent in self.grid_environment.get_agents():
-            grid_agent.share_policy_from(self.grid_environment_for_training.get_agent(grid_agent.id))
         
     """------------------------------------------------------------------------------------------------
     """
@@ -38,32 +35,19 @@ class MainWindow(ux.Window):
         self.grid_canvas = ux.Canvas(self, size=(64, 64))
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
-        self.agent_iteration_randomness_label = ux.Text(self, label='Randomness:') 
-        self.agent_iteration_randomness_combobox = ux.ComboBox(self, choices=[str(agent.id) + '|' + agent.get_name() for agent in self.grid_environment.get_agents()])
-        self.agent_iteration_randomness_combobox.SetSelection(0)
-        def agent_iteration_randomness_combobox__OnItemSelected(sender, event_args): 
-            self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
-            self.grid_canvas.UpdateDrawing()
-        self.agent_iteration_randomness_combobox.OnItemSelected += agent_iteration_randomness_combobox__OnItemSelected
-        self.agent_iteration_randomness_spinbox = ux.FloatSpinBox(self, min=0.0, max=1.0, initial=0.0, inc=0.01, size=(64, -1))
-        self.agent_iteration_randomness_spinbox.SetValue(self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).get_iteration_randomness())
-        def agent_iteration_randomness_spinbox_OnValueChanged(sender, event_args): 
-            self.grid_environment.get_agent(id=int(self.agent_iteration_randomness_combobox.GetValue().split('|')[0])).set_iteration_randomness(self.agent_iteration_randomness_spinbox.GetValue())
-            self.grid_canvas.UpdateDrawing()
-        self.agent_iteration_randomness_spinbox.OnValueChanged += agent_iteration_randomness_spinbox_OnValueChanged
-
         self.train_button = ux.Button(parent=self, label='Train')
         self.train_button.OnPress += self.__train_button__OnPress
         self.cancel_training_button = ux.Button(parent=self, label='Cancel training')
         self.cancel_training_button.OnPress += self.__cancel_training_button__OnPress
-        self.train_count_text = ux.Text(parent=self, label='0')
+        self.train_count_text = ux.Text(parent=self, label='0', size=(64, -1))
+        self.train_batch_time_elapsed_text = ux.Text(parent=self, label='0', size=(64, -1))
         self.training_is_running = False
         
         self.do_iteration_button = ux.Button(parent=self, label='Do iteration')
         self.do_iteration_button.OnPress += self.__do_iteration_button__OnPress
         
-        self.do_iterations_speed_label = ux.Text(self, label='Speed:')
-        self.do_iterations_speed_spinbox = ux.FloatSpinBox(self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
+        self.do_iterations_speed_label = ux.Text(parent=self, label='Speed:')
+        self.do_iterations_speed_spinbox = ux.FloatSpinBox(parent=self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
         self.do_iterations_button = ux.Button(parent=self, label='Do iterations')
         self.do_iterations_button.OnPress += self.__do_iterations_button__OnPress
         self.cancel_iterations_button = ux.Button(parent=self, label='Cancel iterations')
@@ -89,14 +73,11 @@ class MainWindow(ux.Window):
         # 
         self.grid_canvas.AddToSizer(self.grid_sizer, pos=(0, 0), flag=ux.ALIGN_CENTER | ux.SHAPED)
 
-        self.agent_iteration_randomness_label.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
-        self.agent_iteration_randomness_combobox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-        self.agent_iteration_randomness_spinbox.AddToSizer(self.agent_settings_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-
-        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT)
         self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-        self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-
+        self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        self.train_batch_time_elapsed_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        
         self.do_iteration_button.AddToSizer(self.do_iteration_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
 
         self.do_iterations_speed_label.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
@@ -104,41 +85,38 @@ class MainWindow(ux.Window):
         self.do_iterations_button.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
         self.cancel_iterations_button.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
 
+
     """------------------------------------------------------------------------------------------------
     """
     def __grid_canvas__OnDraw(self, sender, event_args):
         cgc = event_args.CGC
 
+        # scene
+        scene = self.grid_environment.get_scene()
+
         # cell size
-        cell_width = cgc.GetSize()[0]/self.grid_environment.shape[0]
-        cell_height = cgc.GetSize()[1]/self.grid_environment.shape[1]
+        (cw, ch) = (cgc.GetSize()[0]/scene.shape[1:3][0], cgc.GetSize()[1]/scene.shape[1:3][1])
 
         # draw grid
-        for (cell_index, cell_content) in self.grid_environment.cells.items():
-            x = (cell_index[1] - 1)*cell_width 
-            y = (cell_index[0] - 1)*cell_height
-            w = cell_width
-            h = cell_height
-            if(cell_content is None):
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
-            else:
-                cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
-
+        for ci in np.ndindex(scene.shape[1:3]):
+            (x, y, w, h) = (ci[1]*cw, ci[0]*ch, cw, ch)
+            match scene[0,ci[0],ci[1]]:
+                case 0:
+                    cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.WHITE_BRUSH)
+                case 1: 
+                    cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=ux.GRAY_BRUSH)
+            
         # draw agents
         for agent in self.grid_environment.get_agents():
-            cell_index = agent.get_state().value[0]
-            x = (cell_index[1] - 1)*cell_width + cell_width/2
-            y = (cell_index[0] - 1)*cell_height + cell_height/2
-            agent_kind = agent.get_kind()
-            if(agent_kind == GridAgentKind.CHASER):
-                r = min(cell_width/4, cell_height/4)
-                cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
-            elif(agent_kind == GridAgentKind.CHASED):
-                r = min(cell_width/5, cell_height/5)
-                cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
-            else:
-                raise ex.ApplicationError()
-    
+            ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
+            match agent.get_kind():
+                case GridAgentKind.CHASER:
+                    (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
+                    cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
+                case GridAgentKind.CHASED:
+                    (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/5, ch/5))
+                    cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.LIME_BRUSH)
+                   
     """------------------------------------------------------------------------------------------------
     """
     def __train_button__OnPress(self, sender, event_args):
@@ -149,13 +127,16 @@ class MainWindow(ux.Window):
         def _():
             N = 0
             while self.training_is_running:
-                n = 1000
-                self.grid_environment_for_training.do_iterations(n)
+                sw = dgn.Stopwatch().start()
+                n = 100
+                self.grid_environment_for_training.do_iterations(n, log_transition=True)
+                self.grid_environment.learn_from_logged_transitions(self.grid_environment_for_training)
                 N += n
                 self.train_count_text.Label = str(N)
+                self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)
         thread = pc.Thread(fn=_)
         thread.start()
-
+        
     def __cancel_training_button__OnPress(self, sender, event_args):
         if(not self.training_is_running):
             return

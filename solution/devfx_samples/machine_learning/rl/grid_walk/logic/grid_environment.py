@@ -58,17 +58,7 @@ class GridEnvironment(ml.rl.Environment):
         self.add_agents((agent1,))
 
     def _on_added_agents(self, agents):
-        scene = self.get_scene()
-
-        for agent in agents:
-            choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) & (scene[2,:,:] == 0))
-            ci = rnd.choice(choosable_ci)
-            scene[2, ci[0], ci[1]] = agent.get_id()
-
-        for agent in self.get_agents():
-            ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-            state = ml.rl.State(kind=scene[0, ci[0], ci[1]], value=scene.copy())
-            agent.set_state(state=state)
+        self.reset()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -77,13 +67,14 @@ class GridEnvironment(ml.rl.Environment):
         scene[2,:,:] = 0
 
         for agent in self.get_agents():
-            choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) & (scene[2,:,:] == 0))
+            choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) 
+                                       & (scene[2,:,:] == 0))
             ci = rnd.choice(choosable_ci)
-            scene[2, ci[0], ci[1]] = agent.get_id()
+            scene[2,ci[0],ci[1]] = agent.get_id()
 
         for agent in self.get_agents():
             ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-            state = ml.rl.State(kind=scene[0, ci[0], ci[1]], value=scene.copy())
+            state = ml.rl.State(kind=scene[0,ci[0],ci[1]], value=scene.copy())
             agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
@@ -104,15 +95,15 @@ class GridEnvironment(ml.rl.Environment):
         ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
         nci = ci + action.get_value()
 
-        reward = ml.rl.Reward(value=scene[1, nci[0], nci[1]])
+        reward = ml.rl.Reward(value=scene[1,nci[0],nci[1]])
 
-        if(scene[0, nci[0], nci[1]] == ml.rl.StateKind.UNDEFINED):
+        if(scene[0,nci[0],nci[1]] == ml.rl.StateKind.UNDEFINED):
             next_state = agent.get_state()
-        else:
-            scene[2, ci[0], ci[1]] = 0
-            scene[2, nci[0], nci[1]] = agent.get_id()
-            next_state = ml.rl.State(kind=scene[0, nci[0], nci[1]], value=scene.copy())
+            return (reward, next_state)
         
+        scene[2,ci[0],ci[1]] = 0
+        scene[2,nci[0],nci[1]] = agent.get_id()
+        next_state = ml.rl.State(kind=scene[0,nci[0],nci[1]], value=scene.copy())
         return (reward, next_state)
 
 

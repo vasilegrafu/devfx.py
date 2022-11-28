@@ -100,7 +100,7 @@ class Agent(object):
       
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_action(self, action=None):   
+    def do_action(self, action=None, log_transition=False):   
         is_in_terminal_state = self.is_in_terminal_state()
         if(is_in_terminal_state):
             raise ex.ApplicationError()
@@ -119,7 +119,8 @@ class Agent(object):
 
         transition = (state, action, (reward, next_state))
 
-        self.log_transition(transition=transition)
+        if(log_transition == True):
+            self.log_transition(transition=transition)
         
         return transition
 

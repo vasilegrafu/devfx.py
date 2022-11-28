@@ -99,17 +99,17 @@ class MainWindow(ux.Window):
         # draw grid
         for ci in np.ndindex(scene.shape[1:3]):
             (x, y, w, h) = (ci[1]*cw, ci[0]*ch, cw, ch)
-            if(scene[0, ci[0], ci[1]] == ml.rl.StateKind.UNDEFINED):                                    brush=ux.GRAY_BRUSH
-            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.NON_TERMINAL):                               brush=ux.WHITE_BRUSH
-            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.TERMINAL and scene[1, ci[0], ci[1]] >= 0):   brush=ux.GREEN_BRUSH
-            elif(scene[0, ci[0], ci[1]] == ml.rl.StateKind.TERMINAL and scene[1, ci[0], ci[1]] < 0):    brush=ux.RED_BRUSH
-            else:                                                                                       raise ex.NotSupportedError()
+            if(scene[0,ci[0],ci[1]] == ml.rl.StateKind.UNDEFINED):                                  brush=ux.GRAY_BRUSH
+            elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.NON_TERMINAL):                             brush=ux.WHITE_BRUSH
+            elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.TERMINAL and scene[1,ci[0],ci[1]] >= 0):   brush=ux.GREEN_BRUSH
+            elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.TERMINAL and scene[1,ci[0],ci[1]] < 0):    brush=ux.RED_BRUSH
+            else:                                                                                   raise ex.NotSupportedError()
             cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=brush)
 
         # draw rewards
         for ci in np.ndindex(scene.shape[1:3]):
             (x, y) = (ci[1]*cw + cw, ci[0]*ch)
-            cgc.DrawText(text=f'{scene[1, ci[0], ci[1]]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
+            cgc.DrawText(text=f'{scene[1,ci[0],ci[1]]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
         for agent in self.grid_environment.get_agents():
@@ -140,13 +140,8 @@ class MainWindow(ux.Window):
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
                 n = 1000
-                self.grid_environment_for_training.do_iterations(n)
-
-                agent_for_training = self.grid_environment_for_training.get_agent(id=1)
-                agent = self.grid_environment.get_agent(id=1)
-                agent.learn(transitions=agent_for_training.get_logged_transitions())
-                agent_for_training.clear_logged_transitions()
-
+                self.grid_environment_for_training.do_iterations(n, log_transition=True)
+                self.grid_environment.learn_from_logged_transitions(self.grid_environment_for_training)
                 N += n
                 self.train_count_text.Label = str(N)
                 self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)

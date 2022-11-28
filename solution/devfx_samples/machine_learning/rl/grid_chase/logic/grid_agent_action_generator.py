@@ -1,11 +1,5 @@
-import numpy as np
-import devfx.exceptions as ex
 import devfx.machine_learning as ml
 
-
-"""========================================================================================================
-"""
-    
 class GridAgentActionGenerator(ml.rl.ActionGenerator):
     def __init__(self):
         super().__init__(ranges=[ml.rl.DiscreteRange('MOVE', value=[('LEFT',    [ 0,-1]),      #Left     (row: 0, col:-1)
@@ -15,4 +9,4 @@ class GridAgentActionGenerator(ml.rl.ActionGenerator):
                                 ])
 
     def _get_random(self):
-        return ml.rl.Action(*self.ranges[0].get_random())
+        return ml.rl.Action(*self.get_ranges()[0].get_random())

@@ -101,10 +101,10 @@ class Environment(object):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def do_iteration(self, agents=None):
-        self._do_iteration(agents=agents)
+    def do_iteration(self, agents=None, log_transition=False):
+        self._do_iteration(agents=agents, log_transition=log_transition)
 
-    def _do_iteration(self, agents=None):
+    def _do_iteration(self, agents=None, log_transition=False):
         if(agents is None):
             agents = self.get_agents()
     
@@ -112,14 +112,14 @@ class Environment(object):
             self.reset()
         else:
             for agent in agents:
-                agent.do_action()
+                agent.do_action(log_transition=log_transition)
 
-    def do_iterations(self, n, agents=None):
-        self._do_iterations(n=n, agents=agents)
+    def do_iterations(self, n, agents=None, log_transition=False):
+        self._do_iterations(n=n, agents=agents, log_transition=log_transition)
 
-    def _do_iterations(self, n, agents=None):
+    def _do_iterations(self, n, agents=None, log_transition=False):
         for i in range(0, n):
-            self.do_iteration(agents=agents)
+            self.do_iteration(agents=agents, log_transition=log_transition)
 
     """------------------------------------------------------------------------------------------------
     """    
@@ -136,5 +136,28 @@ class Environment(object):
         raise ex.NotImplementedError()
 
 
+
+    """------------------------------------------------------------------------------------------------
+    """  
+    def clear_logged_transitions(self):
+        agents = self.get_agents()
+        for agent in agents:
+            agent.clear_logged_transitions()
+
+    def learn_from_logged_transitions(self, environment, clear_logged_transitions=True):
+        to_agents = self.get_agents()
+        from_agents = environment.get_agents()
+        
+        if(len(to_agents) != len(from_agents)):
+            raise ex.ApplicationError()
+        
+        to_agents = sorted(to_agents, key=lambda agent: agent.get_id())
+        from_agents = sorted(from_agents, key=lambda agent: agent.get_id())
+        
+        for (to_agent, from_agent) in zip(to_agents, from_agents):
+            to_agent.learn(transitions=from_agent.get_logged_transitions())
+            if(clear_logged_transitions == True):
+                from_agent.clear_logged_transitions()
+        
 
 
