@@ -50,3 +50,8 @@ class Action(object):
 
     def __getitem__(self, key):
         return self.get_data()[key]
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def copy(self):
+        return Action(name=self.get_name(), value=self.get_data().copy())

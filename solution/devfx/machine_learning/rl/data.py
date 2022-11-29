@@ -14,11 +14,15 @@ class Data(object):
     def __setup_value(self, value, *args, **kwargs):
         match value:
             case Data():
-                self.__value = value.value
+                self.__value = value.value.copy()
             case np.ndarray():
-                self.__value = value
-            case _:
+                self.__value = value.copy()
+            case list():
                 self.__value = np.array(value, *args, **kwargs)           
+            case tuple():
+                self.__value = np.array(value, *args, **kwargs)  
+            case _:
+                raise ex.NotSupportedError()      
 
     def get_value(self):
         return self.__value
@@ -48,3 +52,8 @@ class Data(object):
 
     def __getitem__(self, key):
         return self.get_value()[key]
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def copy(self):
+        return Data(value=self.get_value().copy())

@@ -74,7 +74,7 @@ class GridEnvironment(ml.rl.Environment):
 
         for agent in self.get_agents():
             ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-            state = ml.rl.State(kind=scene[0,ci[0],ci[1]], value=scene.copy())
+            state = ml.rl.State(kind=scene[0,ci[0],ci[1]], value=scene)
             agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class GridEnvironment(ml.rl.Environment):
         
         scene[2,ci[0],ci[1]] = 0
         scene[2,nci[0],nci[1]] = agent.get_id()
-        next_state = ml.rl.State(kind=scene[0,nci[0],nci[1]], value=scene.copy())
+        next_state = ml.rl.State(kind=scene[0,nci[0],nci[1]], value=scene)
         return (reward, next_state)
 
 

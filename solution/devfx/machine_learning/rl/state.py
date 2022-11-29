@@ -62,3 +62,8 @@ class State(object):
 
     def __getitem__(self, key):
         return self.get_data()[key]
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def copy(self):
+        return State(kind=self.get_kind(), value=self.get_data().copy())

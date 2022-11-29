@@ -45,11 +45,11 @@ class GridEnvironment(ml.rl.Environment):
         agent1 = GridAgent(id=1, 
                            name='Wolf', 
                            kind=GridAgentKind.CHASER, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=5e-1))
         agent2 = GridAgent(id=2, 
                            name='Rabbit', 
                            kind=GridAgentKind.CHASED, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
+                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=5e-1))
         self.add_agents((agent1, agent2))
 
     def _on_added_agents(self, agents):
@@ -70,7 +70,7 @@ class GridEnvironment(ml.rl.Environment):
 
         for agent in self.get_agents():
             ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
-            state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+            state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
             agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
@@ -89,44 +89,41 @@ class GridEnvironment(ml.rl.Environment):
     def _do_action(self, agent, action):
         scene = self.get_scene()
 
-        ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
-        nci = ci + action.get_value()
+        agent_ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
+        agent_next_ci = agent_ci + action.get_value()
 
-        if(scene[0,nci[0],nci[1]] == 1):
-            reward = ml.rl.Reward(value=-1)
-            next_state = agent.get_state()
-            return (reward, next_state)
-        
-        scene[agent.get_id(),ci[0],ci[1]] = 0
-        scene[agent.get_id(),nci[0],nci[1]] = agent.get_id()
+        if(agent_next_ci[0] == 10 or agent_next_ci[1] == 10):
+            x = 0
 
-        aci = np.argwhere(  (scene[1,:,:] == 1) 
-                          | (scene[2,:,:] == 2))
-                          
-        match len(aci):
-            case n if n == 1:
+        scene[agent.get_id(),agent_ci[0],agent_ci[1]] = 0
+        scene[agent.get_id(),agent_next_ci[0],agent_next_ci[1]] = agent.get_id()
+
+        other_agent = self.get_agents_others_than(id=agent.get_id())[0]
+
+        if(scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
+            agent_reward = ml.rl.Reward(value=-1e+3)
+            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+            other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+        else:
+            other_agent_ci = np.argwhere(scene[other_agent.get_id(),:,:] == other_agent.get_id())[0]
+            if(np.equal(agent_next_ci, other_agent_ci).all()):
                 match agent.get_kind():
                     case GridAgentKind.CHASER:   
-                        reward = ml.rl.Reward(value=+1e+3)
-                        next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
+                        agent_reward = ml.rl.Reward(value=+1e+3)
+                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+                        other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
                     case GridAgentKind.CHASED: 
-                        reward = ml.rl.Reward(value=-1e+3)
-                        next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene.copy())
-            case n if n > 1:
-                match agent.get_kind():
-                    case GridAgentKind.CHASER:   
-                        reward = ml.rl.Reward(value=0)
-                        next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
-                    case GridAgentKind.CHASED: 
-                        reward = ml.rl.Reward(value=0)
-                        next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene.copy())
+                        agent_reward = ml.rl.Reward(value=-1e+3)
+                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+                        other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+            else:
+                agent_reward = ml.rl.Reward(value=0)
+                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
+                other_agent_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
         
-        for agent in self.get_agents_others_than(id=agent.get_id()):
-            agent.set_state(state=next_state)
-
-        return (reward, next_state)
-
-
+        # other_agent.set_state(state=other_agent_state)
+        
+        return (agent_reward, agent_next_state)
 
 
 
