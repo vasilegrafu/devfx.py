@@ -1,4 +1,3 @@
-import itertools
 import time
 import numpy as np
 import devfx.exceptions as ex
@@ -43,16 +42,16 @@ class MainWindow(ux.Window):
         self.train_batch_time_elapsed_text = ux.Text(parent=self, label='0', size=(64, -1))
         self.training_is_running = False
         
-        self.do_iteration_button = ux.Button(parent=self, label='Do iteration')
-        self.do_iteration_button.OnPress += self.__do_iteration_button__OnPress
+        self.do_action_button = ux.Button(parent=self, label='Do action')
+        self.do_action_button.OnPress += self.__do_action_button__OnPress
         
-        self.do_iterations_speed_label = ux.Text(parent=self, label='Speed:')
-        self.do_iterations_speed_spinbox = ux.FloatSpinBox(parent=self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
-        self.do_iterations_button = ux.Button(parent=self, label='Do iterations')
-        self.do_iterations_button.OnPress += self.__do_iterations_button__OnPress
-        self.cancel_iterations_button = ux.Button(parent=self, label='Cancel iterations')
-        self.cancel_iterations_button.OnPress += self.__cancel_iterations_button__OnPress
-        self.do_iterations_is_running = False
+        self.do_actions_speed_label = ux.Text(parent=self, label='Speed:')
+        self.do_actions_speed_spinbox = ux.FloatSpinBox(parent=self, min=0.01, max=1.0, initial=0.10, inc=0.01, size=(64, -1))
+        self.do_actions_button = ux.Button(parent=self, label='Do actions')
+        self.do_actions_button.OnPress += self.__do_actions_button__OnPress
+        self.cancel_actions_button = ux.Button(parent=self, label='Cancel actions')
+        self.cancel_actions_button.OnPress += self.__cancel_actions_button__OnPress
+        self.do_actions_is_running = False
 
     def __init_layout(self):
         #
@@ -67,8 +66,8 @@ class MainWindow(ux.Window):
 
         self.training_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(0, 0), span=(1, 2), flag=ux.ALIGN_RIGHT | ux.TOP, border=4)
         self.agent_settings_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(1, 0), span=(2, 1), flag=ux.ALIGN_CENTER_VERTICAL | ux.ALIGN_RIGHT)
-        self.do_iteration_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(1, 1), flag=ux.ALIGN_RIGHT | ux.TOP, border=4)
-        self.do_iterations_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(2, 1), flag=ux.ALIGN_RIGHT | ux.TOP | ux.BOTTOM, border=4)
+        self.do_action_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(1, 1), flag=ux.ALIGN_RIGHT | ux.TOP, border=4)
+        self.do_actions_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(2, 1), flag=ux.ALIGN_RIGHT | ux.TOP | ux.BOTTOM, border=4)
 
         # 
         self.grid_canvas.AddToSizer(self.grid_sizer, pos=(0, 0), flag=ux.ALIGN_CENTER | ux.SHAPED)
@@ -78,12 +77,12 @@ class MainWindow(ux.Window):
         self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
         self.train_batch_time_elapsed_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
         
-        self.do_iteration_button.AddToSizer(self.do_iteration_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+        self.do_action_button.AddToSizer(self.do_action_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
 
-        self.do_iterations_speed_label.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
-        self.do_iterations_speed_spinbox.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-        self.do_iterations_button.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-        self.cancel_iterations_button.AddToSizer(self.do_iterations_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        self.do_actions_speed_label.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+        self.do_actions_speed_spinbox.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
+        self.do_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
+        self.cancel_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
 
 
     """------------------------------------------------------------------------------------------------
@@ -144,34 +143,38 @@ class MainWindow(ux.Window):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __do_iteration_button__OnPress(self, sender, event_args):
-        agents_iterator = core.ObjectStorage.intercept(self, 'agents_iterator', lambda: itertools.cycle(self.grid_environment.get_agents()))
-        agent = next(agents_iterator)
-        self.grid_environment.do_iteration(agents=(agent,))
+    def __do_action_button__OnPress(self, sender, event_args):
+        if(self.grid_environment.has_agents_in_terminal_state()):
+            self.grid_environment.reset()
+        else:
+            agent = next(self.grid_environment.get_agents_cycler())
+            self.grid_environment.do_action(agent=agent)
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
     """
-    def __do_iterations_button__OnPress(self, sender, event_args):
-        if(self.do_iterations_is_running):
+    def __do_actions_button__OnPress(self, sender, event_args):
+        if(self.do_actions_is_running):
             return
-        self.do_iterations_is_running = True
+        self.do_actions_is_running = True
 
-        self.do_iteration_sizer.DisableChildren()
+        self.do_action_sizer.DisableChildren()
 
         def _():
-            agents_iterator = core.ObjectStorage.intercept(self, 'agents_iterator', lambda: itertools.cycle(self.grid_environment.get_agents()))
-            while self.do_iterations_is_running:
-                agent = next(agents_iterator)
-                self.grid_environment.do_iteration(agents=(agent,))
+            while self.do_actions_is_running:
+                if(self.grid_environment.has_agents_in_terminal_state()):
+                    self.grid_environment.reset()
+                else:
+                    agent = next(self.grid_environment.get_agents_cycler())
+                    self.grid_environment.do_action(agent=agent)
                 self.grid_canvas.UpdateDrawing()
-                time.sleep(self.do_iterations_speed_spinbox.GetValue())          
+                time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)
         thread.start()
 
-    def __cancel_iterations_button__OnPress(self, sender, event_args):
-        if(not self.do_iterations_is_running):
+    def __cancel_actions_button__OnPress(self, sender, event_args):
+        if(not self.do_actions_is_running):
             return
-        self.do_iterations_is_running = False
+        self.do_actions_is_running = False
 
-        self.do_iteration_sizer.EnableChildren()
+        self.do_action_sizer.EnableChildren()

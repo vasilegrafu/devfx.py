@@ -86,15 +86,12 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _do_action(self, agent, action):
+    def _do_next_transition(self, agent, action):
         scene = self.get_scene()
 
         agent_ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
         agent_next_ci = agent_ci + action.get_value()
-
-        if(agent_next_ci[0] == 10 or agent_next_ci[1] == 10):
-            x = 0
-
+        
         scene[agent.get_id(),agent_ci[0],agent_ci[1]] = 0
         scene[agent.get_id(),agent_next_ci[0],agent_next_ci[1]] = agent.get_id()
 
@@ -103,7 +100,7 @@ class GridEnvironment(ml.rl.Environment):
         if(scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
             agent_reward = ml.rl.Reward(value=-1e+3)
             agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
-            other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+            # other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
         else:
             other_agent_ci = np.argwhere(scene[other_agent.get_id(),:,:] == other_agent.get_id())[0]
             if(np.equal(agent_next_ci, other_agent_ci).all()):
@@ -111,15 +108,15 @@ class GridEnvironment(ml.rl.Environment):
                     case GridAgentKind.CHASER:   
                         agent_reward = ml.rl.Reward(value=+1e+3)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
-                        other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+                        # other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
                     case GridAgentKind.CHASED: 
                         agent_reward = ml.rl.Reward(value=-1e+3)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
-                        other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+                        # other_agent_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
             else:
                 agent_reward = ml.rl.Reward(value=0)
                 agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
-                other_agent_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
+                # other_agent_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
         
         # other_agent.set_state(state=other_agent_state)
         

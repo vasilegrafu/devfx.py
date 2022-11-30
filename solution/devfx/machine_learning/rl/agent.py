@@ -113,7 +113,7 @@ class Agent(object):
         if(action is None):
             return None
 
-        reward_and_next_state = self.get_environment().do_action(agent=self, action=action)
+        reward_and_next_state = self.get_environment().do_next_transition(agent=self, action=action)
         
         if(reward_and_next_state is None):
             return None

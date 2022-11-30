@@ -89,7 +89,7 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """
-    def _do_action(self, agent, action):
+    def _do_next_transition(self, agent, action):
         scene = self.get_scene()
 
         ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
