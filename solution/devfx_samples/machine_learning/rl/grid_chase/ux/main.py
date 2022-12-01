@@ -8,7 +8,7 @@ class Application(ux.Application):
     def OnInit(self):
         super().OnInit()
         self.main_window = MainWindow(title="MainWindow",
-                                      size=(1024, 768),
+                                      size=(1024, 704),
                                       align=(ux.CENTER, ux.CENTER))
         self.main_window.Show()
         return True

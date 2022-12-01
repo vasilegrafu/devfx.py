@@ -16,3 +16,7 @@ class GridBagSizer(wx.GridBagSizer,
         window.SetSizer(self, *args, **kwargs)
         return self
 
+    def AddToWindowAndFit(self, window, *args, **kwargs):
+        window.SetSizerAndFit(self, *args, **kwargs)
+        return self
+

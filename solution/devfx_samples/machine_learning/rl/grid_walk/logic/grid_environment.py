@@ -44,7 +44,7 @@ class GridEnvironment(ml.rl.Environment):
         self.get_scene()[1,3,3] = -1
         self.get_scene()[1,4,4] = -1
         self.get_scene()[1,5,5] = -1
-        self.get_scene()[1,1,6] = +1
+        self.get_scene()[1,1,6] = -1
         self.get_scene()[1,2,6] = -1
 
         self.get_scene()[2,:,:] = 0

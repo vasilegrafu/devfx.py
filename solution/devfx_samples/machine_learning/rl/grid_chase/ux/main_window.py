@@ -16,6 +16,7 @@ class MainWindow(ux.Window):
 
         self.__init_model()
 
+        self.Center()
         self.__init_widgets()
         self.__init_layout()
 
@@ -31,14 +32,16 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __init_widgets(self):
-        self.grid_canvas = ux.Canvas(self, size=(64, 64))
+        self.grid_canvas = ux.Canvas(self, size=(256, 256))
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
         self.train_button = ux.Button(parent=self, label='Train')
         self.train_button.OnPress += self.__train_button__OnPress
         self.cancel_training_button = ux.Button(parent=self, label='Cancel training')
         self.cancel_training_button.OnPress += self.__cancel_training_button__OnPress
+        self.train_count_text_label = ux.Text(parent=self, label='Iterations:')
         self.train_count_text = ux.Text(parent=self, label='0', size=(64, -1))
+        self.train_batch_time_elapsed_text_label = ux.Text(parent=self, label='Time elapsed/batch:')
         self.train_batch_time_elapsed_text = ux.Text(parent=self, label='0', size=(64, -1))
         self.training_is_running = False
         
@@ -53,36 +56,37 @@ class MainWindow(ux.Window):
         self.cancel_actions_button.OnPress += self.__cancel_actions_button__OnPress
         self.do_actions_is_running = False
 
+        self.reset_button = ux.Button(parent=self, label='Reset')
+        self.reset_button.OnPress += self.__reset_button__OnPress
+
     def __init_layout(self):
         #
-        self.main_sizer = ux.GridBagSizer().AddToWindow(self)
-        self.grid_sizer = ux.GridBagSizer().AddToSizer(self.main_sizer, pos=(0, 0), flag=ux.EXPAND)
-        self.grid_sizer.AddGrowableCol(0)
-        self.grid_sizer.AddGrowableRow(0)
-        self.command_sizer = ux.GridBagSizer(hgap=32).AddToSizer(self.main_sizer, pos=(1, 0), flag=ux.ALIGN_CENTER)
-        self.main_sizer.AddGrowableCol(0)
-        self.main_sizer.AddGrowableRow(0, 1)
-        self.main_sizer.AddGrowableRow(1, 0)
+        self.window_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToWindow(self)
 
-        self.training_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(0, 0), span=(1, 2), flag=ux.ALIGN_RIGHT | ux.TOP, border=4)
-        self.agent_settings_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(1, 0), span=(2, 1), flag=ux.ALIGN_CENTER_VERTICAL | ux.ALIGN_RIGHT)
-        self.do_action_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(1, 1), flag=ux.ALIGN_RIGHT | ux.TOP, border=4)
-        self.do_actions_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, pos=(2, 1), flag=ux.ALIGN_RIGHT | ux.TOP | ux.BOTTOM, border=4)
+        self.grid_canvas.AddToSizer(self.window_sizer, flag=ux.SHAPED | ux.EXPAND | ux.ALL, border=4)
 
-        # 
-        self.grid_canvas.AddToSizer(self.grid_sizer, pos=(0, 0), flag=ux.ALIGN_CENTER | ux.SHAPED)
+        self.command_sizer = ux.BoxSizer(ux.VERTICAL).AddToSizer(self.window_sizer, flag=ux.EXPAND)
 
-        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT)
-        self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-        self.train_count_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
-        self.train_batch_time_elapsed_text.AddToSizer(self.training_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
-        
-        self.do_action_button.AddToSizer(self.do_action_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
+        self.training_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, flag=ux.EXPAND)
+        self.train_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.cancel_training_button.AddToSizer(self.training_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4) 
+        self.training_sizer_info = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, flag=ux.EXPAND)
+        self.train_count_text_label.AddToSizer(self.training_sizer_info, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.train_count_text.AddToSizer(self.training_sizer_info, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.train_batch_time_elapsed_text_label.AddToSizer(self.training_sizer_info, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.train_batch_time_elapsed_text.AddToSizer(self.training_sizer_info, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
 
-        self.do_actions_speed_label.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL)
-        self.do_actions_speed_spinbox.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=2) 
-        self.do_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4) 
-        self.cancel_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_CENTER_VERTICAL | ux.LEFT, border=4)
+        self.do_action_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, flag=ux.EXPAND)
+        self.do_action_button.AddToSizer(self.do_action_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+
+        self.do_actions_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, flag=ux.EXPAND)
+        self.do_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.cancel_actions_button.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.do_actions_speed_label.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+        self.do_actions_speed_spinbox.AddToSizer(self.do_actions_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
+ 
+        self.reset_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToSizer(self.command_sizer, flag=ux.EXPAND)
+        self.reset_button.AddToSizer(self.reset_sizer, flag=ux.ALIGN_LEFT | ux.ALIGN_CENTER_VERTICAL | ux.ALL, border=4)
 
 
     """------------------------------------------------------------------------------------------------
@@ -149,6 +153,12 @@ class MainWindow(ux.Window):
         else:
             agent = next(self.grid_environment.get_agents_cycler())
             self.grid_environment.do_action(agent=agent)
+        self.grid_canvas.UpdateDrawing()  
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __reset_button__OnPress(self, sender, event_args):
+        self.grid_environment.reset()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------

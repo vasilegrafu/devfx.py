@@ -1,4 +1,4 @@
-import itertools
+import threading
 import numpy as np
 import random as rnd
 import devfx.exceptions as ex
@@ -35,19 +35,19 @@ class Environment(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def __setup_agents_container(self):
-        self.__agents_container = []
+        self.__agents_container = {}
 
     """------------------------------------------------------------------------------------------------
     """ 
     def add_agents(self, agents):
         for agent in agents:
-            if(agent.get_id() in (agent.get_id() for agent in self.__agents_container)):
+            if(agent.get_id() in self.__agents_container):
                 raise ex.ApplicationError()
             
         for agent in agents:
-            self.__agents_container.append(agent)
+            self.__agents_container[agent.get_id()] = agent
             agent.set_environment(environment=self)
-        
+            
         self._on_added_agents(agents=agents)
        
     def _on_added_agents(self, agents):
@@ -56,14 +56,14 @@ class Environment(object):
 
     def remove_agents(self, agents=None):
         if(agents is None):
-            agents = self.get_agents()
+            agents = self.__agents_container
             
         for agent in agents:    
-            if(agent.get_id() not in (agent.get_id() for agent in self.__agents_container)):
+            if(agent.get_id() not in self.__agents_container):
                 raise ex.ApplicationError()
             
         for agent in agents: 
-            self.__agents_container.remove(agent)
+            self.__agents_container.pop(agent.get_id())
             agent.set_environment(environment=None)
 
         self._on_removed_agents(agents=agents)
@@ -73,52 +73,53 @@ class Environment(object):
 
 
     def get_agents(self):
-        agents = self.__agents_container
+        agents = [agent for agent in self.__agents_container.values()]
         return agents
 
     def get_agents_cycler(self):
         def get_agents_cycler(self):
             while(True):
-                for agent in self.__agents_container:
+                agents = [agent for agent in self.__agents_container.values()]
+                for agent in agents:
                     yield agent  
         agents_iter = core.ObjectStorage.intercept(self, 'agents_iter', lambda: get_agents_cycler(self=self))
         return agents_iter
 
 
     def exists_agent(self, id):
-        return id in (agent.get_id() for agent in self.__agents_container)
+        return id in self.__agents_container
 
 
     def get_agent(self, id):
-        if(id not in (agent.get_id() for agent in self.__agents_container)):
+        if(id not in self.__agents_container):
             raise ex.ApplicationError()
-        agent = [agent for agent in self.__agents_container if(agent.get_id() == id)][0]
+        agent = [agent for agent in self.__agents_container.values() if(agent.get_id() == id)][0]
         return agent
 
     def get_agents_others_than(self, id):
-        agents = [agent for agent in self.__agents_container if(agent.get_id() != id)]
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_id() != id)]
         return agents
 
 
     def get_agents_of_kind(self, kind):
-        agents = [agent for agent in self.__agents_container if(agent.get_kind() == kind)]
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_kind() == kind)]
         return agents
 
     def get_agents_not_of_kind(self, kind):
-        agents = [agent for agent in self.__agents_container if(agent.get_kind() != kind)]
+        agents = [agent for agent in self.__agents_container.values() if(agent.get_kind() != kind)]
         return agents
 
 
     def has_agents_in_undefined_state(self):
-        has_agents_in_undefined_state = any(agent.is_in_undefined_state() for agent in self.__agents_container)
+        has_agents_in_undefined_state = any(agent.is_in_undefined_state() for agent in self.__agents_container.values())
         return has_agents_in_undefined_state
         
     def has_agents_in_terminal_state(self):
-        has_agents_in_terminal_state = any(agent.is_in_terminal_state() for agent in self.__agents_container)
+        has_agents_in_terminal_state = any(agent.is_in_terminal_state() for agent in self.__agents_container.values())
         return has_agents_in_terminal_state
     
     def has_agents_in_non_terminal_state(self):
-        has_agents_in_non_terminal_state = any(agent.is_in_non_terminal_state() for agent in self.__agents_container)
+        has_agents_in_non_terminal_state = any(agent.is_in_non_terminal_state() for agent in self.__agents_container.values())
         return has_agents_in_non_terminal_state
 
     """------------------------------------------------------------------------------------------------
@@ -147,12 +148,10 @@ class Environment(object):
         self._do_iteration(log_transition=log_transition)
 
     def _do_iteration(self, log_transition=False):
-        agents = self.get_agents()
-    
-        if(any(agent.is_in_terminal_state() for agent in agents)):
-            self.reset()
-        else:
-            for agent in agents:
+        for agent in self.get_agents():
+            if(self.has_agents_in_terminal_state()):
+                self.reset()
+            else:
                 self.do_action(agent=agent, log_transition=log_transition)
 
 
