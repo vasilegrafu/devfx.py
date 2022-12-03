@@ -2,6 +2,7 @@ import wx
 import devfx.core as core
 from .layout_handler import LayoutHandler
 from .. import groups
+from .. import constants
 
 class BoxSizer(wx.BoxSizer, 
                LayoutHandler, 
@@ -15,5 +16,4 @@ class BoxSizer(wx.BoxSizer,
     def AddToWindow(self, window, *args, **kwargs):
         window.SetSizer(self, *args, **kwargs)
         return self
-
 

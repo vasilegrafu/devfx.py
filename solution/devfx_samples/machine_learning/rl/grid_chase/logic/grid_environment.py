@@ -65,11 +65,10 @@ class GridEnvironment(ml.rl.Environment):
             choosable_ci = np.argwhere(  (scene[0,:,:] == 0) 
                                        & (scene[1,:,:] == 0) 
                                        & (scene[2,:,:] == 0))
-            ci = rnd.choice(choosable_ci)
-            scene[agent.get_id(),ci[0],ci[1]] = agent.get_id()
+            agent_ci = rnd.choice(choosable_ci)
+            scene[agent.get_id(),agent_ci[0],agent_ci[1]] = agent.get_id()
 
         for agent in self.get_agents():
-            ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
             state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
             agent.set_state(state=state)
 

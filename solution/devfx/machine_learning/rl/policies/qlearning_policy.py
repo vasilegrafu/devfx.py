@@ -41,20 +41,6 @@ class QLearningPolicy(TabularPolicy):
                 error = reward.get_value() + self.get_discount_factor()*super().get_max_value(next_state) - super().get_value(state, action)
             value = super().get_value(state, action) + self.get_learning_rate()*error
             super().set_value(state, action, value)
-          
-    """------------------------------------------------------------------------------------------------
-    """
-    def _get_action(self, state):
-        is_terminal_state = state.is_terminal()
-        if(is_terminal_state):
-            return None
-    
-        if(not self.has_state(state=state)):
-             return None
-        if(not self.has_actions(state=state)):
-             return None
 
-        action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
-        return action
 
 

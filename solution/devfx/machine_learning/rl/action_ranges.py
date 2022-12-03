@@ -63,23 +63,17 @@ class ContinousRange(Range):
 
 """================================================================================================
 """
-class ActionGenerator(object):
+class ActionRanges(object):
     def __init__(self, ranges):
         self.__set_ranges(ranges=ranges)
 
     """------------------------------------------------------------------------------------------------
     """
     def __set_ranges(self, ranges):
-        self.__ranges = ranges
+        self.__ranges = { range.get_name(): range for range in ranges }
 
     def get_ranges(self):
         return self.__ranges
 
-    """------------------------------------------------------------------------------------------------
-    """
-    def get_random(self):
-        return self._get_random()
-
-    def _get_random(self):
-        action = Action(name='unknown', value=[range.get_random() for range in self.get_ranges()])
-        return action
+    def get_range(self, name):
+        return self.__ranges[name]

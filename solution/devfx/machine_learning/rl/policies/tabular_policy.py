@@ -1,3 +1,4 @@
+import random as rnd
 import devfx.exceptions as ex
 
 from .policy import Policy
@@ -84,7 +85,24 @@ class TabularPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """
     def _get_action(self, state):
-        raise ex.NotImplementedError()
+        is_terminal_state = state.is_terminal()
+        if(is_terminal_state):
+            return None
+    
+        if(not self.has_state(state=state)):
+             return None
+        if(not self.has_actions(state=state)):
+             return None
+
+        action = max(self.get_actions(state=state), key=lambda action: self.get_value(state=state, action=action))
+        return action
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def _get_random_action(self, state):
+        random_action = rnd.choice(self.get_actions(state=state))
+        return random_action
+
                 
 
 

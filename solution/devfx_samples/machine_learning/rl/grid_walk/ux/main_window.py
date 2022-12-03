@@ -26,7 +26,7 @@ class MainWindow(ux.Window):
         self.grid_environment_for_training = GridEnvironment(training=True)
         self.grid_environment_for_training.setup()
 
-        self.grid_environment = GridEnvironment()
+        self.grid_environment = GridEnvironment(training=True)
         self.grid_environment.setup()
         
     """------------------------------------------------------------------------------------------------
@@ -144,7 +144,8 @@ class MainWindow(ux.Window):
                 sw = dgn.Stopwatch().start()
                 n = 1000
                 self.grid_environment_for_training.do_iterations(n, log_transition=True)
-                self.grid_environment.learn_from_logged_transitions(self.grid_environment_for_training)
+                self.grid_environment.transfer_logged_transitions_from(self.grid_environment_for_training)
+                self.grid_environment.learn_from_logged_transitions()
                 N += n
                 self.train_count_text.Label = str(N)
                 self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)
@@ -181,7 +182,8 @@ class MainWindow(ux.Window):
                     self.grid_environment.reset()
                 else:
                     agent = next(self.grid_environment.get_agents_cycler())
-                    self.grid_environment.do_action(agent=agent)
+                    self.grid_environment.do_action(agent=agent, log_transition=True)
+                    self.grid_environment.learn_from_logged_transitions()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)

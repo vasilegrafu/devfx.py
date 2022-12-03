@@ -31,6 +31,14 @@ class Policy(object):
 
     def _get_action(self, state):
         raise ex.NotImplementedError()
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def get_random_action(self, state):
+        return self._get_action(state=state)
+
+    def _get_random_action(self, state):
+        raise ex.NotImplementedError()
     
 
 

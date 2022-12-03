@@ -129,6 +129,15 @@ class Environment(object):
         return transition
 
     """------------------------------------------------------------------------------------------------
+    """  
+    def generate_random_action(self, agent):
+        action = self._generate_random_action(agent=agent)
+        return action
+
+    def _generate_random_action(self, agent):
+        raise ex.NotImplementedError()
+
+    """------------------------------------------------------------------------------------------------
     """    
     def do_next_transition(self, agent, action):
         is_terminal_state = agent.is_in_terminal_state()
@@ -169,7 +178,7 @@ class Environment(object):
         for agent in agents:
             agent.clear_logged_transitions()
 
-    def learn_from_logged_transitions(self, environment, clear_logged_transitions=True):
+    def transfer_logged_transitions_from(self, environment):
         to_agents = self.get_agents()
         from_agents = environment.get_agents()
         
@@ -180,9 +189,21 @@ class Environment(object):
         from_agents = sorted(from_agents, key=lambda agent: agent.get_id())
         
         for (to_agent, from_agent) in zip(to_agents, from_agents):
-            to_agent.learn(transitions=from_agent.get_logged_transitions())
-            if(clear_logged_transitions == True):
-                from_agent.clear_logged_transitions()
+            to_agent.transfer_logged_transitions_from(agent=from_agent)
+
+    def transfer_logged_transitions_to(self, environment):
+        environment.transfer_logged_transitions_from(environment=self)  
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def learn_from_logged_transitions(self, clear_logged_transitions=True):
+        for agent in self.get_agents():
+            agent.learn_from_logged_transitions(clear_logged_transitions=clear_logged_transitions)
+
+     
+
+
+
         
 
 

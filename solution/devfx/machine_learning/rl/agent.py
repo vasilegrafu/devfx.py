@@ -1,4 +1,5 @@
 import numpy as np
+import random as rnd
 import devfx.exceptions as ex
 import devfx.core as core
 
@@ -7,7 +8,9 @@ class Agent(object):
         self.__set_id(id=id)
         self.__set_name(name=name)
         self.__set_kind(kind=kind)
-        self.__set_policy(policy=policy)  
+        self.__set_policy(policy=policy) 
+        
+        self.__setup_action_randomness()
 
         self.__setup_transitions_log()
 
@@ -65,6 +68,17 @@ class Agent(object):
 
     def transfer_policy_to(self, agent):
         agent.transfer_policy_from(agent=self)
+
+    """------------------------------------------------------------------------------------------------
+    """
+    def __setup_action_randomness(self):
+        self.__action_randomness = None
+
+    def set_action_randomness(self, action_randomness):
+        self.__action_randomness = action_randomness
+
+    def get_action_randomness(self):
+        return self.__action_randomness
     
     """------------------------------------------------------------------------------------------------
     """ 
@@ -107,14 +121,22 @@ class Agent(object):
 
         state = self.get_state()
         
-        if(action is None):
-            action = self.get_policy().get_action(state=state)
-
-        if(action is None):
-            return None
-
+        if(self.get_action_randomness() is None):
+            if(action is None):
+                action = self.get_policy().get_action(state=state)
+            if(action is None):
+                return None
+        else:
+            random_number = rnd.random()
+            if(random_number < self.get_action_randomness()):
+                action = self.get_environment().generate_random_action(agent=self)
+            else:
+                if(action is None):
+                    action = self.get_policy().get_action(state=state)      
+                if(action is None):
+                    return None
+            
         reward_and_next_state = self.get_environment().do_next_transition(agent=self, action=action)
-        
         if(reward_and_next_state is None):
             return None
 
@@ -128,11 +150,6 @@ class Agent(object):
             self.log_transition(transition=transition)
         
         return transition
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def learn(self, transitions):
-        self.get_policy().learn(transitions=transitions)
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -154,5 +171,25 @@ class Agent(object):
     def clear_logged_transitions(self):
         return self.__transitions_log.clear()
 
-    def learn_from_logged_transitions(self):
-        self.get_policy().learn(transitions=self.__transitions_log)
+
+    def transfer_logged_transitions_from(self, agent):
+        self.clear_logged_transitions()
+        self.log_transitions(transitions=agent.get_logged_transitions())
+        agent.clear_logged_transitions()
+
+    def transfer_logged_transitions_to(self, agent):
+        agent.transfer_logged_transitions_from(agent=self)   
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def learn_from_logged_transitions(self, clear_logged_transitions=True):
+        self.get_policy().learn(transitions=self.get_logged_transitions())
+        if(clear_logged_transitions):
+            self.clear_logged_transitions()    
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def learn(self, transitions):
+        self.get_policy().learn(transitions=transitions)
+
+
