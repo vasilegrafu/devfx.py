@@ -164,7 +164,8 @@ class MainWindow(ux.Window):
             self.grid_environment.reset()
         else:
             agent = next(self.grid_environment.get_agents_cycler())
-            self.grid_environment.do_action(agent=agent)
+            agent.do_action(log_transition=True)
+            agent.learn_from_logged_transitions()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -182,8 +183,8 @@ class MainWindow(ux.Window):
                     self.grid_environment.reset()
                 else:
                     agent = next(self.grid_environment.get_agents_cycler())
-                    self.grid_environment.do_action(agent=agent, log_transition=True)
-                    self.grid_environment.learn_from_logged_transitions()
+                    agent.do_action(log_transition=True)
+                    agent.learn_from_logged_transitions()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)

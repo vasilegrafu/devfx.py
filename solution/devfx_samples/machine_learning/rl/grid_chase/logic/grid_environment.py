@@ -1,17 +1,18 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as ex
 import devfx.machine_learning as ml
 
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
-from .grid_agent_random_policy import GridAgentRandomPolicy
+from .grid_agent_action_ranges import GridAgentActionRanges
 
 class GridEnvironment(ml.rl.Environment):
     def __init__(self, training=False):
         super().__init__()
 
         self.__training = training
+
+        self.__action_ranges = GridAgentActionRanges()
         
     """------------------------------------------------------------------------------------------------
     """
@@ -45,11 +46,17 @@ class GridEnvironment(ml.rl.Environment):
         agent1 = GridAgent(id=1, 
                            name='Wolf', 
                            kind=GridAgentKind.CHASER, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=5e-1))
+                           policy=ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=1e-1))
+        if(self.__training == True):
+            agent1.set_action_randomness(1.0)
+
         agent2 = GridAgent(id=2, 
                            name='Rabbit', 
                            kind=GridAgentKind.CHASED, 
-                           policy=GridAgentRandomPolicy() if self.__training == True else ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=5e-1))
+                           policy=ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=1e-1))
+        if(self.__training == True):
+            agent2.set_action_randomness(1.0)
+        
         self.add_agents((agent1, agent2))
 
     def _on_added_agents(self, agents):
@@ -84,14 +91,21 @@ class GridEnvironment(ml.rl.Environment):
         scene[2,:,:] = 0
 
     """------------------------------------------------------------------------------------------------
-    """
+    """  
+    def _generate_random_action(self, agent):
+        range = self.__action_ranges.get_range(name='MOVE')
+        action = ml.rl.Action(*range.get_random())
+        return action
+
+    """------------------------------------------------------------------------------------------------
+    """  
     def _do_next_transition(self, agent, action):
         scene = self.get_scene()
 
         agent_ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
         match agent.get_kind():
             case GridAgentKind.CHASER:   
-                agent_next_ci = agent_ci
+                agent_next_ci = agent_ci + action.get_value()
             case GridAgentKind.CHASED: 
                 agent_next_ci = agent_ci + action.get_value()
         
