@@ -41,6 +41,9 @@ class State(object):
     """
     def get_value(self):
         return self.get_data().get_value()
+
+    def get_hash(self):
+        return hash((self.get_name(), self.get_data()))
     
     """------------------------------------------------------------------------------------------------
     """

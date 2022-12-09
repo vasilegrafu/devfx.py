@@ -1,6 +1,6 @@
 from .tabular_policy import TabularPolicy
 
-class QLearningPolicy(TabularPolicy):
+class DoubleQLearningPolicy(TabularPolicy):
     def __init__(self, discount_factor, learning_rate):
         super().__init__()
 

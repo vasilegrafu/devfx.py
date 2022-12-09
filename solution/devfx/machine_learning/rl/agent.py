@@ -123,7 +123,7 @@ class Agent(object):
         
         if(self.get_action_randomness() is None):
             if(action is None):
-                action = self.get_policy().get_action(state=state)
+                action = self.get_policy().get_max_action(state=state)
             if(action is None):
                 return None
         else:
@@ -132,7 +132,7 @@ class Agent(object):
                 action = self.get_environment().generate_random_action(agent=self)
             else:
                 if(action is None):
-                    action = self.get_policy().get_action(state=state)      
+                    action = self.get_policy().get_max_action(state=state)      
                 if(action is None):
                     return None
             

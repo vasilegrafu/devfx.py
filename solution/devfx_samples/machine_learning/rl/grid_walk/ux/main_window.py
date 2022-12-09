@@ -122,7 +122,7 @@ class MainWindow(ux.Window):
 
         # draw policy
         agent = self.grid_environment.get_agent(id=1)
-        for (state, action, value) in agent.get_policy().iter:
+        for (state, action, value) in agent.get_policy().get_model().get_sav_iterator():
             ci = np.argwhere(state[2,:,:] == agent.get_id())[0]
             if(action.get_name() == 'LEFT'):    (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
             elif(action.get_name() == 'RIGHT'): (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)

@@ -7,7 +7,7 @@ import devfx.core as core
 class Data(object):
     def __init__(self, value, *args, **kwargs):
         self.__setup_value(value, *args, **kwargs)
-        self.__setup_hash()
+        self.__calculate_hash()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -29,7 +29,7 @@ class Data(object):
 
     """------------------------------------------------------------------------------------------------
     """
-    def __setup_hash(self):
+    def __calculate_hash(self):
         self.__hash = int(hlib.md5(self.get_value().view(np.uint8)).hexdigest(), 16)
 
     """------------------------------------------------------------------------------------------------
@@ -49,6 +49,7 @@ class Data(object):
     """
     def __setitem__(self, key, item):
         self.get_value()[key] = item
+        self.__calculate_hash()
 
     def __getitem__(self, key):
         return self.get_value()[key]

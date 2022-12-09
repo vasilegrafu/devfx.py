@@ -26,16 +26,16 @@ class Policy(object):
     
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_action(self, state):
-        return self._get_action(state=state)
+    def get_max_action(self, state):
+        return self._get_max_action(state=state)
 
-    def _get_action(self, state):
+    def _get_max_action(self, state):
         raise ex.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def get_random_action(self, state):
-        return self._get_action(state=state)
+        return self._get_random_action(state=state)
 
     def _get_random_action(self, state):
         raise ex.NotImplementedError()

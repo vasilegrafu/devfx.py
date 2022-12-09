@@ -20,6 +20,6 @@ class AproximatePolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _get_action(self, state):
+    def _get_max_action(self, state):
         raise ex.NotImplementedError()
 
