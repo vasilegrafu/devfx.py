@@ -17,6 +17,22 @@ class DoubleTabularPolicy(Policy):
         return self.__model
 
     """------------------------------------------------------------------------------------------------
+    """
+    def get_sav_iterator(self):
+        states1 = self.get_model()[1].get_states()
+        states2 = self.get_model()[2].get_states()
+        states = [state for state in states1 if state in states2]
+        for state in states:
+            actions1 = self.get_model()[1].get_actions(state=state)
+            actions2 = self.get_model()[2].get_actions(state=state)
+            actions = [action for action in actions1 if action in actions2]
+            for action in actions:
+                value1 = self.get_model()[1].get_value(state=state, action=action)
+                value2 = self.get_model()[2].get_value(state=state, action=action)
+                value = (value1 + value2)/2.0
+                yield (state, action, value)
+
+    """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, transitions):
         raise ex.NotImplementedError()
@@ -27,22 +43,45 @@ class DoubleTabularPolicy(Policy):
         is_terminal_state = state.is_terminal()
         if(is_terminal_state):
             return None
-    
-        action_values1 = self.get_model()[1].get_action_values_or_none(state)
-        action_values2 = self.get_model()[2].get_action_values_or_none(state)
 
-        if((action_values1 is None) or (action_values2 is None)):
+        model1 = self.get_model()[1]
+        model2 = self.get_model()[2]
+
+        if(not model1.has_state(state=state)):
             return None
-        
-        actions = action_values1.keys() & action_values2.keys()
+        if(not model1.has_actions(state=state)):
+            return None
+        if(not model2.has_state(state=state)):
+            return None
+        if(not model2.has_actions(state=state)):
+            return None
 
-        action = max(actions, key=lambda action: action_values1[action] + action_values2[action])
+        actions1 = model1.get_actions(state=state)
+        actions2 = model2.get_actions(state=state)
+        actions = [action for action in actions1 if action in actions2]
+        if(len(actions) == 0):
+            return None
+
+        action = max(actions, key=lambda action: (model1.get_value(state=state, action=action) + model2.get_value(state=state, action=action))/2.0)
         return action
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_action(self, state):
-        random_action = rnd.choice(self.get_model().get_actions(state=state))
+        is_terminal_state = state.is_terminal()
+        if(is_terminal_state):
+            return None
+
+        model1 = self.get_model()[1]
+        model2 = self.get_model()[2]
+
+        actions1 = model1.get_actions(state=state)
+        actions2 = model2.get_actions(state=state)
+        actions = [action for action in actions1 if action in actions2]
+        if(len(actions) == 0):
+            return None
+
+        random_action = rnd.choice(actions)
         return random_action
 
                 

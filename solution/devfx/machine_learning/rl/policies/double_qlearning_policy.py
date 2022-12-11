@@ -1,6 +1,7 @@
-from .tabular_policy import TabularPolicy
+import random as rnd
+from .double_tabular_policy import DoubleTabularPolicy
 
-class DoubleQLearningPolicy(TabularPolicy):
+class DoubleQLearningPolicy(DoubleTabularPolicy):
     def __init__(self, discount_factor, learning_rate):
         super().__init__()
 
@@ -29,14 +30,24 @@ class DoubleQLearningPolicy(TabularPolicy):
         for transition in transitions:
             (state, action, (reward, next_state)) = transition
 
-            value = super().get_model().get_value_or_zero(state, action)
+            model1 = super().get_model()[1]
+            model2 = super().get_model()[2]
 
-            if(not super().get_model().has_state(next_state)):
-                error = reward.get_value() - value
+            random_number = rnd.random()
+            if(random_number < 0.5):
+                state_action_value = model1.get_value_or_zero(state, action)
+                max_action = model2.get_max_action(state=state)
+                next_state_max_value = model2.get_max_value_or_zero(next_state)
+                error = reward.get_value() + self.get_discount_factor()*next_state_max_value - state_action_value
+                state_action_value = state_action_value + self.get_learning_rate()*error
+                model1.set_value(state, action, state_action_value)
             else:
-                error = reward.get_value() + self.get_discount_factor()*super().get_model().get_max_value(next_state) - value
-            next_value = value + self.get_learning_rate()*error
-            super().get_model().set_value(state, action, next_value)
+                state_action_value = model2.get_value_or_zero(state, action)
+                next_state_max_value = model1.get_max_value_or_zero(next_state)
+                error = reward.get_value() + self.get_discount_factor()*next_state_max_value - state_action_value
+                state_action_value = state_action_value + self.get_learning_rate()*error
+                model2.set_value(state, action, state_action_value)
+
 
 
 

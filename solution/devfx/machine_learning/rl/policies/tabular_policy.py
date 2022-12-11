@@ -15,6 +15,11 @@ class TabularPolicy(Policy):
    
     def _get_model(self):
         return self.__model
+  
+    """------------------------------------------------------------------------------------------------
+    """
+    def get_sav_iterator(self):
+        return self.get_model().get_sav_iterator()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -28,17 +33,17 @@ class TabularPolicy(Policy):
         if(is_terminal_state):
             return None
     
-        action_values = self.get_model().get_action_values_or_none(state)
-        if(action_values is None):
-            return None
-
-        action = max(action_values.keys(), key=lambda action: action_values[action])
+        action = self.get_model().get_max_action(state=state)
         return action
 
     """------------------------------------------------------------------------------------------------
     """
     def _get_random_action(self, state):
-        random_action = rnd.choice(self.get_model().get_actions(state=state))
+        is_terminal_state = state.is_terminal()
+        if(is_terminal_state):
+            return None
+
+        random_action = self.get_model().get_random_action(state=state)
         return random_action
 
                 
