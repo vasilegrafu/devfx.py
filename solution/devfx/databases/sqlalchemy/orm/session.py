@@ -176,53 +176,11 @@ class Session(object):
         return instance
 
     """----------------------------------------------------------------
-    """
-    # def save_data(self, entity, data):
-    #     columns = {column.name: column for column in sa.inspection.inspect(entity).c}
-    #     primary_key_columns = {column.name: column for column in sa.inspection.inspect(entity).primary_key}
-    #     instances = []
-    #     for row in data.itertuples():
-    #         instance = self.__session.query(entity) \
-    #                                  .get([core.getattr(row, column_name) for column_name in primary_key_columns])
-    #         if(instance is None):
-    #             instance = entity()                   
-    #             for column_name in columns:
-    #                 core.setattr(instance, column_name, core.getattr(row, column_name))
-    #             instances.append(instance)
-    #         else:
-    #             for column_name in columns:
-    #                 core.setattr(instance, column_name, core.getattr(row, column_name))
-    #     self.__session.bulk_save_objects(instances)
-
-    # def save_data(self, entity, data):
-    #     columns = [column for column in sa.inspection.inspect(entity).c]
-    #     primary_key_columns = [column for column in sa.inspection.inspect(entity).primary_key]
-    #     instances = []
-    #     data_chunk_size = 100
-    #     data_chunks = [data[i:i+data_chunk_size].copy() for i in range(0, data.shape[0], data_chunk_size)]
-    #     for data_chunk in data_chunks:
-    #         data_chunk['pk_tuple'] = data_chunk[[column.name for column in primary_key_columns]].apply(tuple, axis=1)
-
-    #         instances_from_db = self.__session.query(entity) \
-    #                                           .filter(sa.or_(*[sa.and_(*[column == core.getattr(data_chunk_row, column.name) for column in primary_key_columns]) for data_chunk_row in data_chunk.itertuples()])) \
-    #                                           .all()  
-    #         instances_from_db = {tuple([core.getattr(instance, column.name) for column in primary_key_columns]): instance for instance in instances_from_db}
-            
-    #         for data_chunk_row in data_chunk.itertuples(index=None, name=None):
-    #             pk_tuple = data_chunk_row[data_chunk.columns.get_loc('pk_tuple')]
-    #             if(pk_tuple not in instances_from_db):
-    #                 instance = entity()   
-    #             else:
-    #                 instance = instances_from_db[pk_tuple]
-    #             for column in columns:
-    #                 core.setattr(instance, column.name, data_chunk_row[data_chunk.columns.get_loc(column.name)])
-    #             instances.append(instance)
-    #     self.__session.bulk_save_objects(instances)
-    
+    """   
     def save_data(self, entity, data):
         primary_key_columns = [column for column in sa.inspection.inspect(entity).primary_key]
         instances = []
-        data_chunk_size = 100
+        data_chunk_size = 512
         data_chunks = [data[i:i+data_chunk_size].copy() for i in range(0, data.shape[0], data_chunk_size)]
         for data_chunk in data_chunks:
             data_chunk.set_index([column.name for column in primary_key_columns], inplace=True)
@@ -297,7 +255,7 @@ class Session(object):
             return count
 
         def __get_data(self, instances):
-            if(core.is_instance(self.__columns[0], sa.ext.declarative.api.DeclarativeMeta)):
+            if(core.is_instance(self.__columns[0], sa.orm.DeclarativeMeta)):
                 data = pd.DataFrame.from_records(data=[instance.__dict__ for instance in instances], 
                                                  columns=[column.name for column in sa.inspection.inspect(*self.__columns).c])
                 if(self.__index is not None):

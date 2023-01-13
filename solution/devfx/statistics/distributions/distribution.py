@@ -244,9 +244,8 @@ class distribution(distribution_algebra_operation_node):
         return (lol, uol)
 
     def is_outlierNx(self, x, Nx):
-        x = np.asarray(x)
         (lol, uol) = self.outliersNx_limits(Nx)
-        return ~((lol <= x) & (x <= uol))
+        return not ((lol <= x) and (x <= uol))
 
     def lolNx(self, Nx):
         (lol, uol) = self.outliersNx_limits(Nx)

@@ -6,12 +6,18 @@ import devfx.math as math
 from .distribution import distribution
 
 class empirical(distribution):
-    def __init__(self, data):
+    def __init__(self, data, olNx=None):
         self.__data = np.asarray(data)
+        self.__setup()
 
-        itemfreq = sp.stats.itemfreq(self.__data)
-        item = itemfreq[:,0]
-        freq = itemfreq[:,1]
+        if(olNx is not None):
+            self.__data = np.asarray([x for x in self.__data if(not self.is_outlierNx(x, olNx))])
+            self.__setup()
+
+    def __setup(self):
+        itemfreq = np.unique(self.__data, return_counts=True)
+        item = itemfreq[0]
+        freq = itemfreq[1]
         cfreq = math.csum(freq/math.sum(freq))
 
         __x = item
@@ -22,7 +28,7 @@ class empirical(distribution):
         a = math.min(self.__data)
         b = math.max(self.__data)
         super().__init__(a=a, b=b)
-
+    
     """------------------------------------------------------------------------------------------------
     """         
     def _cdf(self, x):
