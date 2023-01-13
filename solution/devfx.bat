@@ -1,3 +1,5 @@
 @echo off
 
-Code.exe devfx.code-workspace
+SET PATH=%PATH_PYTHON%;%PATH%
+
+%PATH_VSCODE%\Code.exe devfx.code-workspace
