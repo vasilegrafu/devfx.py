@@ -1,1 +1,2 @@
-from .config_manager import ConfigManager
+from .config_getter import ConfigGetter
+from .config_getter_builder import ConfigGetterBuilder

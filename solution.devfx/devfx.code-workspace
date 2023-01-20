@@ -11,16 +11,14 @@
 			"**/__pycache__": true
 		},
 	
-		"python.linting.pylintEnabled": false,
-
 		"terminal.integrated.env.windows": {
-			"PYTHONPATH": "${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}"
 		},
 		"terminal.integrated.env.linux": {
-			"PYTHONPATH": "${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}"
 		},
 		"terminal.integrated.env.osx": {
-			"PYTHONPATH": "${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}"
 		}
 	}
 }
