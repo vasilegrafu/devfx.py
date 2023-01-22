@@ -9,11 +9,11 @@ def test_GeometricK1Distribution():
 
     figure = dv.Figure(size=(8, 8), grid=(2,1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     for p in p_range:
         stats.distributions.geometrick1(p).cdf_on_chart(chart).plot()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     for p in p_range:
         stats.distributions.geometrick1(p).pmf_on_chart(chart).plot()
 
@@ -27,11 +27,11 @@ def test_GeometricK0Distribution():
 
     figure = dv.Figure(size=(8, 8), grid=(2,1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     for p in p_range:
         stats.distributions.geometrick0(p).cdf_on_chart(chart).plot()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     for p in p_range:
         stats.distributions.geometrick0(p).pmf_on_chart(chart).plot()
 

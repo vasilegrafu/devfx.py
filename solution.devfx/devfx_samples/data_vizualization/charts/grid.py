@@ -35,19 +35,19 @@ def test2():
 
     figure = dv.Figure(size=(8, 8), grid=(2, 2))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0, 0], ylim=(0, 4))
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0, 0], ylim=(0, 4))
     f1 = x**(0.5)
     f1_label='f(x)=x**(0.5)'
     chart.plot(x, f1, label=f1_label)
     chart.set_legend(loc='lower right')
 
-    chart = dv.Chart2d(figure=figure, position=figure[0, 1], ylim=(0, 4))
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0, 1], ylim=(0, 4))
     f2_label='f(x)=x**(2.00)'
     f2 = x**(2.00)
     chart.plot(x, f2, label=f2_label)
     chart.set_legend(loc='lower right')
 
-    chart = dv.Chart2d(figure=figure, position=figure[1, :], ylim=(0, 4))
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1, :], ylim=(0, 4))
     chart.plot(x, f1, label=f1_label)
     chart.plot(x, f2, label=f2_label)
     chart.set_legend(loc='lower right')

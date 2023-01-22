@@ -10,11 +10,11 @@ def test():
 
     figure = dv.Figure(size=(8, 8), grid=(2, 1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0], ylim=(0.0, 0.5))
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0], ylim=(0.0, 0.5))
     for n in n_range:
         stats.distributions.chisquare(n).pdf_on_chart(chart).plot()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0], ylim=(0.0, 1.0))
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0], ylim=(0.0, 1.0))
     for n in n_range:
         stats.distributions.chisquare(n).cdf_on_chart(chart).plot()
 

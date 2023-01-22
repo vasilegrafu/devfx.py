@@ -27,7 +27,7 @@ def test():
     data['y_ewmean'] = stats.series.rolling.ewmean(data['y'], 64)
 
     figure = dv.Figure(size=(8, 8), grid=(1,1))
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     chart.plot(data['x'], data['y'])
     chart.plot(data['x'], data['y_mean'], 'red')
     chart.plot(data['x'], data['y_ewmean'], 'green')

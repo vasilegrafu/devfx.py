@@ -10,10 +10,10 @@ def test():
 
     figure = dv.Figure(size=(8, 8), grid=(2, 1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     stats.estimators.cdhistogram.from_distribution(binomial, ll=0, ul=n, bin_count=n).on_chart(chart).bar()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     stats.estimators.dhistogram.from_distribution(binomial, ll=0, ul=n, bin_count=n).on_chart(chart).bar()
 
     figure.show()

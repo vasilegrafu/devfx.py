@@ -20,10 +20,10 @@ def test():
 
     figure = dv.Figure(size=(8, 8), grid=(4, 1))
 
-    chart_cdf(figure, 2.0, position=figure[0,0])
-    chart_cdf(figure, 4.0, position=figure[1,0])
-    chart_cdf(figure, 8.0, position=figure[2,0])
-    chart_cdf(figure, 16.0, position=figure[3,0])
+    chart_cdf(figure, 2.0, position=figure.grid[0,0])
+    chart_cdf(figure, 4.0, position=figure.grid[1,0])
+    chart_cdf(figure, 8.0, position=figure.grid[2,0])
+    chart_cdf(figure, 16.0, position=figure.grid[3,0])
 
     figure.show()
 
@@ -34,10 +34,10 @@ def test():
     
     figure = dv.Figure(size=(8, 8), grid=(4, 1))
 
-    chart_pmf(figure, 2.0, position=figure[0,0])
-    chart_pmf(figure, 4.0, position=figure[1,0])
-    chart_pmf(figure, 8.0, position=figure[2,0])
-    chart_pmf(figure, 16.0, position=figure[3,0])
+    chart_pmf(figure, 2.0, position=figure.grid[0,0])
+    chart_pmf(figure, 4.0, position=figure.grid[1,0])
+    chart_pmf(figure, 8.0, position=figure.grid[2,0])
+    chart_pmf(figure, 16.0, position=figure.grid[3,0])
 
     figure.show()
 

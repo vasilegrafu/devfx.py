@@ -3,6 +3,7 @@ import numpy as np
 import devfx.exceptions as ex
 from .figure import Figure as Figure
 from .chart import Chart
+from .chart_factory import ChartFactory
 
 class ChartPolar(Chart):
     def __init__(self, 
@@ -19,9 +20,9 @@ class ChartPolar(Chart):
                 figure = Figure(size=fig_size)
 
         if(position is None):
-            axes = figure.new_chartPolar()
+            axes = ChartFactory.new_chartPolar(figure=figure)
         else:
-            axes = figure.new_chartPolar(position)
+            axes = ChartFactory.new_chartPolar(figure=figure, position=position)
 
         super().__init__(figure, axes, title, grid)
 

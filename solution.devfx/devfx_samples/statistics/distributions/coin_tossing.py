@@ -17,13 +17,13 @@ def test():
     def build_chart(p_theta_head_func, n, heads, chart_column):
         heads = np.asarray(heads)
 
-        chart = dv.Chart2d(figure=figure, position=figure[0, chart_column])
+        chart = dv.Chart2d(figure=figure, position=figure.grid[0, chart_column])
         chart.plot(theta_head, p_theta_head_func(n))
 
-        chart = dv.Chart2d(figure=figure, position=figure[1, chart_column])
+        chart = dv.Chart2d(figure=figure, position=figure.grid[1, chart_column])
         chart.plot(theta_head, p_x_theta_head_func(heads))
 
-        chart = dv.Chart2d(figure=figure, position=figure[2, chart_column])
+        chart = dv.Chart2d(figure=figure, position=figure.grid[2, chart_column])
         chart.plot(theta_head, p_theta_head_x_func(n, heads))
 
     heads = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]

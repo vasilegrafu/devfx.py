@@ -8,6 +8,7 @@ import devfx.core as core
 import devfx.exceptions as ex
 from .figure import Figure as Figure
 from .chart import Chart
+from .chart_factory import ChartFactory
 
 class Chart2d(Chart):
     def __init__(self, 
@@ -24,9 +25,9 @@ class Chart2d(Chart):
                 figure = Figure(size=fig_size)
           
         if(position is None):
-            axes = figure.new_chart2d()
+            axes = ChartFactory.new_chart2d(figure=figure)
         else:
-            axes = figure.new_chart2d(position)
+            axes = ChartFactory.new_chart2d(figure=figure, position=position)
 
         super().__init__(figure, axes, title, grid)
 
@@ -335,8 +336,6 @@ class Chart2d(Chart):
             self.__set_axes_labels(datetimes, datetime_format, eliminate_gaps)
 
             self.__chart._do_post_draw()
-
-
 
     @property
     def timeseries(self):

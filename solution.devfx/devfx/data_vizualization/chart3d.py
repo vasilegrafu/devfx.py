@@ -4,6 +4,7 @@ import numpy as np
 import devfx.exceptions as ex
 from .figure import Figure as Figure
 from .chart import Chart
+from .chart_factory import ChartFactory
 
 class Chart3d(Chart):
     def __init__(self, 
@@ -20,9 +21,9 @@ class Chart3d(Chart):
                 figure = Figure(size=fig_size)
                       
         if(position is None):
-            axes = figure.new_chart3d()
+            axes = ChartFactory.new_chart3d(figure=figure)
         else:
-            axes = figure.new_chart3d(position)
+            axes = ChartFactory.new_chart3d(figure=figure, position=position)
 
         super().__init__(figure, axes, title, grid)
 

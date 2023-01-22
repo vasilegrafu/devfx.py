@@ -10,10 +10,10 @@ def test():
 
     figure = dv.Figure(size=(8, 8), grid=(2,1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     lognormal.cdf_on_chart(chart).plot()
     
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     lognormal.pdf_on_chart(chart).plot()
 
     figure.show()

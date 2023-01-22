@@ -11,22 +11,22 @@ def test_cdf():
     figure = dv.Figure(size=(8, 12), grid=(4,1))
 
     n = 1.0
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 1.5
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 2.0
-    chart = dv.Chart2d(figure=figure, position=figure[2,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[2,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
     n = 4.0
-    chart = dv.Chart2d(figure=figure, position=figure[3,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[3,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).cdf_on_chart(chart).plot()
 
@@ -42,22 +42,22 @@ def test_pdf():
     figure = dv.Figure(size=(8, 12), grid=(4,1))
 
     n = 1.0
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 1.5
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 2.0
-    chart = dv.Chart2d(figure=figure, position=figure[2,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[2,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 
     n = 4.0
-    chart = dv.Chart2d(figure=figure, position=figure[3,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[3,0])
     for rate in rate_range:
         stats.distributions.gamma(n, rate).pdf_on_chart(chart).plot()
 

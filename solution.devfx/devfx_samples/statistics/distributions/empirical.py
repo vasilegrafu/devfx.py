@@ -9,12 +9,12 @@ def test_empirical():
 
     figure = dv.Figure(size=(8, 8), grid=(2,1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     dhistogram = stats.estimators.dhistogram.from_distribution(empirical)
     dhistogram.on_chart(chart).bar()
     dhistogram.on_chart(chart).plot('r')
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     cdhistogram = stats.estimators.cdhistogram.from_distribution(empirical)
     cdhistogram.on_chart(chart).bar()
     cdhistogram.on_chart(chart).plot('r')

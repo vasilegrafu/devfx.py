@@ -19,13 +19,13 @@ def test_algebra1():
 
     figure = dv.Figure(size=(8, 8), grid=(3, 1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     stats.estimators.dhistogram.from_distribution(N1).on_chart(chart).bar()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     stats.estimators.dhistogram.from_distribution(N2).on_chart(chart).bar()
 
-    chart = dv.Chart2d(figure=figure, position=figure[2,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[2,0])
     stats.estimators.dhistogram.from_distribution(E).on_chart(chart).bar()
     stats.estimators.dhistogram.from_distribution(E).on_chart(chart).plot('r')
 
@@ -49,10 +49,10 @@ def test_algebra2():
 
     figure = dv.Figure(size=(8, 8), grid=(2, 1))
 
-    chart = dv.Chart2d(figure=figure, position=figure[0,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
     stats.estimators.dhistogram.from_distribution(KD, ll=-2, ul=2, bin_count=256).on_chart(chart).plot()
 
-    chart = dv.Chart2d(figure=figure, position=figure[1,0])
+    chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
     stats.estimators.cdhistogram.from_distribution(KD, ll=-2, ul=2, bin_count=256).on_chart(chart).plot()
 
     figure.show()

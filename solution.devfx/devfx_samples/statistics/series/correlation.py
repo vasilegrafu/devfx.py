@@ -13,10 +13,10 @@ print(stats.series.corr(x, y(x)))
 
 figure = dv.Figure(size=(8, 8), grid=(2,1))
 
-chart = dv.Chart2d(figure=figure, position=figure[0,0])
+chart = dv.Chart2d(figure=figure, position=figure.grid[0,0])
 chart.scatter(x, y(x))
 
-chart = dv.Chart2d(figure=figure, position=figure[1,0])
+chart = dv.Chart2d(figure=figure, position=figure.grid[1,0])
 stats.estimators.dhistogram.from_data(y(x), bin_count=16).on_chart(chart).bar()
 
 figure.show()
