@@ -10,5 +10,6 @@ from .button import Button
 from .spinbox import IntSpinBox
 from .spinbox import FloatSpinBox
 from .combobox import ComboBox
+from .matplotlib_figure_canvas import MatplotlibFigureCanvas
 
 from .application import Application

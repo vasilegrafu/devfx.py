@@ -8,10 +8,12 @@ class EmbeddableFigure(object):
     def __init__(self, size=(8, 4), dpi=None,
                        grid=(1, 1),
                        facecolor=None,
-                       linewidth=0.0, edgecolor=None, frameon=True):
+                       linewidth=0.0, edgecolor=None, frameon=True,
+                       layout=None):
         self.__figure = matplotlib.figure.Figure(figsize=size, dpi=dpi,
                                                  facecolor=facecolor,
-                                                 linewidth=linewidth, edgecolor=edgecolor, frameon=frameon)
+                                                 linewidth=linewidth, edgecolor=edgecolor, frameon=frameon,
+                                                 layout=layout)
         if(grid is None):
             self.__grid = None
         else:
