@@ -14,15 +14,15 @@ class MainWindow(ux.Window):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.__init_model()
+        self.__setup_logic()
 
         self.Center()
-        self.__init_widgets()
-        self.__init_layout()
+        self.__setup_widgets()
+        self.__setup_layout()
 
     """------------------------------------------------------------------------------------------------
     """
-    def __init_model(self):
+    def __setup_logic(self):
         self.grid_environment_for_training = GridEnvironment(training=True)
         self.grid_environment_for_training.setup()
 
@@ -31,7 +31,7 @@ class MainWindow(ux.Window):
         
     """------------------------------------------------------------------------------------------------
     """
-    def __init_widgets(self):
+    def __setup_widgets(self):
         self.grid_canvas = ux.Canvas(self, size=(256, 256))
         self.grid_canvas.OnDraw += self.__grid_canvas__OnDraw
 
