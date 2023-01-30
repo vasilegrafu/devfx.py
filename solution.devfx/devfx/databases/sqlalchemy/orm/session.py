@@ -250,6 +250,10 @@ class Session(object):
             self.__query = self.__query.limit(limit)
             return self
 
+        def offset(self, offset):
+            self.__query = self.__query.offset(offset)
+            return self
+
         def count(self):
             count = self.__query.count()
             return count
@@ -304,3 +308,4 @@ class Session(object):
             instances = [instance]
             data = self.__get_data(instances)
             return data
+
