@@ -111,11 +111,11 @@ def Column_as__id(*args, **kwargs):
     return Column(primary_key=True, *args, **kwargs)
 
 
-def Column_as__String_id(length=1024, convert_unicode=True):
-    return Column(sa.types.String(length=length, convert_unicode=convert_unicode), primary_key=True)
+def Column_as__String_id(length=1024):
+    return Column(sa.types.String(length=length), primary_key=True)
 
-def Column_as__Text_id(length=1024, convert_unicode=True):
-    return Column(sa.types.String(length=length, convert_unicode=convert_unicode), primary_key=True)
+def Column_as__Text_id(length=1024):
+    return Column(sa.types.String(length=length), primary_key=True)
     
 
 def Column_as__Date_id():
