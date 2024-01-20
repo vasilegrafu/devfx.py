@@ -1,7 +1,7 @@
 
 class BaseError(Exception):
-    def __init__(self, *, message=None, data={}, inner=None):
-        Exception.__init__(self, message, data, inner)
+    def __init__(self, message=None, data={}, inner=None):
+        Exception.__init__(self)
 
         self.__message = message
         self.__data = data
