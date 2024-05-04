@@ -70,6 +70,8 @@ from .functions import is_odd
 from .functions import next_even
 from .functions import next_odd
 
+from .functions import cap
+
 from .functions import iverson
 from .functions import macaulay
 from .functions import kronecker

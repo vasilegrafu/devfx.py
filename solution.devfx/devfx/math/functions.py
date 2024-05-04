@@ -210,7 +210,18 @@ def next_odd(n):
         return n+1
     else:
         raise ex.ArgumentError()
-        
+    
+def cap(value, lower_limmit=None, upper_limmit=None):
+    if((lower_limmit is None) and (upper_limmit is None)):
+        raise ex.ArgumentError()
+    
+    if(lower_limmit is not None):
+       value  = value if(value >= lower_limmit) else lower_limmit
+    if(upper_limmit is not None):
+        value = value if(value <= upper_limmit) else upper_limmit
+    return value
+
+
 """ special  
 """
 def iverson(predicate):
