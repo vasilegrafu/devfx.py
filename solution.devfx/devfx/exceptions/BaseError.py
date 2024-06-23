@@ -19,3 +19,7 @@ class BaseError(Exception):
     def inner(self):
         return self.__inner
 
+    def __str__(self):
+        return self.message
+
+
