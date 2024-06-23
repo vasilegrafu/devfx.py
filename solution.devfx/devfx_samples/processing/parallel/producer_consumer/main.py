@@ -28,6 +28,8 @@ def main():
 
     print("time elapsed: ", sw.stop().elapsed)
 
+    pp.ParallelFor([], 2, lambda args: print(args))
+
 if(__name__ == '__main__'):
     main()
 
