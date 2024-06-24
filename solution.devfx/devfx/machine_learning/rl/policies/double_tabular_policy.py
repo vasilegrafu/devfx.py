@@ -35,7 +35,7 @@ class DoubleTabularPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, transitions):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

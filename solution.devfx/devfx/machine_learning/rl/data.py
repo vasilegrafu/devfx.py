@@ -22,7 +22,7 @@ class Data(object):
             case tuple():
                 self.__value = np.array(value, *args, **kwargs)  
             case _:
-                raise ex.NotSupportedError()      
+                raise excs.NotSupportedError()      
 
     def get_value(self):
         return self.__value

@@ -33,7 +33,7 @@ class Range(object):
         return self._get_random()
 
     def _get_random(self):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
 """================================================================================================
 """

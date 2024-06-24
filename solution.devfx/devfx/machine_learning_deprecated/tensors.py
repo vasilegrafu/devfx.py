@@ -9,7 +9,7 @@ from . import types
 """
 def as_tensor(value, dtype=None, shape=None):
     if((dtype is None) and (shape is None)):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(dtype is not None):
         value = convert_to_tensor(value, dtype_hint=dtype)
         if(value.dtype != dtype):
@@ -62,7 +62,7 @@ def build_graph(**tkwargs):
                 output = fn(self, *args, **kwargs)
                 return output
             return __
-        raise ex.NotSupportedError()
+        raise excs.NotSupportedError()
     return _
 
 """------------------------------------------------------------------------------------------------

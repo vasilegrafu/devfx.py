@@ -42,7 +42,7 @@ class Environment(object):
     def add_agents(self, agents):
         for agent in agents:
             if(agent.get_id() in self.__agents_container):
-                raise ex.ApplicationError()
+                raise excs.ApplicationError()
             
         for agent in agents:
             self.__agents_container[agent.get_id()] = agent
@@ -60,7 +60,7 @@ class Environment(object):
             
         for agent in agents:    
             if(agent.get_id() not in self.__agents_container):
-                raise ex.ApplicationError()
+                raise excs.ApplicationError()
             
         for agent in agents: 
             self.__agents_container.pop(agent.get_id())
@@ -92,7 +92,7 @@ class Environment(object):
 
     def get_agent(self, id):
         if(id not in self.__agents_container):
-            raise ex.ApplicationError()
+            raise excs.ApplicationError()
         agent = [agent for agent in self.__agents_container.values() if(agent.get_id() == id)][0]
         return agent
 
@@ -135,7 +135,7 @@ class Environment(object):
         return action
 
     def _generate_random_action(self, agent):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """    
@@ -149,7 +149,7 @@ class Environment(object):
         return (reward, next_state)
         
     def _do_next_transition(self, agent, action):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -183,7 +183,7 @@ class Environment(object):
         from_agents = environment.get_agents()
         
         if(len(to_agents) != len(from_agents)):
-            raise ex.ApplicationError()
+            raise excs.ApplicationError()
         
         to_agents = sorted(to_agents, key=lambda agent: agent.get_id())
         from_agents = sorted(from_agents, key=lambda agent: agent.get_id())

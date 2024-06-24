@@ -17,7 +17,7 @@ def create_variable(name=None, shape=None, dtype=None, initializer=None, trainab
     elif((shape is not None) and (dtype is not None)):
         initial_value = initializer(shape=shape, dtype=dtype)
     else:
-        raise ex.NotSupportedError()
+        raise excs.NotSupportedError()
     
     variable = tf.Variable(name=name, initial_value=initial_value, trainable=trainable)
     return variable

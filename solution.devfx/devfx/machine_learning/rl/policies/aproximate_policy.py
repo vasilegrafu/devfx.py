@@ -16,10 +16,10 @@ class AproximatePolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, transitions):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_max_action(self, state):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 

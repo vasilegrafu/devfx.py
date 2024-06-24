@@ -127,7 +127,7 @@ class Chart2d(Chart):
         elif (core.is_iterable(args[0])):
             result = self.axes.plot(args[0], *args[1:], **kwargs)
         else:
-            raise ex.NotSupportedError()
+            raise excs.NotSupportedError()
         self._do_post_draw()
         return result
 
@@ -180,7 +180,7 @@ class Chart2d(Chart):
         elif(core.is_iterable(args[0])):
             result = self.axes.scatter(range(1, len(args[0]) + 1), args[0], *args[1:], marker = kwargs.pop('marker', '.'), **kwargs)
         else:
-            raise ex.NotSupportedError()
+            raise excs.NotSupportedError()
         self._do_post_draw()
         return result
 
@@ -226,7 +226,7 @@ class Chart2d(Chart):
             if(core.is_typeof(data, pd.DataFrame)):
                 datetimes = data.index.values
             else:
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
            
@@ -252,7 +252,7 @@ class Chart2d(Chart):
             if(core.is_typeof(data, pd.DataFrame)):
                 datetimes = data.index.values
             else:
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
            
@@ -278,12 +278,12 @@ class Chart2d(Chart):
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             if(len(datetimes) is None):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
             if(len(datetimes) <= 1):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
 
@@ -313,12 +313,12 @@ class Chart2d(Chart):
             elif(core.is_typeof(data, pd.Series)):
                 (datetimes, values) = (data.index.values, data.values)
             else:
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             if(len(datetimes) is None):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
             if(len(datetimes) <= 1):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
 
             self.__chart._do_prior_draw()
 

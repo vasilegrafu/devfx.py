@@ -18,7 +18,7 @@ class ModelExecuter(object):
     """
     def __getattr__(self, attr):
         if(self.__model is None):
-            raise ex.ValueError()
+            raise excs.ValueError()
         return core.getattr(self.__model, attr)
 
 

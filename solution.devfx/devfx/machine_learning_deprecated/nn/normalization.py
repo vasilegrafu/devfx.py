@@ -57,6 +57,6 @@ def gauss_normalizer(alpha=0.05, epsilon=1e-8):
 """
 def l2_normalizer():
     def __call(self, name, input):
-       raise ex.NotImplementedError()
+       raise excs.NotImplementedError()
     return __call
 

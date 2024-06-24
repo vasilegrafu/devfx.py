@@ -195,7 +195,7 @@ class Session(object):
                                                   .all()  
                 instances_from_db = {tuple([core.getattr(instance, column.name) for column in primary_key_columns]): instance for instance in instances_from_db}
             else:
-                raise ex.NotSupportedError()                             
+                raise excs.NotSupportedError()                             
             
             for data_chunk_row in data_chunk.itertuples():
                 if(data_chunk_row[0] not in instances_from_db):
@@ -206,7 +206,7 @@ class Session(object):
                         for (i, _) in enumerate(data_chunk.index.names):
                             core.setattr(instance, data_chunk.index.names[i], data_chunk_row[0][i])
                     else:
-                        raise ex.NotSupportedError()  
+                        raise excs.NotSupportedError()  
                 else:
                     instance = instances_from_db[data_chunk_row[0]]
 
@@ -272,7 +272,7 @@ class Session(object):
                     data.set_index([column.name for column in self.__index], inplace=True)
                 return data
             else:
-                raise ex.NotSupportedError()
+                raise excs.NotSupportedError()
 
         def all(self):
             instances = self.__query.all()

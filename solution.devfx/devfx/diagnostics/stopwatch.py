@@ -12,7 +12,7 @@ class Stopwatch(object):
        
     def start(self):
         if(self.__running == True):
-            raise ex.OperationError()
+            raise excs.OperationError()
 
         self.__running = True
         self.__start = datetime.datetime.utcnow()
@@ -23,7 +23,7 @@ class Stopwatch(object):
 
     def stop(self):
         if(self.__running == False):
-            raise ex.OperationError()
+            raise excs.OperationError()
 
         self.__running = False
         self.__elapsed = self.__elapsed + (datetime.datetime.utcnow() - self.__start)

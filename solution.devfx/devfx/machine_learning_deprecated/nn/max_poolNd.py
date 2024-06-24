@@ -13,25 +13,25 @@ def max_poolNd(name,
     name = name + '__max_poolNd'
 
     if (not 3 <= len(input.shape) <= 5):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     N = len(input.shape) - 2
 
     if(not core.is_iterable(kernel_size)):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(not len(kernel_size) == N):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
 
     if(strides is None):
         strides = tuple([1]*N)
     if(not core.is_iterable(strides)):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(not len(strides) == N):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
         
     if(padding is None):
         padding = 'VALID'
     if(padding != 'VALID' and padding != 'SAME'):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
 
     if (data_format is None and len(input.shape) == 3):
         data_format = 'NWC'
@@ -40,13 +40,13 @@ def max_poolNd(name,
     if (data_format is None and len(input.shape) == 5):
         data_format = 'NDHWC'
     if(len(data_format) != len(input.shape)):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 3 and (data_format != 'NWC' and data_format != 'NCW')):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 4 and (data_format != 'NHWC' and data_format != 'NCHW')):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
     if(len(input.shape) == 5 and (data_format != 'NDHWC' and data_format != 'NCDHW')):
-        raise ex.ArgumentError()
+        raise excs.ArgumentError()
 
 
     pool = tf.nn.max_pool(input=input,

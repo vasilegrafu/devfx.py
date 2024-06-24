@@ -8,13 +8,13 @@ class Policy(object):
     """------------------------------------------------------------------------------------------------
     """ 
     def _setup_model(self):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     def get_model(self):
         return self._get_model()
     
     def _get_model(self):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
       
     """------------------------------------------------------------------------------------------------
     """ 
@@ -22,7 +22,7 @@ class Policy(object):
         self._learn(transitions=transitions)
 
     def _learn(self, transitions):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
     
     """------------------------------------------------------------------------------------------------
     """ 
@@ -30,7 +30,7 @@ class Policy(object):
         return self._get_max_action(state=state)
 
     def _get_max_action(self, state):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -38,7 +38,7 @@ class Policy(object):
         return self._get_random_action(state=state)
 
     def _get_random_action(self, state):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
     
 
 

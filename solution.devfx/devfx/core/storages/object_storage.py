@@ -33,7 +33,7 @@ class ObjectStorage(object):
             if(source_fn is not None):
                 obj.__storage__[key] = source_fn()
             else:
-                raise ex.ApplicationError()
+                raise excs.ApplicationError()
         else:
             if(refresh_condition_fn is not None):
                 if(refresh_condition_fn(obj.__storage__[key])):
