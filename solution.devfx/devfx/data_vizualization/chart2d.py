@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 import devfx.core as core
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 from .figure import Figure as Figure
 from .chart import Chart
 from .chart_factory import ChartFactory

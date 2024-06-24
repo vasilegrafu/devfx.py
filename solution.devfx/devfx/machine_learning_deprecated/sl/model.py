@@ -4,7 +4,7 @@ import itertools as it
 import datetime as dt
 import numpy as np
 import tensorflow as tf
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 from . import variables
@@ -55,7 +55,7 @@ class Model(tf.Module):
                 if(condition):
                     self.__is_cancellation_requested = True
             else:
-                raise ex.NotSupportedError()
+                raise excs.NotSupportedError()
 
         def is_cancellation_requested(self):
             return (self.__is_cancellation_requested == True)
@@ -108,7 +108,7 @@ class Model(tf.Module):
             return ', '.join(name_value_list)
 
         def __repr__(self):
-            raise ex.NotSupportedError()
+            raise excs.NotSupportedError()
 
     """------------------------------------------------------------------------------------------------
     """
@@ -153,15 +153,15 @@ class Model(tf.Module):
     def train(self, training_data, batch_size=None, iterations=None, epochs=None, hparams=None, **kwargs):
         # ----------------------------------------------------------------
         if(not core.is_iterable(training_data)):
-            raise ex.ArgumentError()
+            raise excs.ArgumentError()
         if(len(training_data) != 2):
-            raise ex.ArgumentError()
+            raise excs.ArgumentError()
         if(not core.is_iterable(training_data[0])):
-            raise ex.ArgumentError()
+            raise excs.ArgumentError()
         if(not core.is_iterable(training_data[1])):
-            raise ex.ArgumentError()
+            raise excs.ArgumentError()
         if(len(training_data[0]) != len(training_data[1])):
-            raise ex.ArgumentError()
+            raise excs.ArgumentError()
         # ----------------------------------------------------------------
 
         # ----------------------------------------------------------------
@@ -189,9 +189,9 @@ class Model(tf.Module):
         apply_cost_optimizer = None
         def register_apply_cost_optimizer_function(self, cost_fn, cost_optimizer):
             if(cost_fn is None):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
             if(cost_optimizer is None):
-                raise ex.ArgumentError()
+                raise excs.ArgumentError()
             def __apply_cost_optimizer(*args, **kwargs):
                 with tf.GradientTape() as gradient_tape:
                     cost = cost_fn(*args, **kwargs)

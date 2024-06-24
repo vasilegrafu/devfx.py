@@ -1,5 +1,5 @@
 import h5py as hdf5
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 from .dataset_adapter import DatasetAdapter
 from .attributes_adapter import AttributesAdapter

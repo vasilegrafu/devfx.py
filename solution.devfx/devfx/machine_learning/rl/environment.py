@@ -1,7 +1,7 @@
 import threading
 import numpy as np
 import random as rnd
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 from .agent import Agent
 from .state_kind import StateKind

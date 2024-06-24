@@ -1,5 +1,5 @@
 import random as rnd
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 
 from .policy import Policy
 from .tabular_model import TabularModel

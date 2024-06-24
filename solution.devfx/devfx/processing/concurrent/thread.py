@@ -1,6 +1,6 @@
 import threading
 import queue
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 
 class Thread(threading.Thread):
@@ -40,7 +40,7 @@ class Thread(threading.Thread):
             thread_result = Thread._Result(value=fn_result)
         except Exception as exception:
             thread_result = Thread._Result(value=exception)
-            ex.ErrorInfo.print()
+            excs.ErrorInfo.print()
         finally:
             self.__is_started_event.clear()
             self.__queue.put(thread_result)
@@ -59,7 +59,7 @@ class Thread(threading.Thread):
         if(self.__result is None):
             self.__result = self.__queue.get()
         if(core.is_typeof(self.__result.value, Exception)):
-            raise ex.ApplicationError(inner=self.__result.value)
+            raise excs.ApplicationError(inner=self.__result.value)
         else:
             return self.__result.value
 
@@ -70,7 +70,7 @@ class Thread(threading.Thread):
         if(self.__result is None):
             self.__result = self.__queue.get()
         if(core.is_typeof(self.__result.value, Exception)):
-            raise ex.ApplicationError(inner=self.__result.value)
+            raise excs.ApplicationError(inner=self.__result.value)
         else:
             pass
 

@@ -1,5 +1,5 @@
 import numpy as np
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.math as math
 from .. import distributions
 
@@ -25,9 +25,9 @@ class cdhistogram(object):
 
     def __call__(self, x):
         if (x < self.a):
-            raise ex.ArgumentOutOfRangeError()
+            raise excs.ArgumentOutOfRangeError()
         elif (x > self.b):
-            raise ex.ArgumentOutOfRangeError()
+            raise excs.ArgumentOutOfRangeError()
         else:
             return self.cfreq[np.searchsorted(self.xbin_edges[:-1], x)]
 
@@ -50,7 +50,7 @@ class cdhistogram(object):
         elif ((bin_count is not None) and (dx is None)):
             bins = int(bin_count)
         else:
-            raise ex.NotSupportedError()
+            raise excs.NotSupportedError()
 
         (freq, bin_edges) = np.histogram(data, range=(ll, ul), bins=bins, density=density)
 

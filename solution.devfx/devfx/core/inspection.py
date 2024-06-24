@@ -1,6 +1,6 @@
 import builtins as bt
 import inspect as insp
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 
 """------------------------------------------------------------------------------------------------
 """

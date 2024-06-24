@@ -1,5 +1,5 @@
 import os
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 from .directory_info import directory_info
 
 class directory(directory_info):
@@ -30,7 +30,7 @@ class directory(directory_info):
     """
     @classmethod
     def copy(self, from_path, to_path, overwrite=True):
-        raise ex.NotImplementedError()
+        raise excs.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

@@ -1,6 +1,6 @@
 import time
 import numpy as np
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml

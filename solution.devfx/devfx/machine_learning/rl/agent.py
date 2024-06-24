@@ -1,6 +1,6 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 
 class Agent(object):

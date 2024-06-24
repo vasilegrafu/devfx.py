@@ -1,4 +1,4 @@
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 from .policy import Policy
 
 class AproximatePolicy(Policy):

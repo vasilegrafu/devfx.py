@@ -1,7 +1,7 @@
 import numpy as np
 import hashlib as hlib
 import random as rnd
-import devfx.exceptions as ex
+import devfx.exceptions as excscs
 import devfx.core as core
 
 class Data(object):

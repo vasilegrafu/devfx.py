@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 from . import initialization
 
 """------------------------------------------------------------------------------------------------

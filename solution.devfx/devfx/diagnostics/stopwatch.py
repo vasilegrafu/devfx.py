@@ -1,6 +1,6 @@
 import datetime
 import contextlib
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 
 
 class Stopwatch(object):

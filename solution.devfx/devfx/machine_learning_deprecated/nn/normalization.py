@@ -1,4 +1,4 @@
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 from .. import initialization
 from .. import math
 from ..sl import variables

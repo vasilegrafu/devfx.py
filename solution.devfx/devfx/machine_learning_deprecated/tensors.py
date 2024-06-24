@@ -1,7 +1,7 @@
 import tensorflow as tf
 import inspect as insp
 import functools as fnt
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 from . import types
 

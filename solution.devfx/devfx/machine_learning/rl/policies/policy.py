@@ -1,5 +1,5 @@
 import pickle as pckl
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 
 class Policy(object):
     def __init__(self):

@@ -3,7 +3,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 import sqlalchemy.inspection
 import devfx.core as core
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.diagnostics as dgn
 
 """------------------------------------------------------------------------------------------------

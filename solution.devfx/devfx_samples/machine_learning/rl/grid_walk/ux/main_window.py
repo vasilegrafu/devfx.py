@@ -1,6 +1,6 @@
 import time
 import numpy as np
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 import devfx.diagnostics as dgn
 import devfx.machine_learning as ml
@@ -105,7 +105,7 @@ class MainWindow(ux.Window):
             elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.NON_TERMINAL):                             brush=ux.WHITE_BRUSH
             elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.TERMINAL and scene[1,ci[0],ci[1]] >= 0):   brush=ux.GREEN_BRUSH
             elif(scene[0,ci[0],ci[1]] == ml.rl.StateKind.TERMINAL and scene[1,ci[0],ci[1]] < 0):    brush=ux.RED_BRUSH
-            else:                                                                                   raise ex.NotSupportedError()
+            else:                                                                                   raise excs.NotSupportedError()
             cgc.DrawRectangle(x=x, y=y, w=w, h=h, pen=ux.BLACK_PEN, brush=brush)
 
         # draw rewards
@@ -127,7 +127,7 @@ class MainWindow(ux.Window):
             elif(action.get_name() == 'RIGHT'): (x, y, anchor) = (ci[1]*cw + cw, ci[0]*ch + ch/2, ux.RIGHT)
             elif(action.get_name() == 'UP'):    (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch, ux.TOP) 
             elif(action.get_name() == 'DOWN'):  (x, y, anchor) = (ci[1]*cw + cw/2, ci[0]*ch + ch, ux.BOTTOM)
-            else:                               raise ex.NotImplementedError()
+            else:                               raise excs.NotImplementedError()
             cgc.DrawText(text=f'{value:.2f}', x=x, y=y, offx=4, offy=0, anchor=anchor, colour=ux.GRAY)
     
     """------------------------------------------------------------------------------------------------

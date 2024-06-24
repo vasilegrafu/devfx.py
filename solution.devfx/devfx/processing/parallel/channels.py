@@ -1,5 +1,5 @@
 import multiprocessing
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.core as core
 
 from .channel import Channel

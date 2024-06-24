@@ -1,7 +1,7 @@
 import seaborn as sb
 sb.set_style('darkgrid')
 
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 
 class Chart(object):
     def __init__(self, figure=None, axes=None, title=None, grid=None):                              

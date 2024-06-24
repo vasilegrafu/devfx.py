@@ -3,7 +3,7 @@ import multiprocessing.connection
 import pickle
 import time
 import math
-import devfx.exceptions as ex
+import devfx.exceptions as excs
 import devfx.diagnostics as dgn
 
 """------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class Channel():
                     obj_bytes = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
                     self.__sender_end.send_bytes(obj_bytes)
                 except Exception as exception:
-                    ex.ErrorInfo.print()
+                    excs.ErrorInfo.print()
                     raise exception
 
         # ----------------------------------------------------------------  
@@ -47,7 +47,7 @@ class Channel():
                     is_empty = not self.__receiver_end.poll()
                     return is_empty
                 except Exception as exception:
-                    ex.ErrorInfo.print()
+                    excs.ErrorInfo.print()
                     raise exception
 
         class Empty(Exception):
@@ -64,7 +64,7 @@ class Channel():
                         obj = pickle.loads(obj_bytes)
                         return obj
                 except Exception as exception:
-                    ex.ErrorInfo.print()
+                    excs.ErrorInfo.print()
                     raise exception
 
         def try_receive(self):
@@ -78,7 +78,7 @@ class Channel():
                         obj = pickle.loads(obj_bytes)
                         return (True, obj)
                 except Exception as exception:
-                    ex.ErrorInfo.print()
+                    excs.ErrorInfo.print()
                     raise exception
 
     def __init__(self):
