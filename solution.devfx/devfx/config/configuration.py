@@ -13,18 +13,17 @@ class Configuration(object):
         else:
             return config_node_value
         
-    @staticmethod
-    def load(config_file_path):
+    @classmethod
+    def load(cls, config_file_path):
         with open(config_file_path) as config_file:
             configuration = Configuration(json.load(config_file))
             GlobalStorage.set(f'7fae92dc-fcd4-4a98-8d97-4605189335e8', configuration)
             return configuration
         
-    @staticmethod
-    def get():
-        configGetter = GlobalStorage.get(f'7fae92dc-fcd4-4a98-8d97-4605189335e8')
-        return configGetter
-
+    @classmethod
+    def get(cls):
+        configuration = GlobalStorage.get(f'7fae92dc-fcd4-4a98-8d97-4605189335e8')
+        return configuration
 
 
 
