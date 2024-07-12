@@ -2,6 +2,8 @@ from .lock import Lock
 
 __lock = Lock()
 
+__print = print
+
 def print(*args, **kwargs):
     with __lock:
-        print(*args, **kwargs)
+        __print(*args, **kwargs)
