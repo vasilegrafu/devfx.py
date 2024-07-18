@@ -10,15 +10,20 @@
 		"files.exclude": {
 			"**/__pycache__": true
 		},
+
+		"python.defaultInterpreterPath": "${env:PATH_PYTHON}/python.exe",
 	
 		"terminal.integrated.env.windows": {
-			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}",
+			"PATH": "${env:PATH_PYTHON};${env:PATH}"
 		},
 		"terminal.integrated.env.linux": {
-			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
+			"PATH": "${env:PATH}"
 		},
 		"terminal.integrated.env.osx": {
-			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}"
+			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
+			"PATH": "${env:PATH}"
 		}
 	}
 }
