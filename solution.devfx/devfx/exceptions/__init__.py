@@ -15,9 +15,11 @@ from .NotSupportedError import NotSupportedError
 
 from .OperationError import OperationError
 
-from .SecurityError import SecurityError
 from .AuthenticationError import AuthenticationError
 from .AutorizationError import AutorizationError
+
+from .ValidationError import ValidationError    
+from .NotFoundError import NotFoundError
 
 from .ErrorInfo import ErrorInfo
 from .ErrorInfo import print_error_info
