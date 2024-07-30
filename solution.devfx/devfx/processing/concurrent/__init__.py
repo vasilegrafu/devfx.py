@@ -5,4 +5,5 @@ from .semaphore import Semaphore
 from .event import Event
 from .condition import Condition
 from .parallel_for import parallel_for
+from .parallel_while import parallel_while
 from .print import print

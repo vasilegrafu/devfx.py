@@ -11,7 +11,7 @@ from queue import Queue
 # parallel_for(iterable, n, fn)
 # ----------------------------------------------------------------
 
-def worker(queue, fn):
+def __worker(queue, fn):
     while True:
         item = queue.get()
         if item is None:
@@ -34,7 +34,7 @@ def parallel_for(iterable, n, fn):
 
     # Start worker threads
     for _ in range(n):
-        thread = Thread(target=worker, args=(queue, fn))
+        thread = Thread(target=__worker, args=(queue, fn))
         thread.start()
         threads.append(thread)
 
