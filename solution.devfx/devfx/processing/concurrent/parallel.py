@@ -1,17 +1,17 @@
 from threading import Thread
 from queue import Queue
 
-def __worker(queue, fn):
+def __worker(queue):
     while True:
-        item = queue.get()
-        if item is None:
+        fn = queue.get()
+        if fn is None:
             break
         try:
-            fn(item)
+            fn()
         finally:
             queue.task_done()
 
-def parallel_for(iterable, n, fn):
+def parallel(fns, n=None):
     # Create a queue
     queue = Queue()
 
@@ -19,12 +19,15 @@ def parallel_for(iterable, n, fn):
     threads = []
 
     # Enqueue all items
-    for item in iterable:
-        queue.put(item)
+    for fn in fns:
+        queue.put(fn)
+
+    if(n is None):
+        n = len(fns)
 
     # Start worker threads
     for _ in range(n):
-        thread = Thread(target=__worker, args=(queue, fn))
+        thread = Thread(target=__worker, args=(queue,))
         thread.start()
         threads.append(thread)
 
@@ -39,13 +42,19 @@ def parallel_for(iterable, n, fn):
     for thread in threads:
         thread.join()
 
-    
 # # ----------------------------------------------------------------
 # # Example:
-# def fn(item):
-#     print(item)
+# def fn1():
+#     print(1)
 
-# iterable = range(100)
-# n = 10
-# parallel_for(iterable, n, fn)
+# def fn2():
+#     print(2)
+
+# def fn3():
+#     print(3)
+
+# def fn4():
+#     print(4)
+
+# parallel([fn1, fn2, fn3, fn4], 2)
 # # ----------------------------------------------------------------

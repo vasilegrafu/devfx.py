@@ -6,4 +6,5 @@ from .event import Event
 from .condition import Condition
 from .parallel_for import parallel_for
 from .parallel_while import parallel_while
+from .parallel import parallel
 from .print import print

@@ -12,3 +12,14 @@ def __worker(fn, execution_interval):
 def parallel_while(fn, execution_interval=None):
     thread = Thread(target=__worker, args=(fn, execution_interval))
     thread.start()
+
+# # ----------------------------------------------------------------
+# # Example:
+# def fn():
+#     print(1)
+#     time.sleep(1)
+#
+# parallel_while(fn, 1)
+
+# time.sleep(5)
+# # ----------------------------------------------------------------
