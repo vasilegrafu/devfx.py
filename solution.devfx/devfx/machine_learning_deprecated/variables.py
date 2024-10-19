@@ -1,5 +1,5 @@
 import tensorflow as tf
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from . import initialization
 
 """------------------------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ def create_variable(name=None, shape=None, dtype=None, initializer=None, trainab
     elif((shape is not None) and (dtype is not None)):
         initial_value = initializer(shape=shape, dtype=dtype)
     else:
-        raise excs.NotSupportedError()
+        raise exp.NotSupportedError()
     
     variable = tf.Variable(name=name, initial_value=initial_value, trainable=trainable)
     return variable

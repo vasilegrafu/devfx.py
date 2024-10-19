@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from .constants import e
 
 """ constants  
@@ -201,7 +201,7 @@ def next_even(n):
     elif(is_odd(n)):
         return n+1
     else:
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
 
 def next_odd(n):
     if(is_odd(n)):
@@ -209,11 +209,11 @@ def next_odd(n):
     elif(is_even(n)):
         return n+1
     else:
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
     
 def cap(value, lower_limmit=None, upper_limmit=None):
     if((lower_limmit is None) and (upper_limmit is None)):
-        raise excs.s.ArgumentError()
+        raise exp.s.ArgumentError()
     
     if(lower_limmit is not None):
        value  = value if(value >= lower_limmit) else lower_limmit

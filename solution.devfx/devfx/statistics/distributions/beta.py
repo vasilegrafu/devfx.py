@@ -1,16 +1,16 @@
 import numpy as np
 import scipy as sp
 import scipy.stats
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from .dcontinuous import dcontinuous
 
 
 class beta(dcontinuous):
     def __init__(self, a=0.0, b=1.0, alpha=0.0, beta=1.0):
         if(alpha <= 0.0):
-            raise excs.ArgumentOutOfRangeError()
+            raise exp.ArgumentOutOfRangeError()
         if(beta <= 0.0):
-            raise excs.ArgumentOutOfRangeError()
+            raise exp.ArgumentOutOfRangeError()
 
         self.__distribution = sp.stats.beta(a=alpha, b=beta, loc=a, scale=(b-a))
 

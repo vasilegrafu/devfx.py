@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 
 class Reward(object):

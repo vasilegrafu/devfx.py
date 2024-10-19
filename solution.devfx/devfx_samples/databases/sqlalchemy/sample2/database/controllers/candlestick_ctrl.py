@@ -1,5 +1,5 @@
 import datetime as dt
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 import devfx.databases.sqlalchemy as sa
 from ..models import Candlestick
@@ -168,7 +168,7 @@ class CandlestickCtrl(object):
                                      & ((Candlestick.datetime >= interval[0]) & (Candlestick.datetime <= interval[1])))
             # incorrect argument
             else:
-                raise excs.ArgumentError()
+                raise exp.ArgumentError()
             
             return query
 

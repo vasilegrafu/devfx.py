@@ -1,5 +1,5 @@
 import multiprocessing
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 
 from .process import Process

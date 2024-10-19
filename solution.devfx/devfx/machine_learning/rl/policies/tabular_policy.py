@@ -1,5 +1,5 @@
 import random as rnd
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 
 from .policy import Policy
 from .tabular_model import TabularModel
@@ -24,7 +24,7 @@ class TabularPolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, transitions):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """

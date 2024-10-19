@@ -1,6 +1,6 @@
 import matplotlib as mpl
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from .figure import Figure as Figure
 from .chart import Chart
 from .chart_factory import ChartFactory

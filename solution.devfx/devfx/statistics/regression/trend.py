@@ -1,13 +1,13 @@
 import numpy as np
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 
 def trend(x, y, n_max=None):
     if(len(x) < 2):
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
     if(len(y) < 2):
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
     if (not (len(x) == len(y))):
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
     if(n_max is None):
         n_max = len(x)
 

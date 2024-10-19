@@ -1,7 +1,7 @@
 import tensorflow as tf
 import inspect as insp
 import functools as fnt
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 from . import types
 
@@ -9,7 +9,7 @@ from . import types
 """
 def as_tensor(value, dtype=None, shape=None):
     if((dtype is None) and (shape is None)):
-        raise excs.ArgumentError()
+        raise exp.ArgumentError()
     if(dtype is not None):
         value = convert_to_tensor(value, dtype_hint=dtype)
         if(value.dtype != dtype):
@@ -62,7 +62,7 @@ def build_graph(**tkwargs):
                 output = fn(self, *args, **kwargs)
                 return output
             return __
-        raise excs.NotSupportedError()
+        raise exp.NotSupportedError()
     return _
 
 """------------------------------------------------------------------------------------------------

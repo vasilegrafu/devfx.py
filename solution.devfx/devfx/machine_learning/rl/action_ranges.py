@@ -1,6 +1,6 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 from .action import Action
 
@@ -33,7 +33,7 @@ class Range(object):
         return self._get_random()
 
     def _get_random(self):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
 """================================================================================================
 """

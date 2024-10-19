@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from .policy import Policy
 
 class AproximatePolicy(Policy):
@@ -16,10 +16,10 @@ class AproximatePolicy(Policy):
     """------------------------------------------------------------------------------------------------
     """ 
     def _learn(self, transitions):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def _get_max_action(self, state):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 

@@ -1,6 +1,6 @@
 import numpy as np
 import random as rnd
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 from .data import Data
 

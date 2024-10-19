@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 from .. import initialization
 from .. import math
 from ..sl import variables
@@ -57,6 +57,6 @@ def gauss_normalizer(alpha=0.05, epsilon=1e-8):
 """
 def l2_normalizer():
     def __call(self, name, input):
-       raise excs.NotImplementedError()
+       raise exp.NotImplementedError()
     return __call
 

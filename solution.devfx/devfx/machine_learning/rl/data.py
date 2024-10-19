@@ -1,7 +1,7 @@
 import numpy as np
 import hashlib as hlib
 import random as rnd
-import devfx.exceptions as excscs
+import devfx.exceptions as expcs
 import devfx.core as core
 
 class Data(object):
@@ -22,7 +22,7 @@ class Data(object):
             case tuple():
                 self.__value = np.array(value, *args, **kwargs)  
             case _:
-                raise excs.NotSupportedError()      
+                raise exp.NotSupportedError()      
 
     def get_value(self):
         return self.__value

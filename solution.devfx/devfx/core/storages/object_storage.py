@@ -1,4 +1,4 @@
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 
 class ObjectStorage(object):
     @staticmethod
@@ -33,7 +33,7 @@ class ObjectStorage(object):
             if(source_fn is not None):
                 obj.__storage__[key] = source_fn()
             else:
-                raise excs.ApplicationError()
+                raise exp.ApplicationError()
         else:
             if(refresh_condition_fn is not None):
                 if(refresh_condition_fn(obj.__storage__[key])):

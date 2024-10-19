@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-import devfx.exceptions as excs
+import devfx.exceptions as exp
 import devfx.core as core
 import devfx.math as math
 from .distribution_algebra_operation_node import distribution_algebra_operation_node
@@ -62,30 +62,30 @@ class distribution(distribution_algebra_operation_node):
     def cdf(self, x):
         if(core.is_iterable(x)):
             if(np.where((x < self.a) | (x > self.b))[0].size > 0):
-                raise excs.ArgumentOutOfRangeError()
+                raise exp.ArgumentOutOfRangeError()
             return self._cdf(x)
         else:
             if((x < self.a) or (x > self.b)):
-                raise excs.ArgumentOutOfRangeError()
+                raise exp.ArgumentOutOfRangeError()
             return self._cdf(x)
 
     def _cdf(self, x):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------
     """ 
     def icdf(self, p):
         if(core.is_iterable(p)):
             if (np.where((p < self.cdf_a) | (p > self.cdf_b))[0].size > 0):
-                raise excs.ArgumentOutOfRangeError()
+                raise exp.ArgumentOutOfRangeError()
             return self._icdf(p)
         else:
             if ((p < self.cdf_a) or (p > self.cdf_b)):
-                raise excs.ArgumentOutOfRangeError()
+                raise exp.ArgumentOutOfRangeError()
             return self._icdf(p)
 
     def _icdf(self, p):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
                      
     """------------------------------------------------------------------------------------------------
     """   
@@ -171,13 +171,13 @@ class distribution(distribution_algebra_operation_node):
         return self._mean()
         
     def _mean(self):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
     def var(self):
         return self._var()
         
     def _var(self):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
 
     def stddev(self):
         return math.sqrt(self.var())
@@ -186,13 +186,13 @@ class distribution(distribution_algebra_operation_node):
         return self._skew()
         
     def _skew(self):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
                
     def kurtosis(self):
         return self._kurtosis()
         
     def _kurtosis(self):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
  
             
     """------------------------------------------------------------------------------------------------
@@ -347,7 +347,7 @@ class distribution(distribution_algebra_operation_node):
             return (ll, ul)
 
         def _get_xrange(self, kwargs):
-            raise excs.NotImplementedError()
+            raise exp.NotImplementedError()
 
         def plot(self, *args, **kwargs):
             xrange = self._get_xrange(kwargs)
@@ -369,4 +369,4 @@ class distribution(distribution_algebra_operation_node):
             self.__chart.bar(xrange[:-1]+xrange_dx/2.0, fxrange[:-1], xrange_dx, align=align, *args, **kwargs)
 
     def cdf_on_chart(self, chart):
-        raise excs.NotImplementedError()
+        raise exp.NotImplementedError()
