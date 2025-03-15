@@ -23,3 +23,8 @@ class AproximatePolicy(Policy):
     def _get_max_action(self, state):
         raise exp.NotImplementedError()
 
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def _get_random_action(self, state):
+        raise exp.NotImplementedError()

@@ -6,9 +6,9 @@ import devfx.core as core
 from .agent import Agent
 from .state_kind import StateKind
 
-class Environment(object):
+class MultiAgentEnvironment(object):
     def __init__(self):
-        self.__setup_agents_container()
+        self.__agents_container = {}
 
     """------------------------------------------------------------------------------------------------
     """    
@@ -16,26 +16,15 @@ class Environment(object):
         return self._setup(*args, **kwargs)
 
     def _setup(self, *args, **kwargs):
-        pass   
+        raise exp.NotImplementedError()   
 
 
     def reset(self, *args, **kwargs):
         return self._reset(*args, **kwargs)
 
     def _reset(self, *args, **kwargs):
-        pass 
+        raise exp.NotImplementedError() 
     
-
-    def cleanup(self, *args, **kwargs):
-        return self._cleanup(*args, **kwargs)
-
-    def _cleanup(self, *args, **kwargs):
-        pass 
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def __setup_agents_container(self):
-        self.__agents_container = {}
 
     """------------------------------------------------------------------------------------------------
     """ 
@@ -51,7 +40,7 @@ class Environment(object):
         self._on_added_agents(agents=agents)
        
     def _on_added_agents(self, agents):
-        pass
+        raise exp.NotImplementedError()
 
 
     def remove_agents(self, agents=None):
@@ -69,7 +58,7 @@ class Environment(object):
         self._on_removed_agents(agents=agents)
        
     def _on_removed_agents(self, agents):
-        pass
+        raise exp.NotImplementedError()
 
 
     def get_agents(self):
@@ -171,34 +160,7 @@ class Environment(object):
         for i in range(0, n):
             self.do_iteration(log_transition=log_transition)
 
-    """------------------------------------------------------------------------------------------------
-    """  
-    def clear_logged_transitions(self):
-        agents = self.get_agents()
-        for agent in agents:
-            agent.clear_logged_transitions()
 
-    def transfer_logged_transitions_from(self, environment):
-        to_agents = self.get_agents()
-        from_agents = environment.get_agents()
-        
-        if(len(to_agents) != len(from_agents)):
-            raise exp.ApplicationError()
-        
-        to_agents = sorted(to_agents, key=lambda agent: agent.get_id())
-        from_agents = sorted(from_agents, key=lambda agent: agent.get_id())
-        
-        for (to_agent, from_agent) in zip(to_agents, from_agents):
-            to_agent.transfer_logged_transitions_from(agent=from_agent)
-
-    def transfer_logged_transitions_to(self, environment):
-        environment.transfer_logged_transitions_from(environment=self)  
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def learn_from_logged_transitions(self, clear_logged_transitions=True):
-        for agent in self.get_agents():
-            agent.learn_from_logged_transitions(clear_logged_transitions=clear_logged_transitions)
 
      
 

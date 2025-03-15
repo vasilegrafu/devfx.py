@@ -59,7 +59,7 @@ class MainWindow(ux.Window):
         self.reset_button = ux.Button(parent=self, label='Reset')
         self.reset_button.OnPress += self.__reset_button__OnPress
 
-    def __init_layout(self):
+    def __setup_layout(self):
         #
         self.window_sizer = ux.BoxSizer(ux.HORIZONTAL).AddToWindow(self)
 
@@ -131,10 +131,14 @@ class MainWindow(ux.Window):
             N = 0
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
-                n = 500
+                n = 1000
                 self.grid_environment_for_training.do_iterations(n, log_transition=True)
-                self.grid_environment.transfer_logged_transitions_from(self.grid_environment_for_training)
-                self.grid_environment.learn_from_logged_transitions()
+                agents_for_training = self.grid_environment_for_training.get_agents()
+                agents = self.grid_environment.get_agents()
+                for agent in agents:
+                    agent_for_training = next(agent_for_training for agent_for_training in agents_for_training if agent_for_training.get_id() == agent.get_id())
+                    agent.learn_transitions(transitions=agent_for_training.get_logged_transitions())
+                    agent_for_training.clear_logged_transitions()
                 N += n
                 self.train_count_text.Label = str(N)
                 self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)
@@ -154,7 +158,6 @@ class MainWindow(ux.Window):
         else:
             agent = next(self.grid_environment.get_agents_cycler())
             agent.do_action(log_transition=True)
-            agent.learn_from_logged_transitions()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -173,7 +176,6 @@ class MainWindow(ux.Window):
                 else:
                     agent = next(self.grid_environment.get_agents_cycler())
                     agent.do_action(log_transition=True)
-                    agent.learn_from_logged_transitions()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)

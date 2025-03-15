@@ -164,32 +164,13 @@ class Agent(object):
             self.log_transition(transition=transition)
 
     def get_logged_transitions(self, n=None):
-        if(n is None):
-            n = len(self.__transitions_log)
-        return self.__transitions_log[0:n]
+        return self.__transitions_log
 
     def clear_logged_transitions(self):
         return self.__transitions_log.clear()
 
-
-    def transfer_logged_transitions_from(self, agent):
-        self.clear_logged_transitions()
-        self.log_transitions(transitions=agent.get_logged_transitions())
-        agent.clear_logged_transitions()
-
-    def transfer_logged_transitions_to(self, agent):
-        agent.transfer_logged_transitions_from(agent=self)   
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def learn_from_logged_transitions(self, clear_logged_transitions=True):
-        self.get_policy().learn(transitions=self.get_logged_transitions())
-        if(clear_logged_transitions):
-            self.clear_logged_transitions()    
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def learn(self, transitions):
+    def learn_transitions(self, transitions):
         self.get_policy().learn(transitions=transitions)
+
 
 

@@ -50,7 +50,7 @@ class DiscreteRange(Range):
 
 """================================================================================================
 """
-class ContinousRange(Range):
+class UniformContinousRange(Range):
     def __init__(self, name, value):
          super().__init__(name=name, value=value)
 

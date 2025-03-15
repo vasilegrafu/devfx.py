@@ -6,7 +6,7 @@ from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 from .grid_agent_action_ranges import GridAgentActionRanges
 
-class GridEnvironment(ml.rl.Environment):
+class GridEnvironment(ml.rl.MultiAgentEnvironment):
     def __init__(self, training=False):
         super().__init__()
 
@@ -17,11 +17,8 @@ class GridEnvironment(ml.rl.Environment):
     """------------------------------------------------------------------------------------------------
     """
     def __setup_scene(self):
-        self.__scene = np.zeros(shape=(3, 10, 10), dtype=np.int8)
+        self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
         
-    def __cleanup_scene(self):
-        self.__scene = None
-
     def get_scene(self):
         return self.__scene
 
@@ -46,14 +43,14 @@ class GridEnvironment(ml.rl.Environment):
         agent1 = GridAgent(id=1, 
                            name='Wolf', 
                            kind=GridAgentKind.CHASER, 
-                           policy=ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=1e-1))
+                           policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         if(self.__training == True):
             agent1.set_action_randomness(1.0)
 
         agent2 = GridAgent(id=2, 
                            name='Rabbit', 
                            kind=GridAgentKind.CHASED, 
-                           policy=ml.rl.QLearningPolicy(discount_factor=0.99, learning_rate=1e-1))
+                           policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         if(self.__training == True):
             agent2.set_action_randomness(1.0)
         
@@ -78,17 +75,6 @@ class GridEnvironment(ml.rl.Environment):
         for agent in self.get_agents():
             state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
             agent.set_state(state=state)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _cleanup(self):
-        self.remove_agents()
-        self.__cleanup_scene()
-
-    def _on_removed_agents(self, agents):
-        scene = self.get_scene()
-        scene[1,:,:] = 0
-        scene[2,:,:] = 0
 
     """------------------------------------------------------------------------------------------------
     """  
@@ -121,18 +107,18 @@ class GridEnvironment(ml.rl.Environment):
             if(np.equal(agent_next_ci, other_agent_ci).all()):
                 match agent.get_kind():
                     case GridAgentKind.CHASER:   
-                        agent_reward = ml.rl.Reward(value=+1e+3)
+                        agent_reward = ml.rl.Reward(value=+1.0)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
                     case GridAgentKind.CHASED: 
-                        agent_reward = ml.rl.Reward(value=-1e+3)
+                        agent_reward = ml.rl.Reward(value=-1.0)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
             else:
                 match agent.get_kind():
                     case GridAgentKind.CHASER:   
-                        agent_reward = ml.rl.Reward(value=0)
+                        agent_reward = ml.rl.Reward(value=-1.0)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
                     case GridAgentKind.CHASED: 
-                        agent_reward = ml.rl.Reward(value=0)
+                        agent_reward = ml.rl.Reward(value=+1.0)
                         agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
               
         return (agent_reward, agent_next_state)

@@ -6,7 +6,7 @@ from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 from .grid_agent_action_ranges import GridAgentActionRanges
 
-class GridEnvironment(ml.rl.Environment):
+class GridEnvironment(ml.rl.SingleAgentEnvironment):
     def __init__(self, training=False):
         super().__init__()
 
@@ -19,9 +19,6 @@ class GridEnvironment(ml.rl.Environment):
     def __setup_scene(self):
         self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
         
-    def __cleanup_scene(self):
-        self.__scene = None
-
     def get_scene(self):
         return self.__scene
 
@@ -52,17 +49,17 @@ class GridEnvironment(ml.rl.Environment):
         self.get_scene()[2,:,:] = 0
         
         # agents
-        agent1 = GridAgent(id=1, 
-                           name='Johnny Walker 1', 
-                           kind=GridAgentKind.WALKER, 
-                           policy=ml.rl.QLearningPolicy(discount_factor=0.90, learning_rate=1e-1))
+        agent = GridAgent(id=1, 
+                          name='Johnny Walker 1', 
+                          kind=GridAgentKind.WALKER, 
+                          policy=ml.rl.QLearningPolicy(discount_factor=0.90, learning_rate=1e-1))
 
         if(self.__training == True):
-            agent1.set_action_randomness(1.0)
+            agent.set_action_randomness(1.0)
         
-        self.add_agents((agent1,))
+        self.set_agent(agent)
 
-    def _on_added_agents(self, agents):
+    def _on_set_agent(self, agent):
         self.reset()
 
     """------------------------------------------------------------------------------------------------
@@ -71,26 +68,15 @@ class GridEnvironment(ml.rl.Environment):
         scene = self.get_scene()
         scene[2,:,:] = 0
 
-        for agent in self.get_agents():
-            choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) 
-                                       & (scene[2,:,:] == 0))
-            agent_ci = rnd.choice(choosable_ci)
-            scene[2,agent_ci[0],agent_ci[1]] = agent.get_id()
+        agent = self.get_agent()
+        choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) & (scene[2,:,:] == 0))
+        agent_ci = rnd.choice(choosable_ci)
+        scene[2,agent_ci[0],agent_ci[1]] = agent.get_id()
 
-        for agent in self.get_agents():
-            agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-            state = ml.rl.State(kind=scene[0,agent_ci[0],agent_ci[1]], value=scene)
-            agent.set_state(state=state)
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def _cleanup(self):
-        self.remove_agents()
-        self.__cleanup_scene()
-
-    def _on_removed_agents(self, agents):
-        scene = self.get_scene()
-        scene[2,:,:] = 0
+        agent = self.get_agent()
+        agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
+        state = ml.rl.State(kind=scene[0,agent_ci[0],agent_ci[1]], value=scene)
+        agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
     """  

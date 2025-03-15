@@ -114,13 +114,13 @@ class MainWindow(ux.Window):
             cgc.DrawText(text=f'{scene[1,ci[0],ci[1]]:.2f}', x=x, y=y, offx=4, offy=0, anchor=(ux.TOP, ux.RIGHT), colour=ux.BLACK)
 
         # draw agents
-        for agent in self.grid_environment.get_agents():
-            ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-            (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
-            cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
+        agent = self.grid_environment.get_agent()
+        ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
+        (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
+        cgc.DrawCircle(x=x, y=y, r=r, pen=ux.BLACK_PEN, brush=ux.RED_BRUSH)
 
         # draw policy
-        agent = self.grid_environment.get_agent(id=1)
+        agent = self.grid_environment.get_agent()
         for (state, action, value) in agent.get_policy().get_sav_iterator():
             ci = np.argwhere(state[2,:,:] == agent.get_id())[0]
             if(action.get_name() == 'LEFT'):    (x, y, anchor) = (ci[1]*cw, ci[0]*ch + ch/2, ux.LEFT)
@@ -143,8 +143,10 @@ class MainWindow(ux.Window):
                 sw = dgn.Stopwatch().start()
                 n = 1000
                 self.grid_environment_for_training.do_iterations(n, log_transition=True)
-                self.grid_environment.transfer_logged_transitions_from(self.grid_environment_for_training)
-                self.grid_environment.learn_from_logged_transitions()
+                agent_for_training = self.grid_environment_for_training.get_agent()
+                agent = self.grid_environment.get_agent()
+                agent.learn_transitions(transitions=agent_for_training.get_logged_transitions())
+                agent_for_training.clear_logged_transitions()
                 N += n
                 self.train_count_text.Label = str(N)
                 self.train_batch_time_elapsed_text.Label = str(sw.stop().elapsed)
@@ -159,12 +161,11 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __do_action_button__OnPress(self, sender, event_args):
-        if(self.grid_environment.has_agents_in_terminal_state()):
+        if(self.grid_environment.has_agent_in_terminal_state()):
             self.grid_environment.reset()
         else:
-            agent = next(self.grid_environment.get_agents_cycler())
-            agent.do_action(log_transition=True)
-            agent.learn_from_logged_transitions()
+            agent = self.grid_environment.get_agent()
+            agent.do_action()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -178,12 +179,11 @@ class MainWindow(ux.Window):
 
         def _():
             while self.do_actions_is_running:
-                if(self.grid_environment.has_agents_in_terminal_state()):
+                if(self.grid_environment.has_agent_in_terminal_state()):
                     self.grid_environment.reset()
                 else:
-                    agent = next(self.grid_environment.get_agents_cycler())
-                    agent.do_action(log_transition=True)
-                    agent.learn_from_logged_transitions()
+                    agent = self.grid_environment.get_agent()
+                    agent.do_action()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)
