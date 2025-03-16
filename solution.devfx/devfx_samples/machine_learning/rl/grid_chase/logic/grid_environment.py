@@ -6,7 +6,7 @@ from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 from .grid_agent_action_ranges import GridAgentActionRanges
 
-class GridEnvironment(ml.rl.MultiAgentEnvironment):
+class GridEnvironment(ml.rl.Environment):
     def __init__(self, training=False):
         super().__init__()
 

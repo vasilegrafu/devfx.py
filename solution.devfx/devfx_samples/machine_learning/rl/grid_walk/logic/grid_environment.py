@@ -6,19 +6,12 @@ from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
 from .grid_agent_action_ranges import GridAgentActionRanges
 
-class GridEnvironment(ml.rl.SingleAgentEnvironment):
+class GridEnvironment(ml.rl.Environment):
     def __init__(self, training=False):
         super().__init__()
 
         self.__training = training
-
-        self.__action_ranges = GridAgentActionRanges()
-
-    """------------------------------------------------------------------------------------------------
-    """
-    def __setup_scene(self):
-        self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
-        
+       
     def get_scene(self):
         return self.__scene
 
@@ -26,27 +19,27 @@ class GridEnvironment(ml.rl.SingleAgentEnvironment):
     """
     def _setup(self):
         # scene
-        self.__setup_scene()
+        self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
 
-        self.get_scene()[0,:,:] = ml.rl.StateKind.UNDEFINED
-        self.get_scene()[0,1:-1,1:-1] = ml.rl.StateKind.NON_TERMINAL
-        self.get_scene()[0,2,2] = ml.rl.StateKind.UNDEFINED
-        self.get_scene()[0,3,3] = ml.rl.StateKind.UNDEFINED
-        self.get_scene()[0,4,4] = ml.rl.StateKind.UNDEFINED
-        self.get_scene()[0,5,5] = ml.rl.StateKind.UNDEFINED
-        self.get_scene()[0,1,6] = ml.rl.StateKind.TERMINAL
-        self.get_scene()[0,2,6] = ml.rl.StateKind.TERMINAL
+        self.__scene[0,:,:] = ml.rl.StateKind.UNDEFINED
+        self.__scene[0,1:-1,1:-1] = ml.rl.StateKind.NON_TERMINAL
+        self.__scene[0,2,2] = ml.rl.StateKind.UNDEFINED
+        self.__scene[0,3,3] = ml.rl.StateKind.UNDEFINED
+        self.__scene[0,4,4] = ml.rl.StateKind.UNDEFINED
+        self.__scene[0,5,5] = ml.rl.StateKind.UNDEFINED
+        self.__scene[0,1,6] = ml.rl.StateKind.TERMINAL
+        self.__scene[0,2,6] = ml.rl.StateKind.TERMINAL
 
-        self.get_scene()[1,:,:] = -1
-        self.get_scene()[1,1:-1,1:-1] = 0
-        self.get_scene()[1,2,2] = -1
-        self.get_scene()[1,3,3] = -1
-        self.get_scene()[1,4,4] = -1
-        self.get_scene()[1,5,5] = -1
-        self.get_scene()[1,1,6] = 100
-        self.get_scene()[1,2,6] = -100
+        self.__scene[1,:,:] = -1
+        self.__scene[1,1:-1,1:-1] = 0
+        self.__scene[1,2,2] = -1
+        self.__scene[1,3,3] = -1
+        self.__scene[1,4,4] = -1
+        self.__scene[1,5,5] = -1
+        self.__scene[1,1,6] = 100
+        self.__scene[1,2,6] = -100
 
-        self.get_scene()[2,:,:] = 0
+        self.__scene[2,:,:] = 0
         
         # agents
         agent = GridAgent(id=1, 
@@ -57,15 +50,15 @@ class GridEnvironment(ml.rl.SingleAgentEnvironment):
         if(self.__training == True):
             agent.set_action_randomness(1.0)
         
-        self.set_agent(agent)
+        self.install_agents((agent, ))
 
-    def _on_set_agent(self, agent):
+    def _on_installed_agents(self, agents):
         self.reset()
 
     """------------------------------------------------------------------------------------------------
     """
-    def _reset(self):
-        scene = self.get_scene()
+    def reset(self):
+        scene = self.__scene
         scene[2,:,:] = 0
 
         agent = self.get_agent()
@@ -80,15 +73,19 @@ class GridEnvironment(ml.rl.SingleAgentEnvironment):
 
     """------------------------------------------------------------------------------------------------
     """  
-    def _generate_random_action(self, agent):
+    def generate_random_action(self, agent):
         range = self.__action_ranges.get_range(name='MOVE')
         action = ml.rl.Action(*range.get_random())
         return action
 
     """------------------------------------------------------------------------------------------------
     """
-    def _do_next_transition(self, agent, action):
-        scene = self.get_scene()
+    def do_next_transition(self, agent, action):
+        is_terminal_state = agent.is_in_terminal_state()
+        if(is_terminal_state):
+            return None
+    
+        scene = self.__scene
 
         agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
         agent_nci = agent_ci + action.get_value()
