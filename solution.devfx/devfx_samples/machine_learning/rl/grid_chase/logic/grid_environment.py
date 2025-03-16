@@ -16,17 +16,14 @@ class GridEnvironment(ml.rl.Environment):
         
     """------------------------------------------------------------------------------------------------
     """
-    def __setup_scene(self):
-        self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
-        
     def get_scene(self):
         return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
-    def _setup(self):
+    def setup(self):
         # scene
-        self.__setup_scene()
+        self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
 
         self.get_scene()[0,:,:] = 1
         self.get_scene()[0,1:-1,1:-1] = 0
@@ -54,14 +51,13 @@ class GridEnvironment(ml.rl.Environment):
         if(self.__training == True):
             agent2.set_action_randomness(1.0)
         
-        self.add_agents((agent1, agent2))
+        self.install_agents((agent1, agent2))
 
-    def _on_added_agents(self, agents):
         self.reset()
 
     """------------------------------------------------------------------------------------------------
     """
-    def _reset(self):
+    def reset(self):
         scene = self.get_scene()
         
         for agent in self.get_agents():
@@ -78,14 +74,14 @@ class GridEnvironment(ml.rl.Environment):
 
     """------------------------------------------------------------------------------------------------
     """  
-    def _generate_random_action(self, agent):
+    def generate_random_action(self, agent):
         range = self.__action_ranges.get_range(name='MOVE')
         action = ml.rl.Action(*range.get_random())
         return action
 
     """------------------------------------------------------------------------------------------------
     """  
-    def _do_next_transition(self, agent, action):
+    def do_next_transition(self, agent, action):
         scene = self.get_scene()
 
         agent_ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]

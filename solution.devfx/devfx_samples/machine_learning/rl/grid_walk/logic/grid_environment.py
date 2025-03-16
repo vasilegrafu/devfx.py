@@ -11,13 +11,15 @@ class GridEnvironment(ml.rl.Environment):
         super().__init__()
 
         self.__training = training
+
+        self.__action_ranges = GridAgentActionRanges()
        
     def get_scene(self):
         return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
-    def _setup(self):
+    def setup(self):
         # scene
         self.__scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
 
@@ -52,7 +54,6 @@ class GridEnvironment(ml.rl.Environment):
         
         self.install_agents((agent, ))
 
-    def _on_installed_agents(self, agents):
         self.reset()
 
     """------------------------------------------------------------------------------------------------
@@ -61,12 +62,12 @@ class GridEnvironment(ml.rl.Environment):
         scene = self.__scene
         scene[2,:,:] = 0
 
-        agent = self.get_agent()
+        agent = self.get_agents()[0]
         choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) & (scene[2,:,:] == 0))
         agent_ci = rnd.choice(choosable_ci)
         scene[2,agent_ci[0],agent_ci[1]] = agent.get_id()
 
-        agent = self.get_agent()
+        agent = self.get_agents()[0]
         agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
         state = ml.rl.State(kind=scene[0,agent_ci[0],agent_ci[1]], value=scene)
         agent.set_state(state=state)

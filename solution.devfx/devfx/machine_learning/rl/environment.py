@@ -36,10 +36,7 @@ class Environment(object):
         pass
 
 
-    def uninstall_agents(self, agents=None):
-        if(agents is None):
-            agents = self.__agents_container.values()
-            
+    def uninstall_agents(self, agents):
         for agent in agents:    
             if(agent.get_id() not in self.__agents_container):
                 raise exp.ApplicationError("You try to uninstall an agent that is not installed.")
