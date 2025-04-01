@@ -101,6 +101,17 @@ class Environment(object):
 
 
     """------------------------------------------------------------------------------------------------
+    """  
+    def generate_random_action(self, agent):
+        raise exp.NotImplementedError()
+    
+    """------------------------------------------------------------------------------------------------
+    """
+    def do_next_transition(self, agent, action):
+        raise exp.NotImplementedError()
+
+
+    """------------------------------------------------------------------------------------------------
     """ 
     def do_action(self, log_transition=False):
         if(self.has_agents_in_terminal_state()):

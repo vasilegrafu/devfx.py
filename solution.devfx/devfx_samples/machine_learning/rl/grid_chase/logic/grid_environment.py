@@ -95,7 +95,6 @@ class GridEnvironment(ml.rl.Environment):
             else:
                 agent_reward = ml.rl.Reward(value=+1.0)
                 agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
-                
             return (agent_reward, agent_next_state)
 
         #----------------------------------------------------------------
@@ -106,7 +105,6 @@ class GridEnvironment(ml.rl.Environment):
             if(self.scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
                 agent_reward = ml.rl.Reward(value=-1)
                 agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
-
                 return (agent_reward, agent_next_state)
 
             self.scene[2,agent_ci[0],agent_ci[1]] = 0
@@ -119,7 +117,6 @@ class GridEnvironment(ml.rl.Environment):
             else:
                 agent_reward = ml.rl.Reward(value=-1.0)
                 agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
-                
             return (agent_reward, agent_next_state)
         
         #----------------------------------------------------------------

@@ -55,14 +55,15 @@ class GridEnvironment(ml.rl.Environment):
     """
     def reset(self):
         self.scene[2,:,:] = 0
-        for agent in self.get_agents():
-            choosable_ci = np.argwhere(  (self.scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) 
-                                       & (self.scene[2,:,:] == 0))
-            agent_ci = rnd.choice(choosable_ci)
-            self.scene[2,agent_ci[0],agent_ci[1]] = 1
 
-            state = ml.rl.State(kind=self.scene[0,agent_ci[0],agent_ci[1]], value=self.scene)
-            agent.set_state(state=state)
+        agent = self.get_agents()[0]
+        choosable_ci = np.argwhere(  (self.scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) 
+                                    & (self.scene[2,:,:] == 0))
+        agent_ci = rnd.choice(choosable_ci)
+        self.scene[2,agent_ci[0],agent_ci[1]] = 1
+
+        state = ml.rl.State(kind=self.scene[0,agent_ci[0],agent_ci[1]], value=self.scene)
+        agent.set_state(state=state)
 
 
     """------------------------------------------------------------------------------------------------
@@ -80,13 +81,14 @@ class GridEnvironment(ml.rl.Environment):
 
         if(self.scene[0,agent_nci[0],agent_nci[1]] == ml.rl.StateKind.UNDEFINED):
             agent_reward = ml.rl.Reward(value=self.scene[1,agent_nci[0],agent_nci[1]])
-            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
-        else:
-            self.scene[2,agent_ci[0],agent_ci[1]] = 0
-            self.scene[2,agent_nci[0],agent_nci[1]] = 1
-            agent_reward = ml.rl.Reward(value=self.scene[1,agent_nci[0],agent_nci[1]])
-            agent_next_state = ml.rl.State(kind=self.scene[0,agent_nci[0],agent_nci[1]], value=self.scene)
-        
+            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=self.scene)
+            return (agent_reward, agent_next_state)
+
+        self.scene[2,agent_ci[0],agent_ci[1]] = 0
+        self.scene[2,agent_nci[0],agent_nci[1]] = 1
+
+        agent_reward = ml.rl.Reward(value=self.scene[1,agent_nci[0],agent_nci[1]])
+        agent_next_state = ml.rl.State(kind=self.scene[0,agent_nci[0],agent_nci[1]], value=self.scene)
         return (agent_reward, agent_next_state)
 
 
