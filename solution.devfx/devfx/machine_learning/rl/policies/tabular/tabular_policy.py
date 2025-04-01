@@ -1,6 +1,8 @@
 import random as rnd
+import devfx.exceptions as exp
+from ..policy import Policy
 
-class TabularModel():
+class TabularPolicy(Policy):
     def __init__(self):
         self.__setup_table()
   
@@ -105,8 +107,17 @@ class TabularModel():
         return sum(self.__get_table()[state].values())/len(self.__get_table()[state])
 
     """------------------------------------------------------------------------------------------------
+    """ 
+    def _learn(self, transitions):
+        raise exp.NotImplementedError()
+
+    """------------------------------------------------------------------------------------------------
     """
-    def get_max_action(self, state):   
+    def _get_optimal_action(self, state):
+        is_terminal_state = state.is_terminal()
+        if(is_terminal_state):
+            return None
+    
         if(not self.has_state(state=state)):
             return None
         if(not self.has_actions(state=state)):
@@ -118,7 +129,11 @@ class TabularModel():
 
     """------------------------------------------------------------------------------------------------
     """
-    def get_random_action(self, state):
+    def _get_random_action(self, state):
+        is_terminal_state = state.is_terminal()
+        if(is_terminal_state):
+            return None
+
         if(not self.has_state(state=state)):
             return None
         if(not self.has_actions(state=state)):
@@ -127,9 +142,6 @@ class TabularModel():
         actions = self.get_actions(state=state)
         random_action = rnd.choice(actions)
         return random_action
-
-
-
 
 
 

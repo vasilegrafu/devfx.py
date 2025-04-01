@@ -141,7 +141,7 @@ class MainWindow(ux.Window):
             N = 0
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
-                n = 1000
+                n = 100
                 self.grid_environment_for_training.do_iterations(n, log_transition=True)
                 for agent in self.grid_environment.get_agents():
                     agent_for_training = self.grid_environment_for_training.get_agent(agent.get_id())

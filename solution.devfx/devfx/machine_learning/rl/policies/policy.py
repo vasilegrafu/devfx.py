@@ -1,21 +1,6 @@
-import pickle as pckl
 import devfx.exceptions as exp
 
 class Policy(object):
-    def __init__(self):
-        self._setup_model()
-
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def _setup_model(self):
-        raise exp.NotImplementedError()
-
-    def get_model(self):
-        return self._get_model()
-    
-    def _get_model(self):
-        raise exp.NotImplementedError()
-      
     """------------------------------------------------------------------------------------------------
     """ 
     def learn(self, transitions):
@@ -26,10 +11,10 @@ class Policy(object):
     
     """------------------------------------------------------------------------------------------------
     """ 
-    def get_max_action(self, state):
-        return self._get_max_action(state=state)
+    def get_optimal_action(self, state):
+        return self._get_optimal_action(state=state)
 
-    def _get_max_action(self, state):
+    def _get_optimal_action(self, state):
         raise exp.NotImplementedError()
 
     """------------------------------------------------------------------------------------------------

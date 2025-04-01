@@ -6,6 +6,5 @@ from .reward import *
 from .policies import *
 from .agent import *
 from .environment import *
-from .environment import *
 
 

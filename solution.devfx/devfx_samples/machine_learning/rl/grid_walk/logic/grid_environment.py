@@ -4,18 +4,12 @@ import devfx.machine_learning as ml
 
 from .grid_agent_kind import GridAgentKind
 from .grid_agent import GridAgent
-from .grid_agent_action_ranges import GridAgentActionRanges
 
 class GridEnvironment(ml.rl.Environment):
     def __init__(self, training=False):
         super().__init__()
 
         self.__training = training
-
-        self.__action_ranges = GridAgentActionRanges()
-       
-    def get_scene(self):
-        return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
@@ -65,42 +59,31 @@ class GridEnvironment(ml.rl.Environment):
         agent = self.get_agents()[0]
         choosable_ci = np.argwhere((scene[0,:,:] == ml.rl.StateKind.NON_TERMINAL) & (scene[2,:,:] == 0))
         agent_ci = rnd.choice(choosable_ci)
-        scene[2,agent_ci[0],agent_ci[1]] = agent.get_id()
+        scene[2,agent_ci[0],agent_ci[1]] = 1
 
         agent = self.get_agents()[0]
-        agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
+        agent_ci = np.argwhere(scene[2,:,:] == 1)[0]
         state = ml.rl.State(kind=scene[0,agent_ci[0],agent_ci[1]], value=scene)
         agent.set_state(state=state)
 
     """------------------------------------------------------------------------------------------------
-    """  
-    def generate_random_action(self, agent):
-        range = self.__action_ranges.get_range(name='MOVE')
-        action = ml.rl.Action(*range.get_random())
-        return action
+    """
+    def get_scene(self):
+        return self.__scene
 
     """------------------------------------------------------------------------------------------------
-    """
-    def do_next_transition(self, agent, action):
-        is_terminal_state = agent.is_in_terminal_state()
-        if(is_terminal_state):
-            return None
-    
-        scene = self.__scene
+    """ 
+    def do_iteration(self, log_transition=False):
+        for agent in self.get_agents():
+            if(self.has_agents_in_terminal_state()):
+                self.reset()
+            else:
+                agent.do_action(log_transition=log_transition)
 
-        agent_ci = np.argwhere(scene[2,:,:] == agent.get_id())[0]
-        agent_nci = agent_ci + action.get_value()
+    def do_iterations(self, n, log_transition=False):
+        for i in range(0, n):
+            self.do_iteration(log_transition=log_transition)
 
-        if(scene[0,agent_nci[0],agent_nci[1]] == ml.rl.StateKind.UNDEFINED):
-            agent_reward = ml.rl.Reward(value=scene[1,agent_nci[0],agent_nci[1]])
-            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
-        else:
-            scene[2,agent_ci[0],agent_ci[1]] = 0
-            scene[2,agent_nci[0],agent_nci[1]] = agent.get_id()
-            agent_reward = ml.rl.Reward(value=scene[1,agent_nci[0],agent_nci[1]])
-            agent_next_state = ml.rl.State(kind=scene[0,agent_nci[0],agent_nci[1]], value=scene)
-        
-        return (agent_reward, agent_next_state)
 
 
 

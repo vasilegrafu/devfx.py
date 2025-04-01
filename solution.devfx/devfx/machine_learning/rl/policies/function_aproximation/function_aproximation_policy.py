@@ -1,16 +1,16 @@
 import devfx.exceptions as exp
-from .policy import Policy
+from ..policy import Policy
 
-class AproximatePolicy(Policy):
+class FunctionAproximationPolicy(Policy):
     def __init__(self):
-        super().__init__()
-
+        self.__setup_model()
+  
     """------------------------------------------------------------------------------------------------
     """ 
-    def _setup_model(self):
+    def __setup_model(self):
         self.__model = None
    
-    def _get_model(self):
+    def __get_model(self):
         return self.__model
 
     """------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class AproximatePolicy(Policy):
 
     """------------------------------------------------------------------------------------------------
     """ 
-    def _get_max_action(self, state):
+    def _get_optimal_action(self, state):
         raise exp.NotImplementedError()
 
 

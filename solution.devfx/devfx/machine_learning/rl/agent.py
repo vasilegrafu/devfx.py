@@ -123,20 +123,20 @@ class Agent(object):
         
         if(self.get_action_randomness() is None):
             if(action is None):
-                action = self.get_policy().get_max_action(state=state)
+                action = self.get_policy().get_optimal_action(state=state)
             if(action is None):
                 return None
         else:
             random_number = rnd.random()
             if(random_number < self.get_action_randomness()):
-                action = self.get_environment().generate_random_action(agent=self)
+                action = self.generate_random_action()
             else:
                 if(action is None):
-                    action = self.get_policy().get_max_action(state=state)      
+                    action = self.get_policy().get_optimal_action(state=state)      
                 if(action is None):
                     return None
             
-        reward_and_next_state = self.get_environment().do_next_transition(agent=self, action=action)
+        reward_and_next_state = self.do_next_transition(action=action)
         if(reward_and_next_state is None):
             return None
 

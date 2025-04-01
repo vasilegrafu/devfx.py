@@ -2,22 +2,14 @@ import numpy as np
 import random as rnd
 import devfx.machine_learning as ml
 
-from .grid_agent_kind import GridAgentKind
-from .grid_agent import GridAgent
-from .grid_agent_action_ranges import GridAgentActionRanges
+from .grid_chased_agent import GridChasedAgent
+from .grid_chaser_agent import GridChaserAgent
 
 class GridEnvironment(ml.rl.Environment):
     def __init__(self, training=False):
         super().__init__()
 
         self.__training = training
-
-        self.__action_ranges = GridAgentActionRanges()
-        
-    """------------------------------------------------------------------------------------------------
-    """
-    def get_scene(self):
-        return self.__scene
 
     """------------------------------------------------------------------------------------------------
     """
@@ -37,17 +29,15 @@ class GridEnvironment(ml.rl.Environment):
         self.get_scene()[2,:,:] = 0
         
         # agents
-        agent1 = GridAgent(id=1, 
-                           name='Wolf', 
-                           kind=GridAgentKind.CHASER, 
-                           policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
+        agent1 = GridChasedAgent(id=1, 
+                                 name='Rabbit', 
+                                 policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         if(self.__training == True):
             agent1.set_action_randomness(1.0)
 
-        agent2 = GridAgent(id=2, 
-                           name='Rabbit', 
-                           kind=GridAgentKind.CHASED, 
-                           policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
+        agent2 = GridChaserAgent(id=2, 
+                                 name='Wolf', 
+                                 policy=ml.rl.QLearningPolicy(discount_factor=0.95, learning_rate=1e-1))
         if(self.__training == True):
             agent2.set_action_randomness(1.0)
         
@@ -66,58 +56,30 @@ class GridEnvironment(ml.rl.Environment):
                                        & (scene[1,:,:] == 0) 
                                        & (scene[2,:,:] == 0))
             agent_ci = rnd.choice(choosable_ci)
-            scene[agent.get_id(),agent_ci[0],agent_ci[1]] = agent.get_id()
+            scene[agent.get_id(),agent_ci[0],agent_ci[1]] = 1
 
         for agent in self.get_agents():
             state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
             agent.set_state(state=state)
 
-    """------------------------------------------------------------------------------------------------
-    """  
-    def generate_random_action(self, agent):
-        range = self.__action_ranges.get_range(name='MOVE')
-        action = ml.rl.Action(*range.get_random())
-        return action
 
     """------------------------------------------------------------------------------------------------
-    """  
-    def do_next_transition(self, agent, action):
-        scene = self.get_scene()
+    """
+    def get_scene(self):
+        return self.__scene
 
-        agent_ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
-        match agent.get_kind():
-            case GridAgentKind.CHASER:   
-                agent_next_ci = agent_ci + action.get_value()
-            case GridAgentKind.CHASED: 
-                agent_next_ci = agent_ci + action.get_value()
-        
-        if(scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
-            agent_reward = ml.rl.Reward(value=-1)
-            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
-        else:
-            scene[agent.get_id(),agent_ci[0],agent_ci[1]] = 0
-            scene[agent.get_id(),agent_next_ci[0],agent_next_ci[1]] = agent.get_id()
-
-            other_agent = self.get_agents_others_than(id=agent.get_id())[0]
-            other_agent_ci = np.argwhere(scene[other_agent.get_id(),:,:] == other_agent.get_id())[0]
-            if(np.equal(agent_next_ci, other_agent_ci).all()):
-                match agent.get_kind():
-                    case GridAgentKind.CHASER:   
-                        agent_reward = ml.rl.Reward(value=+1.0)
-                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
-                    case GridAgentKind.CHASED: 
-                        agent_reward = ml.rl.Reward(value=-1.0)
-                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=scene)
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def do_iteration(self, log_transition=False):
+        for agent in self.get_agents():
+            if(self.has_agents_in_terminal_state()):
+                self.reset()
             else:
-                match agent.get_kind():
-                    case GridAgentKind.CHASER:   
-                        agent_reward = ml.rl.Reward(value=-1.0)
-                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
-                    case GridAgentKind.CHASED: 
-                        agent_reward = ml.rl.Reward(value=+1.0)
-                        agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=scene)
-              
-        return (agent_reward, agent_next_state)
+                agent.do_action(log_transition=log_transition)
+
+    def do_iterations(self, n, log_transition=False):
+        for i in range(0, n):
+            self.do_iteration(log_transition=log_transition)
 
 
 

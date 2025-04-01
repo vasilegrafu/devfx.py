@@ -101,31 +101,7 @@ class Environment(object):
         has_agents_in_non_terminal_state = any(agent.is_in_non_terminal_state() for agent in self.__agents_container.values())
         return has_agents_in_non_terminal_state
 
-    """------------------------------------------------------------------------------------------------
-    """ 
-    def do_iteration(self, log_transition=False):
-        for agent in self.get_agents():
-            if(self.has_agents_in_terminal_state()):
-                self.reset()
-            else:
-                agent.do_action(log_transition=log_transition)
 
-    def do_iterations(self, n, log_transition=False):
-        for i in range(0, n):
-            self.do_iteration(log_transition=log_transition)
-
-
-    """------------------------------------------------------------------------------------------------
-    """  
-    def generate_random_action(self, agent):
-        raise exp.NotImplementedError()
-    
-    """------------------------------------------------------------------------------------------------
-    """    
-    def do_next_transition(self, agent, action):
-        raise exp.NotImplementedError()
-
-     
 
 
 
