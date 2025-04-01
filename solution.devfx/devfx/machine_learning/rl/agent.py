@@ -129,14 +129,14 @@ class Agent(object):
         else:
             random_number = rnd.random()
             if(random_number < self.get_action_randomness()):
-                action = self.generate_random_action()
+                action = self.get_environment().generate_random_action(agent=self)
             else:
                 if(action is None):
                     action = self.get_policy().get_optimal_action(state=state)      
                 if(action is None):
                     return None
             
-        reward_and_next_state = self.do_next_transition(action=action)
+        reward_and_next_state = self.get_environment().do_next_transition(agent=self, action=action)
         if(reward_and_next_state is None):
             return None
 

@@ -95,7 +95,7 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # scene
-        scene = self.grid_environment.get_scene()
+        scene = self.grid_environment.scene
 
         # cell size
         (cw, ch) = (cgc.GetSize()[0]/scene.shape[1:3][0], cgc.GetSize()[1]/scene.shape[1:3][1])
@@ -111,7 +111,7 @@ class MainWindow(ux.Window):
             
         # draw agents
         for agent in self.grid_environment.get_agents():
-            ci = np.argwhere(scene[agent.get_id(),:,:] == agent.get_id())[0]
+            ci = np.argwhere(scene[agent.get_id(),:,:] == 1)[0]
             match agent.get_kind():
                 case GridAgentKind.CHASER:
                     (x, y, r) = (ci[1]*cw + cw/2, ci[0]*ch + ch/2, min(cw/4, ch/4))
@@ -151,11 +151,7 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __do_action_button__OnPress(self, sender, event_args):
-        if(self.grid_environment.has_agents_in_terminal_state()):
-            self.grid_environment.reset()
-        else:
-            agent = next(self.grid_environment.get_agents_cycler())
-            agent.do_action()
+        self.grid_environment.do_action()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -169,11 +165,7 @@ class MainWindow(ux.Window):
 
         def _():
             while self.do_actions_is_running:
-                if(self.grid_environment.has_agents_in_terminal_state()):
-                    self.grid_environment.reset()
-                else:
-                    agent = next(self.grid_environment.get_agents_cycler())
-                    agent.do_action()
+                self.grid_environment.do_action()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)

@@ -142,7 +142,7 @@ class MainWindow(ux.Window):
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
                 n = 100
-                self.grid_environment_for_training.do_actions(n, log_transition=True)
+                self.grid_environment_for_training.do_iterations(n, log_transition=True)
                 for agent in self.grid_environment.get_agents():
                     agent_for_training = self.grid_environment_for_training.get_agent(agent.get_id())
                     agent.learn_transitions(transitions=agent_for_training.get_logged_transitions())
