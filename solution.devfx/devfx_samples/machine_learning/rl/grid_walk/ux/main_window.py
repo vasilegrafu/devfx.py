@@ -93,7 +93,7 @@ class MainWindow(ux.Window):
         cgc = event_args.CGC
 
         # scene
-        scene = self.grid_environment.get_scene()
+        scene = self.grid_environment.scene
 
         # cell size
         (cw, ch) = (cgc.GetSize()[0]/scene.shape[1:3][0], cgc.GetSize()[1]/scene.shape[1:3][1])
@@ -142,7 +142,7 @@ class MainWindow(ux.Window):
             while self.training_is_running:
                 sw = dgn.Stopwatch().start()
                 n = 100
-                self.grid_environment_for_training.do_iterations(n, log_transition=True)
+                self.grid_environment_for_training.do_actions(n, log_transition=True)
                 for agent in self.grid_environment.get_agents():
                     agent_for_training = self.grid_environment_for_training.get_agent(agent.get_id())
                     agent.learn_transitions(transitions=agent_for_training.get_logged_transitions())
@@ -161,11 +161,7 @@ class MainWindow(ux.Window):
     """------------------------------------------------------------------------------------------------
     """
     def __do_action_button__OnPress(self, sender, event_args):
-        if(self.grid_environment.has_agents_in_terminal_state()):
-            self.grid_environment.reset()
-        else:
-            agent = next(self.grid_environment.get_agents_cycler())
-            agent.do_action()
+        self.grid_environment.do_action()
         self.grid_canvas.UpdateDrawing()  
 
     """------------------------------------------------------------------------------------------------
@@ -179,11 +175,7 @@ class MainWindow(ux.Window):
 
         def _():
             while self.do_actions_is_running:
-                if(self.grid_environment.has_agents_in_terminal_state()):
-                    self.grid_environment.reset()
-                else:
-                    agent = next(self.grid_environment.get_agents_cycler())
-                    agent.do_action()
+                self.grid_environment.do_action()
                 self.grid_canvas.UpdateDrawing()
                 time.sleep(self.do_actions_speed_spinbox.GetValue())          
         thread = pc.Thread(fn=_)

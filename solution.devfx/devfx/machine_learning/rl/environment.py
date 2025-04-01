@@ -63,11 +63,9 @@ class Environment(object):
                     yield agent  
         agents_iter = core.ObjectStorage.intercept(self, 'agents_iter', lambda: get_agents_cycler(self=self))
         return agents_iter
-
-
+    
     def exists_agent(self, id):
         return id in self.__agents_container
-
 
     def get_agent(self, id):
         if(id not in self.__agents_container):
@@ -102,6 +100,31 @@ class Environment(object):
         return has_agents_in_non_terminal_state
 
 
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def do_action(self, log_transition=False):
+        if(self.has_agents_in_terminal_state()):
+            self.reset()
+        else:
+            agent = next(self.get_agents_cycler())
+            agent.do_action(log_transition=log_transition)
+
+    def do_actions(self, n, log_transition=False):
+        for i in range(0, n):
+            self.do_action(log_transition=log_transition)
+
+    """------------------------------------------------------------------------------------------------
+    """ 
+    def do_iteration(self, log_transition=False):
+        for agent in self.get_agents():
+            if(self.has_agents_in_terminal_state()):
+                self.reset()
+            else:
+                agent.do_action(log_transition=log_transition)
+
+    def do_iterations(self, n, log_transition=False):
+        for i in range(0, n):
+            self.do_iteration(log_transition=log_transition)
 
 
 
