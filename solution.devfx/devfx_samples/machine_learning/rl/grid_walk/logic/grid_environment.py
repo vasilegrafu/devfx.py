@@ -81,7 +81,7 @@ class GridEnvironment(ml.rl.Environment):
 
         if(self.scene[0,agent_nci[0],agent_nci[1]] == ml.rl.StateKind.UNDEFINED):
             agent_reward = ml.rl.Reward(value=self.scene[1,agent_nci[0],agent_nci[1]])
-            agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=self.scene)
+            agent_next_state = ml.rl.TerminalState(kind=ml.rl.StateKind.TERMINAL, value=self.scene)
             return (agent_reward, agent_next_state)
 
         self.scene[2,agent_ci[0],agent_ci[1]] = 0

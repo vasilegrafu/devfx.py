@@ -70,3 +70,16 @@ class State(object):
     """
     def copy(self):
         return State(kind=self.get_kind(), value=self.get_data().copy())
+
+
+class UndefinedState(State):
+    def __init__(self, *args, **kwargs):
+        super().__init__(kind=StateKind.UNDEFINED, value=None, *args, **kwargs) 
+
+class NonTerminalState(State):
+    def __init__(self, value, *args, **kwargs):
+        super().__init__(kind=StateKind.NON_TERMINAL, value=value, *args, **kwargs)
+
+class TerminalState(State):
+    def __init__(self, value, *args, **kwargs):
+        super().__init__(kind=StateKind.TERMINAL, value=value, *args, **kwargs)

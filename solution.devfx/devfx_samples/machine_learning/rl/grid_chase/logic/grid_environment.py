@@ -19,15 +19,15 @@ class GridEnvironment(ml.rl.Environment):
     """
     def setup(self):
         # scene
-        self.scene = np.zeros(shape=(3, 8, 8), dtype=np.int8)
+        self.scene = np.zeros(shape=(3, 7, 7), dtype=np.int8)
 
         self.scene[0,:,:] = 1
         self.scene[0,1:-1,1:-1] = 0
         self.scene[0,2,2] = 1
-        self.scene[0,3,3] = 1
+        self.scene[0,3,3] = 0
         self.scene[0,5,5] = 1
-        self.scene[0,7,7] = 1
-        self.scene[0,3,7] = 1
+        # self.scene[0,7,7] = 1
+        # self.scene[0,3,7] = 1
 
         self.scene[1,:,:] = 0
         self.scene[2,:,:] = 0
@@ -82,7 +82,7 @@ class GridEnvironment(ml.rl.Environment):
             
             if(self.scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
                 agent_reward = ml.rl.Reward(value=-1)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.TerminalState(value=self.scene)
                 return (agent_reward, agent_next_state)
 
             self.scene[1,agent_ci[0],agent_ci[1]] = 0
@@ -91,10 +91,10 @@ class GridEnvironment(ml.rl.Environment):
             other_agent_ci = np.argwhere(self.scene[2,:,:] == 1)[0]
             if(np.equal(agent_next_ci, other_agent_ci).all()):
                 agent_reward = ml.rl.Reward(value=-1.0)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.TerminalState(value=self.scene)
             else:
                 agent_reward = ml.rl.Reward(value=+1.0)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.NonTerminalState(value=self.scene)
             return (agent_reward, agent_next_state)
 
         #----------------------------------------------------------------
@@ -104,7 +104,7 @@ class GridEnvironment(ml.rl.Environment):
             
             if(self.scene[0,agent_next_ci[0],agent_next_ci[1]] == 1):
                 agent_reward = ml.rl.Reward(value=-1)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.TerminalState(value=self.scene)
                 return (agent_reward, agent_next_state)
 
             self.scene[2,agent_ci[0],agent_ci[1]] = 0
@@ -113,10 +113,10 @@ class GridEnvironment(ml.rl.Environment):
             other_agent_ci = np.argwhere(self.scene[1,:,:] == 1)[0]
             if(np.equal(agent_next_ci, other_agent_ci).all()):
                 agent_reward = ml.rl.Reward(value=+1.0)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.TerminalState(value=self.scene)
             else:
                 agent_reward = ml.rl.Reward(value=-1.0)
-                agent_next_state = ml.rl.State(kind=ml.rl.StateKind.NON_TERMINAL, value=self.scene)
+                agent_next_state = ml.rl.NonTerminalState(value=self.scene)
             return (agent_reward, agent_next_state)
         
         #----------------------------------------------------------------
