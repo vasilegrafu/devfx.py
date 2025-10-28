@@ -17,13 +17,5 @@
 			"PYTHONPATH": "${env:PYTHONPATH};${workspaceFolder}",
 			"PATH": "${env:PATH_PYTHON};${env:PATH}"
 		},
-		"terminal.integrated.env.linux": {
-			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
-			"PATH": "${env:PATH}"
-		},
-		"terminal.integrated.env.osx": {
-			"PYTHONPATH": "${env:PYTHONPATH}:${workspaceFolder}",
-			"PATH": "${env:PATH}"
-		}
 	}
 }
