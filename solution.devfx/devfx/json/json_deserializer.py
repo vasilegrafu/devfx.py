@@ -1,11 +1,12 @@
 from dataclasses import is_dataclass, fields
 from typing import Any, Type, TypeVar, get_type_hints
 from json import loads as load_json
-from datetime import datetime, date, time
 
 from typing import Any, Type, get_type_hints, get_origin, get_args
 from dataclasses import is_dataclass, fields
-from datetime import datetime, date, time
+from decimal import Decimal
+from datetime import date, time, datetime
+from uuid import UUID
 
 T = TypeVar('T')
 
@@ -40,7 +41,7 @@ class JsonDeserializer:
             return cls(**field_values)
         elif cls == str:
             return json_deserializable
-        elif cls in (int, float):
+        elif cls in (int, float, Decimal):
             return cls(json_deserializable)
         elif cls == bool:
             return cls(json_deserializable)
@@ -50,5 +51,7 @@ class JsonDeserializer:
             return date.fromisoformat(json_deserializable)
         elif cls == time:
             return datetime.strptime(json_deserializable, "%H:%M:%S").time()
+        elif cls == UUID:
+            return UUID(json_deserializable)
         else:
             raise TypeError(f"Unsupported type for json deserialization: {cls}")

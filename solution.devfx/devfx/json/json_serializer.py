@@ -1,7 +1,10 @@
 from dataclasses import is_dataclass
 from typing import Any
 from json import dumps as dump_json
-from datetime import datetime, date, time
+
+from decimal import Decimal
+from datetime import date, time, datetime
+from uuid import UUID
 
 class JsonSerializer:
     @staticmethod
@@ -25,7 +28,7 @@ class JsonSerializer:
             return {field.name: JsonSerializer.__convert_to_serializable(getattr(obj, field.name)) for field in obj.__dataclass_fields__.values()}
         elif isinstance(obj, str):
             return obj
-        elif isinstance(obj, (int, float)):
+        elif isinstance(obj, (int, float, Decimal)):
             return obj
         elif isinstance(obj, bool):
             return obj
@@ -35,6 +38,8 @@ class JsonSerializer:
             return obj.isoformat()
         elif isinstance(obj, time):
             return obj.strftime("%H:%M:%S")
+        elif isinstance(obj, UUID):
+            return str(obj)
         else:
             raise TypeError(f"Unsupported type for json serialization: {type(obj)}")
         

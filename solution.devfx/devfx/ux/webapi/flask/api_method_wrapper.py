@@ -1,4 +1,7 @@
 from flask import request, make_response
+from decimal import Decimal
+from datetime import datetime, date, time
+from uuid import UUID
 from typing import get_type_hints
 import devfx.exceptions as exp
 from devfx.json import JsonSerializer
@@ -35,7 +38,7 @@ def __process_request(fn, **kwargs):
             next_kwargs = {}
             for arg_name in fn_args_info.keys():
                 arg_type = fn_args_info[arg_name]
-                if(arg_type in (str, int, float, bool)):
+                if(arg_type in (str, int, float, Decimal, bool, datetime, date, time, UUID)):
                     if(arg_name in request.args):
                         next_kwargs[arg_name] = request.args.get(arg_name, default=arg_type(), type=arg_type)
                     elif(arg_name in kwargs):
