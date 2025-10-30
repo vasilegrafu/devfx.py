@@ -28,8 +28,10 @@ class JsonSerializer:
             return {field.name: JsonSerializer.__convert_to_serializable(getattr(obj, field.name)) for field in obj.__dataclass_fields__.values()}
         elif isinstance(obj, str):
             return obj
-        elif isinstance(obj, (int, float, Decimal)):
+        elif isinstance(obj, (int, float)):
             return obj
+        elif isinstance(obj, Decimal):
+            return float(obj)
         elif isinstance(obj, bool):
             return obj
         elif isinstance(obj, datetime):

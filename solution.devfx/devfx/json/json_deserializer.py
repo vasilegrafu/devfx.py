@@ -41,8 +41,10 @@ class JsonDeserializer:
             return cls(**field_values)
         elif cls == str:
             return json_deserializable
-        elif cls in (int, float, Decimal):
+        elif cls in (int, float):
             return cls(json_deserializable)
+        elif cls == Decimal:
+            return Decimal(str(json_deserializable))
         elif cls == bool:
             return cls(json_deserializable)
         elif cls == datetime:
