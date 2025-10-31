@@ -5,13 +5,17 @@ Provides custom JSON response handling and global exception handlers
 that integrate devfx's serialization and exception system with FastAPI.
 """
 
+import logging
 from typing import Any
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.responses import Response
 import devfx.exceptions as exp
 from devfx.json import JsonSerializer
 from ..http_status_code import HttpStatusCode
 from ..base_response import BaseResponse
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 
 class JsonResponse(Response):
@@ -25,7 +29,7 @@ class JsonResponse(Response):
     - Any other types handled by devfx's JsonSerializer
     
     Usage:
-        @app.post('/endpoint', response_class=JsonResponse
+        @app.post('/endpoint', response_class=JsonResponse)
         def endpoint() -> MyModel:
             return MyModel(...)
     """
@@ -62,8 +66,9 @@ def setup_exception_handlers(app: FastAPI) -> None:
     """
     
     @app.exception_handler(exp.ValidationError)
-    async def validation_error_handler(request: Request, exc: exp.ValidationError) -> JsonResponse
+    async def validation_error_handler(request: Request, exc: exp.ValidationError) -> JsonResponse:
         """Handle validation errors with 400 Bad Request status."""
+        logger.warning(f"Validation error: {exc.message}")
         error_response = BaseResponse(error_messages=[exc.message])
         return JsonResponse(
             content=error_response,
@@ -71,8 +76,9 @@ def setup_exception_handlers(app: FastAPI) -> None:
         )
     
     @app.exception_handler(exp.AuthenticationError)
-    async def authentication_error_handler(request: Request, exc: exp.AuthenticationError) -> JsonResponse
+    async def authentication_error_handler(request: Request, exc: exp.AuthenticationError) -> JsonResponse:
         """Handle authentication errors with 401 Unauthorized status."""
+        logger.warning(f"Authentication error: {exc.message}")
         error_response = BaseResponse(error_messages=[exc.message])
         return JsonResponse(
             content=error_response,
@@ -82,6 +88,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(exp.AutorizationError)
     async def authorization_error_handler(request: Request, exc: exp.AutorizationError) -> JsonResponse:
         """Handle authorization errors with 403 Forbidden status."""
+        logger.warning(f"Authorization error: {exc.message}")
         error_response = BaseResponse(error_messages=[exc.message])
         return JsonResponse(
             content=error_response,
@@ -91,6 +98,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(exp.NotFoundError)
     async def not_found_error_handler(request: Request, exc: exp.NotFoundError) -> JsonResponse:
         """Handle not found errors with 404 Not Found status."""
+        logger.info(f"Not found error: {exc.message}")
         error_response = BaseResponse(error_messages=[exc.message])
         return JsonResponse(
             content=error_response,
@@ -103,6 +111,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
         Catch-all handler for unexpected exceptions.
         Returns 500 Internal Server Error with error message.
         """
+        logger.error(f"Unexpected error: {str(exc)}", exc_info=True)
         error_response = BaseResponse(error_messages=[str(exc)])
         return JsonResponse(
             content=error_response,
