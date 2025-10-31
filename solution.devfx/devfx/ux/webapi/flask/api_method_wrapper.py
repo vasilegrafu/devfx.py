@@ -9,7 +9,12 @@ from devfx.json import JsonDeserializer
 from ..http_status_code import HttpStatusCode
 from ..base_response import BaseResponse
 
+
 def api_method_wrapper():
+    """
+    Flask wrapper that handles JSON serialization/deserialization and exception handling.
+    Automatically converts function parameters from request data and returns JSON responses.
+    """
     def _(fn):
         def __(**kwargs):
             output = __process_request(fn, **kwargs)   
